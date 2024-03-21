@@ -65,7 +65,9 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "Angular11JwtAuth:build"
+            "browserTarget": "Angular11JwtAuth:build",
+            "proxyConfig": "proxy.conf.json"
+
           },
           "configurations": {
             "production": {

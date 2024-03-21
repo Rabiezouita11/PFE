@@ -1,5 +1,9 @@
 package com.bezkoder.springjwt.models;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,6 +13,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Entity
+@Getter
+@Setter
+
 @Table(	name = "users", 
 		uniqueConstraints = { 
 			@UniqueConstraint(columnNames = "username"),
@@ -22,7 +29,9 @@ public class User {
 	@NotBlank
 	@Size(max = 20)
 	private String username;
-
+	private String fileName;
+	private String resetToken;
+	private LocalDateTime dateToken;
 	@NotBlank
 	@Size(max = 50)
 	@Email

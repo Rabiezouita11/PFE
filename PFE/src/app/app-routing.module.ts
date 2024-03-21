@@ -10,6 +10,8 @@ import { BoardModeratorComponent } from './board-moderator/board-moderator.compo
 import { BoardAdminComponent } from './board-admin/board-admin.component';
 import { MenuloginComponent } from './menulogin/menulogin.component';
 import { MenuadminComponent } from './admin/menuadmin/menuadmin.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { ForgetPasswordComponent } from './forget-password/forget-password.component';
 
 const routes: Routes = [
   { path: '', component: MenuloginComponent , 
@@ -20,7 +22,10 @@ children: [
   { path: 'user', component: BoardUserComponent },
   { path: 'mod', component: BoardModeratorComponent },
   { path: 'admin', component: BoardAdminComponent },
+  {path: 'resetpwd', component: ResetPasswordComponent},
+{path: 'forgetpwd', component: ForgetPasswordComponent},
 ]},
+
 { path: 'menu', component: MenuadminComponent , 
 children: [
   { path: 'login', component: LoginComponent },
