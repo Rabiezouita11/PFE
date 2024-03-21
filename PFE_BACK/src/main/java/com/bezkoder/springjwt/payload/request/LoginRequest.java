@@ -1,27 +1,23 @@
 package com.bezkoder.springjwt.payload.request;
 
-import javax.validation.constraints.NotBlank;
+import lombok.Getter;
+import lombok.Setter;
 
+import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
+@Getter
+@Setter
 public class LoginRequest {
+	@Setter
+	@Getter
 	@NotBlank
 	private String username;
 
+	@Getter
 	@NotBlank
 	private String password;
+	private String fileName;
+	private String resetToken;
+	private LocalDateTime dateToken;
 
-	public String getUsername() {
-		return username;
-	}
-
-	public void setUsername(String username) {
-		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
 }

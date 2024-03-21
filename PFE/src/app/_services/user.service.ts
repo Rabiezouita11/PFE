@@ -34,12 +34,12 @@ export class UserService {
 
   resetPassword(token : string, pwd : string) {
   
-    return this.http.get(`${AUTH_API}/rest/${token}/${pwd}`);
+    return this.http.get(`http://localhost:8080/api/auth/users/rest/${token}/${pwd}`);
    }  
 
-   forgetPassword(email :string,pwd :string) {
+   forgetPassword(email :string) {
  
-    return this.http.get(`http://localhost:8080/api/auth/users/verif/${email}/${pwd}`);
+    return this.http.get(`http://localhost:8080/api/auth/users/verif/${email}`);
    } 
    getAll(): Observable<any> {
     return this.http.get(`${this.baseUrl}`);

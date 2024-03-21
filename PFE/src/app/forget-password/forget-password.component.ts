@@ -12,7 +12,9 @@ export class ForgetPasswordComponent implements OnInit {
 
   form!: FormGroup;
   submitted = false;
-
+  successMessage: string | null = null; // Initialize successMessage as null
+  errorMessage: string | null = null; // Initialize errorMessage as null
+  
   constructor(public service: UserService, private fb: FormBuilder, private router: Router) { }
 
   ngOnInit() {
@@ -23,8 +25,8 @@ export class ForgetPasswordComponent implements OnInit {
 
   initForm() {
     this.form = this.fb.group({
-      email: ['', [Validators.required, Validators.minLength(8)]],
-      password: ['', Validators.required]
+      email: ['', [Validators.required,, Validators.email, Validators.minLength(8)]],
+     
     });
   }
 
@@ -39,12 +41,19 @@ export class ForgetPasswordComponent implements OnInit {
     if (this.form.invalid) {
       return;
     }
-
-    this.service.forgetPassword(this.form.value.email, this.form.value.password)
-      .subscribe(data => {
-        this.service.getAll().subscribe(response => { this.service.list = response; });
-        this.router.navigate(['/users']);
-      });
+    this.successMessage = '';
+    this.errorMessage = '';
+    this.service.forgetPassword(this.form.value.email)
+    .subscribe(
+      (response:any) => {
+        
+          this.successMessage = response.message;
+    
+      },
+      (error) => {
+        this.errorMessage = error.error.message;
+      }
+    );
   }
 
   login() {

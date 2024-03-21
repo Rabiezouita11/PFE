@@ -133,16 +133,17 @@ public class AuthController {
 	}
 
 
-    @GetMapping("/users/verif/{email}/{pwd}")
-    public ResponseEntity<String> findUserByEmail(@PathVariable String email, @PathVariable String pwd, HttpServletRequest request) {
+    @GetMapping("/users/verif/{email}")
+    public ResponseEntity<MessageResponse> findUserByEmail(@PathVariable String email, HttpServletRequest request) {
         Optional<User> user = userService.findUserByEmail(email);
         String appUrl = request.getScheme() + "://" + request.getServerName() + ":4200";
         if (!user.isPresent()) {
             System.out.println("We didn't find an account for that e-mail address.");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("We didn't find an account for that e-mail address.");
-        } else {
+			return ResponseEntity.badRequest().body(new MessageResponse("We didn't find an account for that e-mail address"));
+
+		} else {
             User userr = user.get();
-            if (passwordEncoder.matches(pwd, userr.getPassword())) {
+
                 userr.setDateToken(LocalDateTime.now());
                 userr.setResetToken(UUID.randomUUID().toString());
                 userService.save(userr);
@@ -154,36 +155,41 @@ public class AuthController {
                         + "/resetpwd?token=" + userr.getResetToken());
                 System.out.println(userr.getResetToken());
                 userService.sendEmail(simpleMailMessage);
-                return ResponseEntity.status(HttpStatus.OK).body("1");
-            } else {
-                System.out.println("Mot de Passe Incorrecte");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Mot de Passe Incorrecte");
-            }
+                return ResponseEntity.ok(new MessageResponse("Password reset link has been sent to your email address"));
+
         }
     }
-	@GetMapping("/users/rest/{resetToken}/{password}")
-	public String findUserByResetToken (@PathVariable String resetToken,@PathVariable String password) {
-		System.out.println("Get  User By resetToken..");
+    @GetMapping("/users/rest/{resetToken}/{password}")
+    public ResponseEntity<MessageResponse> findUserByResetToken(@PathVariable String resetToken, @PathVariable String password) {
+        System.out.println(password);
 
-		Optional<User> user = userService.findUserByResetToken(resetToken);
-		if (!user.isPresent()) {
-			System.out.println( "We didn't find an account for that Token");
-			return "0";
+        Optional<User> user = userService.findUserByResetToken(resetToken);
+        if (!user.isPresent()) {
+            System.out.println("We didn't find an account for that Token");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new MessageResponse("We didn't find an account for that Token"));
+
+
 		} else {
-			User userr = user.get();
-			LocalDateTime tokenCreationDate = userr.getDateToken();
+            User userr = user.get();
+            LocalDateTime tokenCreationDate = userr.getDateToken();
 
-			if (isTokenExpired(tokenCreationDate)) {
-				System.out.println("Token expired.");
-				return "1";
+            if (isTokenExpired(tokenCreationDate)) {
+                System.out.println("Token expired.");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponse("Token expired"));
+
 			}
-			userr.setPassword(password.trim());
-			userr.setResetToken(null);
-			userr.setDateToken(null);
-			userService.save(userr);
-			return "2";
+            String encodedPassword = passwordEncoder.encode(password);
+
+
+            userr.setPassword(encodedPassword);
+            userr.setResetToken(null);
+            userr.setDateToken(null);
+            userService.save(userr);
+
+			return ResponseEntity.status(HttpStatus.OK).body(new MessageResponse("Password reset successful"));
+
 		}
-	}
+    }
 
 
 
