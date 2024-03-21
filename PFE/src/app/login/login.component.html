@@ -64,7 +64,7 @@
       </div>
     </div>
   </form>
-  <a class="forgot-password" routerLink="/forgetpwd">Forgot Password?</a>
+  <a *ngIf="!isLoggedIn" class="forgot-password" routerLink="/forgetpwd">Forgot Password?</a>
 
   <div class="alert alert-success" *ngIf="isLoggedIn">
     Logged in as {{ roles }}.
