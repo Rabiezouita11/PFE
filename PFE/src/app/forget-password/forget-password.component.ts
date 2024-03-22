@@ -32,7 +32,7 @@ export class ForgetPasswordComponent implements OnInit {
 
   onReset() {
     this.submitted = false;
-    this.router.navigate(['/users']);
+   
   }
 
   onSubmit() {
@@ -43,15 +43,19 @@ export class ForgetPasswordComponent implements OnInit {
     }
     this.successMessage = '';
     this.errorMessage = '';
+    
     this.service.forgetPassword(this.form.value.email)
     .subscribe(
       (response:any) => {
         
           this.successMessage = response.message;
-    
+          this.form.get('email')?.reset();
+          this.submitted = false;
+
       },
       (error) => {
         this.errorMessage = error.error.message;
+        
       }
     );
   }
