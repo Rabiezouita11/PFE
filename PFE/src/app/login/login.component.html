@@ -1,10 +1,17 @@
 <div class="card card-container">
-  <img  *ngIf="!isLoggedIn"
+  <img  *ngIf="!isLoggedIn "
     id="profile-img"
     src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
     class="profile-img-card"
   />
-  <img *ngIf="isLoggedIn"
+  <img  *ngIf="!fileName "
+  id="profile-img"
+  src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
+  class="profile-img-card"
+/>
+
+
+  <img *ngIf="isLoggedIn &&fileName "
     id="profile-img"
     [src]="getImageUrl()"
     class="profile-img-card"
