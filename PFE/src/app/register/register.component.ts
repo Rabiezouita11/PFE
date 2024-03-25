@@ -10,7 +10,8 @@ export class RegisterComponent implements OnInit {
   form: any = {
     username: null,
     email: null,
-    password: null
+    password: null,
+    image: null // Add image property
   };
   isSuccessful = false;
   isSignUpFailed = false;
@@ -22,9 +23,9 @@ export class RegisterComponent implements OnInit {
   }
 
   onSubmit(): void {
-    const { username, email, password } = this.form;
+    const { username, email, password, image } = this.form;
 
-    this.authService.register(username, email, password).subscribe(
+    this.authService.register(username, email, password, image).subscribe(
       data => {
         console.log(data);
         this.isSuccessful = true;
@@ -35,5 +36,9 @@ export class RegisterComponent implements OnInit {
         this.isSignUpFailed = true;
       }
     );
+  }
+  onFileChange(event: any): void {
+    const file = event.target.files[0];
+    this.form.image = file;
   }
 }

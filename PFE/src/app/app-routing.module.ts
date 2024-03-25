@@ -12,6 +12,7 @@ import { MenuloginComponent } from './menulogin/menulogin.component';
 import { MenuadminComponent } from './admin/menuadmin/menuadmin.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { ForgetPasswordComponent } from './forget-password/forget-password.component';
+import { BadgeComponent } from './badge/badge.component';
 
 const routes: Routes = [
   { path: '', component: MenuloginComponent , 
@@ -24,6 +25,8 @@ children: [
   { path: 'admin', component: BoardAdminComponent },
   {path: 'resetpwd', component: ResetPasswordComponent},
 {path: 'forgetpwd', component: ForgetPasswordComponent},
+{ path: 'badge', component: BadgeComponent },
+
 ]},
 
 { path: 'menu', component: MenuadminComponent , 
@@ -34,6 +37,7 @@ children: [
   { path: 'user', component: BoardUserComponent },
   { path: 'mod', component: BoardModeratorComponent },
   { path: 'admin', component: BoardAdminComponent },
+
 ]},];
 
 @NgModule({

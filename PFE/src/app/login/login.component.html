@@ -1,7 +1,12 @@
 <div class="card card-container">
-  <img
+  <img  *ngIf="!isLoggedIn"
     id="profile-img"
     src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
+    class="profile-img-card"
+  />
+  <img *ngIf="isLoggedIn"
+    id="profile-img"
+    [src]="getImageUrl()"
     class="profile-img-card"
   />
   <form
@@ -68,5 +73,6 @@
 
   <div class="alert alert-success" *ngIf="isLoggedIn">
     Logged in as {{ roles }}.
+  
   </div>
 </div>

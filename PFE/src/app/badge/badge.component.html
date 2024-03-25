@@ -1,0 +1,9 @@
+<div class="badge-container" [ngClass]="{'print': isPrinting}">
+    <div class="badge">
+       <p>{{ userId }}</p>
+      <h2>{{ username }}</h2>
+      <p>{{ email }}</p>
+      <img [src]="getImageUrl()" alt="Badge Image">
+      <button class="print-button form-control" (click)="print()">Print Badge</button>
+    </div>
+</div>

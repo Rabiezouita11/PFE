@@ -2,6 +2,7 @@ package com.bezkoder.springjwt.models;
 
 import lombok.Getter;
 import lombok.Setter;
+import java.sql.Blob;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -26,18 +27,17 @@ public class User {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@NotBlank
 	@Size(max = 20)
 	private String username;
 	private String fileName;
 	private String resetToken;
 	private LocalDateTime dateToken;
-	@NotBlank
+
 	@Size(max = 50)
 	@Email
 	private String email;
-
-	@NotBlank
+    @Column(length = 64)
+	private String photos;
 	@Size(max = 120)
 	private String password;
 

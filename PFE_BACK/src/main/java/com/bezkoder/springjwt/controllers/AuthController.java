@@ -1,5 +1,9 @@
 package com.bezkoder.springjwt.controllers;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -9,8 +13,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import com.bezkoder.springjwt.security.services.UserService;
+import com.bezkoder.springjwt.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +25,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import com.bezkoder.springjwt.models.ERole;
@@ -31,7 +39,9 @@ import com.bezkoder.springjwt.repository.RoleRepository;
 import com.bezkoder.springjwt.repository.UserRepository;
 import com.bezkoder.springjwt.security.jwt.JwtUtils;
 import com.bezkoder.springjwt.security.services.UserDetailsImpl;
+import java.io.File;import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
@@ -72,13 +82,44 @@ public class AuthController {
 
 		return ResponseEntity.ok(new JwtResponse(jwt, 
 												 userDetails.getId(), 
-												 userDetails.getUsername(), 
+												 userDetails.getUsername(),
+												 userDetails.getPhotos(),
 												 userDetails.getEmail(), 
 												 roles));
 	}
+	@GetMapping("/images/{userId}/{fileName}")
+	public ResponseEntity<byte[]> getImage(@PathVariable Long userId, @PathVariable String fileName) throws IOException {
+
+		Optional<User> userOptional = userRepository.findById(userId);
+		if (userOptional.isEmpty()) {
+			String errorMessage = "User not found with ID: " + userId;
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage.getBytes());
+		}
+		// Construct the path to the image file
+		String filePath = "user-photos/" + userId + "/" + fileName;
+		Path path = Paths.get(filePath);
+
+		if (!Files.exists(path)) {
+			String errorMessage = "Image not found for user ID: " + userId + " and file name: " + fileName;
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessage.getBytes());
+		}
+
+		// Read the image file as bytes
+		byte[] imageData = Files.readAllBytes(path);
+
+		// Set content type header
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.IMAGE_JPEG); // Adjust content type as needed
+
+		// Serve the image data as a response
+		return ResponseEntity.ok().headers(headers).body(imageData);
+	}
+
+
 
 	@PostMapping("/signup")
-	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+	public ResponseEntity<?> registerUser(@Valid SignupRequest signUpRequest, @RequestParam("image") MultipartFile multipartFile) throws IOException {
+
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			return ResponseEntity
 					.badRequest()
@@ -91,12 +132,15 @@ public class AuthController {
 					.body(new MessageResponse("Error: Email is already in use!"));
 		}
 
-		// Create new user's account
-		User user = new User(signUpRequest.getUsername(), 
-							 signUpRequest.getEmail(),
-							 encoder.encode(signUpRequest.getPassword()));
+		// Set the user's password using encoder
+		User user = new User(signUpRequest.getUsername(),
+				signUpRequest.getEmail(),
+				encoder.encode(signUpRequest.getPassword()));
 
+		// Set user's roles
 		Set<String> strRoles = signUpRequest.getRole();
+		System.out.println(strRoles);
+
 		Set<Role> roles = new HashSet<>();
 
 		if (strRoles == null) {
@@ -106,31 +150,44 @@ public class AuthController {
 		} else {
 			strRoles.forEach(role -> {
 				switch (role) {
-				case "admin":
-					Role adminRole = roleRepository.findByName(ERole.ROLE_GESTIONNAIRE)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-					roles.add(adminRole);
-
-					break;
-				case "mod":
-					Role modRole = roleRepository.findByName(ERole.ROLE_MANAGER)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-					roles.add(modRole);
-
-					break;
-				default:
-					Role userRole = roleRepository.findByName(ERole.ROLE_COLLABORATEUR)
-							.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-					roles.add(userRole);
+					case "admin":
+						Role adminRole = roleRepository.findByName(ERole.ROLE_GESTIONNAIRE)
+								.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+						roles.add(adminRole);
+						break;
+					case "mod":
+						Role modRole = roleRepository.findByName(ERole.ROLE_MANAGER)
+								.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+						roles.add(modRole);
+						break;
+					default:
+						Role userRole = roleRepository.findByName(ERole.ROLE_COLLABORATEUR)
+								.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+						roles.add(userRole);
+						break;
 				}
 			});
+
+
 		}
 
+
 		user.setRoles(roles);
-		userRepository.save(user);
+		System.out.println(user.getRoles());
+
+		String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+		user.setPhotos(fileName);
+		// Save user to database
+		User savedUser = userRepository.save(user);
+
+		// Save image file
+
+		String uploadDir = "user-photos/" + savedUser.getId();
+		FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
 
 		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 	}
+
 
 
     @GetMapping("/users/verif/{email}")

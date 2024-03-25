@@ -18,6 +18,7 @@ import { MenuloginComponent } from './menulogin/menulogin.component';
 import { MenuadminComponent } from './admin/menuadmin/menuadmin.component';
 import { ForgetPasswordComponent } from './forget-password/forget-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { BadgeComponent } from './badge/badge.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,8 @@ import { ResetPasswordComponent } from './reset-password/reset-password.componen
     MenuloginComponent,
     MenuadminComponent,
     ForgetPasswordComponent,
-    ResetPasswordComponent
+    ResetPasswordComponent,
+    BadgeComponent
   ],
   imports: [
     BrowserModule,
