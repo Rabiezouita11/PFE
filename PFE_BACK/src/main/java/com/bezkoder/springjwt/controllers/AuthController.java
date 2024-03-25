@@ -118,7 +118,7 @@ public class AuthController {
 
 
 	@PostMapping("/signup")
-	public ResponseEntity<?> registerUser(@Valid SignupRequest signUpRequest, @RequestParam("image") MultipartFile multipartFile) throws IOException {
+	public ResponseEntity<?> registerUser(@Valid SignupRequest signUpRequest, @RequestParam(value = "image", required = false) MultipartFile multipartFile) throws IOException {
 
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			return ResponseEntity
@@ -167,23 +167,26 @@ public class AuthController {
 						break;
 				}
 			});
-
-
 		}
-
 
 		user.setRoles(roles);
 		System.out.println(user.getRoles());
 
-		String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
-		user.setPhotos(fileName);
+		// Check if multipartFile is not null before accessing it
+		String fileName = null;
+		if (multipartFile != null) {
+			fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+			user.setPhotos(fileName);
+		}
+
 		// Save user to database
 		User savedUser = userRepository.save(user);
 
-		// Save image file
-
-		String uploadDir = "user-photos/" + savedUser.getId();
-		FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+		// Save image file if multipartFile is not null
+		if (multipartFile != null) {
+			String uploadDir = "user-photos/" + savedUser.getId();
+			FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+		}
 
 		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
 	}
