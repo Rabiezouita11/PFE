@@ -19,6 +19,8 @@ import { MenuadminComponent } from './admin/menuadmin/menuadmin.component';
 import { ForgetPasswordComponent } from './forget-password/forget-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { BadgeComponent } from './badge/badge.component';
+import { AdminModule } from './admin/admin.module';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
 @NgModule({
   declarations: [
@@ -34,13 +36,15 @@ import { BadgeComponent } from './badge/badge.component';
     MenuadminComponent,
     ForgetPasswordComponent,
     ResetPasswordComponent,
-    BadgeComponent
+    BadgeComponent,
+    PageNotFoundComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     FormsModule,
-    
+    AdminModule,
+
     HttpClientModule,
     ReactiveFormsModule
 

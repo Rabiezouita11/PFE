@@ -1,9 +1,9 @@
 package com.bezkoder.springjwt.util;
 
 import java.io.*;
-import java.nio.file.*;
+        import java.nio.file.*;
 
-import org.springframework.web.multipart.MultipartFile;
+        import org.springframework.web.multipart.MultipartFile;
 public class FileUploadUtil {
 
     public static void saveFile(String uploadDir, String fileName,
