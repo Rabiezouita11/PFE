@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { ScriptStyleLoaderService } from 'src/app/Service/ScriptStyleLoaderService/script-style-loader-service.service';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 
@@ -13,8 +14,10 @@ export class HomeComponent implements OnInit {
   userId!: number; // Add userId property to store the user's ID
   image!: string; // Add image property to store the image URL
   username: any;
+  dropdownOpen: boolean = false;
+  elementRef: any;
 
-  constructor(private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
+  constructor(private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
     this.loadScriptsAndStyles();
@@ -34,17 +37,18 @@ export class HomeComponent implements OnInit {
   loadScriptsAndStyles(): void {
     const SCRIPT_PATH_LIST = [
       'assets/frontoffice/vendors/js/vendor.bundle.base.js',
-      ' asets/frontoffice/vendors/chart.js/Chart.min.js',
-      ' assets/frontoffice/vendors/datatables.net/jquery.dataTables.js',
-      ' assets/frontoffice/vendors/datatables.net-bs4/dataTables.bootstrap4.js',
-      ' assets/frontoffice/js/dataTables.select.min.js',
-      ' assets/frontoffice/js/off-canvas.js',
-      ' assets/frontoffice/js/hoverable-collapse.js',
-      ' assets/frontoffice/js/template.js',
-      ' assets/frontoffice/js/settings.js',
-      ' assets/frontoffice/js/todolist.js',
-      ' assets/frontoffice/js/dashboard.js',
-      ' assets/frontoffice/js/Chart.roundedBarCharts.js',
+      'assets/frontoffice/vendors/chart.js/Chart.min.js',
+      'assets/frontoffice/vendors/datatables.net/jquery.dataTables.js',
+      'assets/frontoffice/vendors/datatables.net-bs4/dataTables.bootstrap4.js',
+      'assets/frontoffice/js/dataTables.select.min.js',
+      'assets/frontoffice/js/off-canvas.js',
+      'assets/frontoffice/js/hoverable-collapse.js',
+      'assets/frontoffice/js/template.js',
+      'assets/frontoffice/js/settings.js',
+      'assets/frontoffice/js/todolist.js',
+      'assets/frontoffice/js/dashboard.js',
+      'assets/frontoffice/js/Chart.roundedBarCharts.js',
+      'https://code.jquery.com/jquery-3.6.0.min.js'
     ];
     const STYLE_PATH_LIST = [
       'assets/frontoffice/vendors/feather/feather.css',
@@ -54,16 +58,31 @@ export class HomeComponent implements OnInit {
       'assets/frontoffice/vendors/ti-icons/css/themify-icons.css',
       'assets/frontoffice/js/select.dataTables.min.css',
       'assets/frontoffice/css/vertical-layout-light/style.css',
-      'assets/frontoffice/assets/frontoffice/images/favicon.png'
+      'assets/frontoffice/images/favicon.png'
     ];
     this.scriptStyleLoaderService.loadScripts(SCRIPT_PATH_LIST),
       this.scriptStyleLoaderService.loadStyles(STYLE_PATH_LIST)
     // Show the loader
 
   }
+  toggleDropdown(event: Event): void {
+    event.stopPropagation(); // Prevent the click event from propagating to the document
+  
+    this.dropdownOpen = !this.dropdownOpen;
+  }
+  
+  @HostListener('document:click', ['$event'])
+  handleClickOutside(event: Event): void {
+    // Close the dropdown when clicking outside of it
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+      this.dropdownOpen = false;
+    }
+  }
 
-
-
+  logout(): void {
+    this.tokenStorage.signOut(); // Clear token storage
+    this.router.navigate(['/login']); // Redirect to login page
+  }
 
 
 
