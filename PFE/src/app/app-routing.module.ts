@@ -16,6 +16,7 @@ import {BadgeComponent} from './badge/badge.component';
 import {AuthGuard} from './auth.guard';
 import {ComponentComponent} from './admin/component/component.component';
 import {PageNotFoundComponent} from './page-not-found/page-not-found.component';
+import { CollaborateurGuard } from './guard/collaborateur.guard';
 
 const routes: Routes = [
 
@@ -25,6 +26,13 @@ const routes: Routes = [
         component: ComponentComponent,
         loadChildren: () => import ('./admin/admin.module').then((m) => m.AdminModule),
         canActivate: [AuthGuard] // Apply AuthGuard to this route
+    },
+
+    
+    {
+        path: 'collaborateur',
+        loadChildren: () => import ('./collaborateur/collaborateur.module').then((m) => m.CollaborateurModule),
+        canActivate: [CollaborateurGuard] // Apply AuthGuard to this route
     },
     {
         path: 'login',

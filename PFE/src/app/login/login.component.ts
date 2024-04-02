@@ -21,7 +21,7 @@ export class LoginComponent implements OnInit {
   userId!: number; // Add userId property to store the user's ID
   image!: string; // Add image property to store the image URL
 
-  constructor( private router: Router,private authService: AuthService, private tokenStorage: TokenStorageService) { }
+  constructor(private router: Router, private authService: AuthService, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
     if (this.tokenStorage.getToken()) {
@@ -45,11 +45,25 @@ export class LoginComponent implements OnInit {
         this.tokenStorage.saveToken(data.accessToken);
         this.tokenStorage.saveUser(data);
 
-       
-        this.roles = this.tokenStorage.getUser().roles;
-   
-        this.router.navigate(['/dashboard']);
+        const userRoles = this.tokenStorage.getUser().roles;
 
+        // Check if ROLE_MANAGER exists in user roles
+        const isManager = userRoles.includes('ROLE_MANAGER');
+
+        // Check if ROLE_COLLABORATEUR exists in user roles
+        const isCollaborateur = userRoles.includes('ROLE_COLLABORATEUR');
+
+        if (isManager) {
+          // If user is a manager, navigate to dashboard
+          this.router.navigate(['/dashboard']);
+        } else if (isCollaborateur) {
+          // If user is a collaborateur, navigate to collaborateur/dashboard
+          this.router.navigate(['/collaborateur/dashboard']);
+        } else {
+          // If user is neither manager nor collaborateur, handle accordingly
+          // For example, redirect to a different page or display a message
+          console.log("User is not a manager or collaborateur");
+        }
       },
       err => {
         console.log(err)
