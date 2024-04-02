@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { TokenStorageService } from 'src/app/_services/token-storage.service';
 
 @Component({
   selector: 'app-header',
@@ -10,12 +11,20 @@ import { Router } from '@angular/router';
 export class HeaderComponent implements OnInit {
   authenticated = false;
   listCommande : any =   []   
-  constructor(private http:HttpClient, private router:Router ) { }
+  constructor(private tokenStorage: TokenStorageService,private http:HttpClient, private router:Router ) { }
 
   ngOnInit(): void {
    
    
   }
+
+  logout(): void {
+    this.tokenStorage.signOut(); // Clear token storage
+    this.router.navigate(['/login']); // Redirect to login page
+  }
+
+
+
 //   logout(): void {
 
 //     Swal.fire({

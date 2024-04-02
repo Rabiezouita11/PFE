@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../_services/auth.service';
 import { TokenStorageService } from '../_services/token-storage.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +21,7 @@ export class LoginComponent implements OnInit {
   userId!: number; // Add userId property to store the user's ID
   image!: string; // Add image property to store the image URL
 
-  constructor(private authService: AuthService, private tokenStorage: TokenStorageService) { }
+  constructor( private router: Router,private authService: AuthService, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
     if (this.tokenStorage.getToken()) {
@@ -44,12 +45,14 @@ export class LoginComponent implements OnInit {
         this.tokenStorage.saveToken(data.accessToken);
         this.tokenStorage.saveUser(data);
 
-        this.isLoginFailed = false;
-        this.isLoggedIn = true;
+       
         this.roles = this.tokenStorage.getUser().roles;
-        this.reloadPage();
+   
+        this.router.navigate(['/dashboard']);
+
       },
       err => {
+        console.log(err)
         this.errorMessage = err.error.message;
         this.isLoginFailed = true;
       }

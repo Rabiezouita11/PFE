@@ -23,7 +23,8 @@ const routes: Routes = [
     {
         path: '',
         component: ComponentComponent,
-        loadChildren: () => import ('./admin/admin.module').then((m) => m.AdminModule)
+        loadChildren: () => import ('./admin/admin.module').then((m) => m.AdminModule),
+        canActivate: [AuthGuard] // Apply AuthGuard to this route
     },
     {
         path: 'login',
@@ -45,30 +46,30 @@ const routes: Routes = [
     },
 
 
-    // { path: '', component: MenuloginComponent ,
-    // children: [
-    // { path: 'login', component: LoginComponent },
-    // { path: 'register', component: RegisterComponent },
-    // { path: 'profile', component: ProfileComponent },
-    // { path: 'user', component: BoardUserComponent },
-    // { path: 'mod', component: BoardModeratorComponent },
-    // // { path: 'admin', component: BoardAdminComponent },
-    // {path: 'resetpwd', component: ResetPasswordComponent},
-    // {path: 'forgetpwd', component: ForgetPasswordComponent},
-    // { path: 'badge', component: BadgeComponent, canActivate: [AuthGuard] }, // Protected route
-
-    // ]},
-
-    // { path: 'menu', component: MenuadminComponent ,
-    // children: [
-    // { path: 'login', component: LoginComponent },
-    // { path: 'register', component: RegisterComponent },
-    // { path: 'profile', component: ProfileComponent },
-    // { path: 'user', component: BoardUserComponent },
-    // { path: 'mod', component: BoardModeratorComponent },
+    { path: '', component: MenuloginComponent ,
+    children: [
+    { path: 'login', component: LoginComponent },
+    { path: 'register', component: RegisterComponent },
+    { path: 'profile', component: ProfileComponent },
+    { path: 'user', component: BoardUserComponent },
+    { path: 'mod', component: BoardModeratorComponent },
     // { path: 'admin', component: BoardAdminComponent },
+    {path: 'resetpwd', component: ResetPasswordComponent},
+    {path: 'forgetpwd', component: ForgetPasswordComponent},
+    { path: 'badge', component: BadgeComponent, canActivate: [AuthGuard] }, // Protected route
 
-    // ]},
+    ]},
+
+    { path: 'menu', component: MenuadminComponent ,
+    children: [
+    { path: 'login', component: LoginComponent },
+    { path: 'register', component: RegisterComponent },
+    { path: 'profile', component: ProfileComponent },
+    { path: 'user', component: BoardUserComponent },
+    { path: 'mod', component: BoardModeratorComponent },
+    { path: 'admin', component: BoardAdminComponent },
+
+    ]},
 ];
 
 @NgModule({
