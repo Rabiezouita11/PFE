@@ -4,12 +4,11 @@ import { ScriptStyleLoaderService } from 'src/app/Service/ScriptStyleLoaderServi
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css'],
-  
+  selector: 'app-badge',
+  templateUrl: './badge.component.html',
+  styleUrls: ['./badge.component.css']
 })
-export class HomeComponent implements OnInit {
+export class BadgeComponent implements OnInit {
   roles: string[] = [];
   fileName!: string; // Add fileName property to store the image file name
   userId!: number; // Add userId property to store the user's ID
@@ -101,7 +100,4 @@ export class HomeComponent implements OnInit {
 
 
 
-
-  }
-  
-
+}

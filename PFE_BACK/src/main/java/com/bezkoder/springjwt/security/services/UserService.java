@@ -43,4 +43,8 @@ public class UserService {
         System.out.println("Get all Users 11111...");
         return repository.findAll(Sort.by("username").ascending());
     }
+    public User getUserById(Long userId) {
+        Optional<User> userOptional = repository.findById(userId);
+        return userOptional.orElse(null);
+    }
 }
