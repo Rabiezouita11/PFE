@@ -11,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 
 @RestController
@@ -64,5 +67,34 @@ public class BadgeController {
         }
     }
 
+    @GetMapping("/")
+    public ResponseEntity<?> getAllBadges(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ROLE_MANAGER"))) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
+        }
+        try {
+            List<Badge> badges = badgeRepository.findAll();
+            return ResponseEntity.ok().body(badges);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving badges");
+        }
+    }
+    @PutMapping("/accept/{badgeId}")
+    public ResponseEntity<?> acceptBadge(@PathVariable Long badgeId, @AuthenticationPrincipal UserDetails userDetails) {
+        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_MANAGER"))) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
+        }
+        badgeService.acceptBadge(badgeId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/refuse/{badgeId}")
+    public ResponseEntity<?> refuseBadge(@PathVariable Long badgeId, @AuthenticationPrincipal UserDetails userDetails) {
+        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_MANAGER"))) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
+        }
+        badgeService.refuseBadge(badgeId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 }

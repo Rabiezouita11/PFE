@@ -53,6 +53,8 @@ export class BadgeComponent implements OnInit {
     const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage
     if (!authToken) {
       console.error('Authorization token not found');
+      Swal.fire('Error!', 'Authorization token not found', 'error');
+
       return;
     }
 

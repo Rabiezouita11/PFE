@@ -1,7 +1,7 @@
 import { Component, OnInit, Renderer2 } from '@angular/core';
 import { ScriptService } from 'src/app/Service/script/script.service';
 const SCRIPT_PATH_LIST =[
-  "../../../assets/admin/js/jquery-3.3.1.min.js",
+  "assets/admin/js/jquery-3.3.1.min.js",
 
 
   "assets/admin/js/bootstrap.bundle.min.js",

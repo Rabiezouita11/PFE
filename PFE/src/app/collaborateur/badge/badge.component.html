@@ -437,15 +437,26 @@
             </div>
           </div>
         </div>
-        <div *ngIf="showBadgeRequestPending">
-          <p>Votre demande est en cours.</p>
+        <div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <div *ngIf="showBadgeRequestPending" class="alert alert-info" role="alert">
+            <p>Votre demande est en cours.</p>
+          </div>
+          <div *ngIf="showBadgeRequestAccepter" class="alert alert-success" role="alert">
+            <p>Votre demande a été acceptée.</p>
+          </div>
+          <div *ngIf="showBadgeRequestRefuse" class="alert alert-danger" role="alert">
+            <p>Votre demande a été refusée.</p>
+          </div>
         </div>
-        <div *ngIf="showBadgeRequestAccepter">
-          <p>Votre demande est Accepter .</p>
-        </div>
-        <div *ngIf="showBadgeRequestRefuse">
-          <p>Votre demande est refuser .</p>
-        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
         
 
 

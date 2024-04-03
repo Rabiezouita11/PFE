@@ -55,7 +55,9 @@ export class LoginComponent implements OnInit {
 
         if (isManager) {
           // If user is a manager, navigate to dashboard
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/dashboard']).then(() => {
+            window.location.reload();
+          });
         } else if (isCollaborateur) {
           // If user is a collaborateur, navigate to collaborateur/dashboard
           this.router.navigate(['/collaborateur/dashboard']);
@@ -64,6 +66,7 @@ export class LoginComponent implements OnInit {
           // For example, redirect to a different page or display a message
           console.log("User is not a manager or collaborateur");
         }
+        
       },
       err => {
         console.log(err)
