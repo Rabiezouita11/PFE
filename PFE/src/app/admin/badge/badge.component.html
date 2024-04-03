@@ -112,7 +112,10 @@
                 </tbody>
               </table>
   
-              
+              <div  *ngIf="badges?.length==0" class="text-center" >
+                <h3  style="text-align:center ; color: red;">no data </h3>
+  
+              </div>
             </div>
           </div>
         </div>
