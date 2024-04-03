@@ -21,6 +21,7 @@ import { ResetPasswordComponent } from './reset-password/reset-password.componen
 import { BadgeComponent } from './badge/badge.component';
 import { AdminModule } from './admin/admin.module';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { CollaborateurModule } from './collaborateur/collaborateur.module';
 
 @NgModule({
   declarations: [
@@ -44,7 +45,7 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
     AppRoutingModule,
     FormsModule,
     AdminModule,
-
+    CollaborateurModule,
     HttpClientModule,
     ReactiveFormsModule
 

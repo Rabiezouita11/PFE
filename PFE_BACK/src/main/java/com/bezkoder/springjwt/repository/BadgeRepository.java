@@ -7,4 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 
 public interface BadgeRepository extends JpaRepository<Badge, Long> {
+    Badge findByUserIdAndStatus(Long userId, String status);
+    Badge findByUserId(Long userId);
+
 }

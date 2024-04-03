@@ -1,7 +1,10 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Badge } from 'src/app/Models/badge';
+import { BadgeService } from 'src/app/Service/BadgeService/BadgeService/badge-service.service';
 import { ScriptStyleLoaderService } from 'src/app/Service/ScriptStyleLoaderService/script-style-loader-service.service';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-badge',
@@ -18,7 +21,15 @@ export class BadgeComponent implements OnInit {
   elementRef: any;
   isUICollapsed: boolean = false;
 
-  constructor(private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
+  matricule!: string;
+  createdBadge!: Badge;
+  Newusername: any;
+  Newmatricule: any;
+  showBadgeForm: boolean = false;
+  showBadgeRequestPending: boolean = false; // Declare the property here
+  showBadgeRequestAccepter: boolean= false;
+  showBadgeRequestRefuse: boolean= false;;
+  constructor(private badgeService: BadgeService, private router: Router, private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
     this.loadScriptsAndStyles();
@@ -30,7 +41,82 @@ export class BadgeComponent implements OnInit {
       this.image = this.getImageUrl(); // Call getImageUrl() to construct the image URL
 
     }
+    this.checkBadgeStatus();
+
   }
+
+
+
+  createBadge() {
+
+
+    const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage
+    if (!authToken) {
+      console.error('Authorization token not found');
+      return;
+    }
+
+    const badgeRequest = {
+      username: this.Newusername,
+      matricule: this.Newmatricule
+    };
+
+    this.badgeService.createBadgeForUser(this.userId, badgeRequest, authToken)
+      .subscribe(
+        (data: Badge) => {
+          console.log('Badge created successfully:', data);
+          Swal.fire('Success!', 'Badge created successfully', 'success');
+          this.ngOnInit();
+          this.createdBadge = data;
+        },
+        (error) => {
+          console.error('Error creating badge:', error);
+          Swal.fire('Error!', 'Error creating badge', 'error');
+        }
+      );
+  }
+  checkBadgeStatus() {
+    const authToken = this.tokenStorage.getToken();
+    if (!authToken) {
+      console.error('Authorization token not found');
+      return;
+    }
+  
+    // Make API request to check badge status
+    this.badgeService.getBadgeStatus(this.userId, authToken)
+      .subscribe(
+        (response: any) => {
+          console.log(response);
+          if (response.status === 'accepter') {
+            // User has a badge with status "accepter", display form and button to print
+            this.showBadgeForm = true;
+            this.showBadgeRequestAccepter = true;
+
+          } else if( response.status === 'en cours'){
+            // User does not have a badge with status "accepter", display message indicating request is pending
+            this.showBadgeRequestPending = true;
+            this.showBadgeForm = true;
+
+          }else if ( response.status === 'refuser'){
+            this.showBadgeRequestRefuse = true;
+            this.showBadgeForm = true;
+
+
+          }else{
+            this.showBadgeForm = false;
+
+          }
+        },
+        (error) => {
+          console.error('Error checking badge status:', error);
+          // Handle error
+        }
+      );
+  }
+
+
+
+
   getImageUrl(): string {
     // Assuming your backend endpoint for retrieving images is '/api/images/'
     return `http://localhost:8080/api/auth/images/${this.userId}/${this.fileName}`;
@@ -68,10 +154,10 @@ export class BadgeComponent implements OnInit {
   }
   toggleDropdown(event: Event): void {
     event.stopPropagation(); // Prevent the click event from propagating to the document
-  
+
     this.dropdownOpen = !this.dropdownOpen;
   }
-  
+
   @HostListener('document:click', ['$event'])
   handleClickOutside(event: Event): void {
     // Close the dropdown when clicking outside of it
