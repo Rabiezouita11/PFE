@@ -414,56 +414,109 @@
             <div class="row">
               <div class="col-12 col-xl-8 mb-4 mb-xl-0">
                 <h3 class="font-weight-bold">Demande Badge</h3>
-             
-              </div>
 
+              </div>
+              <br>
+              <br>
               <div *ngIf="!showBadgeForm">
-
-              <h4>Create Badge for User</h4>
-              <div class="form-group">
-                <label for="userId">Username:</label>
-                <input type="text" id="userId" class="form-control" [(ngModel)]="Newusername" name="userId" #ctrl="ngModel">
+                <h4>Create Badge for User</h4>
+                <div class="form-group">
+                  <label for="userId">Username:</label>
+                  <input type="text" id="userId" class="form-control" [(ngModel)]="Newusername" name="userId"
+                    #usernameCtrl="ngModel">
+                </div>
+                <div class="form-group">
+                  <label for="matricule">Matricule:</label>
+                  <input type="text" id="matricule" class="form-control" [(ngModel)]="Newmatricule" name="matricule"
+                    #matriculeCtrl="ngModel">
+                </div>
+                <div class="form-group">
+                  <label for="image">Image:</label>
+                  <input type="file" id="image" class="form-control-file" (change)="onFileSelected($event)">
+                </div>
+                <button class="btn btn-primary" (click)="createBadge()">Create Badge</button>
               </div>
-              
-              <div class="form-group">
-                <label for="matricule">Matricule:</label>
-                <input type="text" id="matricule" class="form-control" [(ngModel)]="Newmatricule" name="matricule" #ctrl="ngModel">
-              </div>
-              
-              <button class="btn btn-primary" (click)="createBadge()">Create Badge</button>
-            </div>
 
-             
+
+
             </div>
           </div>
         </div>
         <div class="container">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-body">
-          <div *ngIf="showBadgeRequestPending" class="alert alert-info" role="alert">
-            <p>Votre demande est en cours.</p>
-          </div>
-          <div *ngIf="showBadgeRequestAccepter" class="alert alert-success" role="alert">
-            <p>Votre demande a été acceptée.</p>
-          </div>
-          <div *ngIf="showBadgeRequestRefuse" class="alert alert-danger" role="alert">
-            <p>Votre demande a été refusée.</p>
+          <div class="row justify-content-center">
+            <div class="col-md-6">
+              <div class="card">
+                <div class="card-body">
+                  <div *ngIf="showBadgeRequestPending" class="alert alert-info" role="alert">
+                    <p>Votre demande est en cours.</p>
+                  </div>
+                  <div *ngIf="showBadgeRequestAccepter" class="alert alert-success" role="alert">
+                    <p>Votre demande a été acceptée.</p>
+                  </div>
+                  <div *ngIf="showBadgeRequestRefuse" class="alert alert-danger" role="alert">
+                    <p>Votre demande a été refusée.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
 
-        
+
 
 
 
 
 
       </div>
+
+      <body>
+
+        <div class="container1" *ngIf="showBadgeRequestAccepter" id="badge-container">
+          <div class="padding">
+            <div class="font">
+              <div class="top">
+                <img *ngIf="badges[0].photos" src="{{ getImageUrlBadge(badges[0].id, badges[0].photos) }}">
+                <img *ngIf="!badges[0].photos" src="{{ getImageUrl() }}">
+                
+              </div>
+              <div class="bottom">
+                <p>{{ badges[0].username }}</p>
+                <p class="desi">Collaborateur Sopra HR</p>
+                <div class="barcode">
+                  <img src="assets/badge/qr sample.png">
+                </div>
+                <br>
+                <!-- <p class="no">+91 8980849796</p>
+                <p class="no">part-1,89 harinadad d...sdv..sdf..sfd..sd.</p> -->
+              </div>
+            </div>
+          </div>
+          <div class="back">
+            <h1 class="Details">information</h1>
+            <hr class="hr">
+            <div class="details-info">
+              <p style="color: white;"><b>Email : </b></p>
+              <p style="color: white;">{{ badges[0]?.user?.email }}</p>
+              <p style="color: white;"><b>Matricule No: </b></p>
+              <p style="color: white;">{{ badges[0].matricule }}</p>
+              <!-- <p style="color: white;"><b>Office Address:</b></p>
+              <p style="color: white;">part-1,89 harinadad d...sdv..sdf..sfd..sd.road,india</p> -->
+            </div>
+            <!-- <div class="logo">
+              <img src="assets/badge/barcode.PNG">
+            </div> -->
+
+
+            <hr>
+
+          </div>
+          <button class="btn btn-primary text-center hide-on-print"  *ngIf="!isPrinting"  (click)="printBadge()">Imprimer cette badge</button>
+
+        </div>
+
+      </body>
+
       <!-- content-wrapper ends -->
       <!-- partial:partials/_footer.html -->
       <footer class="footer">

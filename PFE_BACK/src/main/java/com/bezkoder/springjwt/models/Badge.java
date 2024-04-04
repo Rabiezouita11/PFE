@@ -18,6 +18,10 @@ public class Badge {
     private String username;
     private String matricule;
     private String status;
+    private String photos;
+    public Badge() {
+    }
+
 
     // Getters and setters
 }

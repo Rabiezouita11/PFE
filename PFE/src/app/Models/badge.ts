@@ -6,6 +6,7 @@ export interface Badge {
     username: string;
     matricule: string;
     status: string;
+    photos :string
     // Add other fields as needed
   }
   
