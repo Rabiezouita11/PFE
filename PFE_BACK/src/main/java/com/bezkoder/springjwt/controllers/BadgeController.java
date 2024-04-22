@@ -174,5 +174,38 @@ public class BadgeController {
         }
     }
 
+    @PutMapping("/{badgeId}")
+    public ResponseEntity<Badge> updateBadge(@PathVariable Long badgeId, @RequestParam String username, @RequestParam String matricule,
+                                             @RequestParam(value = "image", required = false) MultipartFile image,
+                                             @AuthenticationPrincipal UserDetails userDetails) throws IOException {
+        // Check if the current user is allowed to update badges
+        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_MANAGER"))) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
+        }
+
+        // Retrieve the badge from the database
+        Optional<Badge> badgeOptional = badgeRepository.findById(badgeId);
+        if (badgeOptional.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Badge not found
+        }
+        Badge badge = badgeOptional.get();
+
+        // Update badge information
+        badge.setUsername(username);
+        badge.setMatricule(matricule);
+
+        // Update badge image if provided
+        if (image != null && !image.isEmpty()) {
+            String fileName = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
+            badge.setPhotos(fileName);
+            String uploadDir = "badge-photos/" + badgeId;
+            FileUploadUtil.saveFile(uploadDir, fileName, image);
+        }
+
+        // Save the updated badge
+        Badge updatedBadge = badgeRepository.save(badge);
+        return ResponseEntity.ok(updatedBadge);
+    }
 
 }
+

@@ -94,4 +94,31 @@ export class BadgeComponent implements OnInit {
       }
     });
   }
+
+  updateBadge(badgeId: number, newUsername: string, newMatricule: string): void {
+    // Call your service method to update the badge
+    this.badgeService.updateBadge(badgeId, newUsername, newMatricule).subscribe(
+      (response: any) => {
+        // If successful, update the badge list
+        this.fetchBadges();
+        // Show a success message using SweetAlert
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Badge updated successfully.'
+        });
+      },
+      (error: any) => {
+        console.error('Error updating badge:', error);
+        // Show an error message using SweetAlert
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error updating badge. Please try again later.'
+        });
+      }
+    );
+  }
+
+
 }

@@ -133,13 +133,19 @@ export class BadgeComponent implements OnInit {
     }
     printBadge(): void {
         this.isPrinting = true; // Set isPrinting to true when printing starts
-
-        const printContents = document.getElementById('badge-container').innerHTML;
+    
+        const badgeContainer = document.getElementById('badge-container');
+        if (!badgeContainer) {
+            console.error("Badge container not found");
+            return;
+        }
+    
+        const printContents = badgeContainer.innerHTML;
         const originalContents = document.body.innerHTML;
-
+    
         // Replace the entire document body with the badge container content
         document.body.innerHTML = printContents;
-
+    
         // Function to check if all images have loaded
         const checkImagesLoaded = () => {
             const images = document.querySelectorAll('img');
@@ -152,26 +158,27 @@ export class BadgeComponent implements OnInit {
             });
             return allLoaded;
         };
-
+    
         // Check if all images are loaded before printing
         const checkPrint = () => {
             if (checkImagesLoaded()) { // Trigger the print dialog
                 window.print();
-
+    
                 // Restore the original document body content after printing
                 document.body.innerHTML = originalContents;
-
+    
                 this.isPrinting = false; // Set isPrinting back to false after printing
                 window.location.reload();
-
+    
             } else { // If images are not loaded yet, wait and check again
                 setTimeout(checkPrint, 100);
             }
         };
-
+    
         // Initiate the printing process
         checkPrint();
     }
+    
 
 
     loadScriptsAndStyles(): void {
