@@ -1,23 +1,14 @@
 <div class="card card-container">
-  <img  *ngIf="!isLoggedIn "
-    id="profile-img"
-    src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
-    class="profile-img-card"
-  />
-  <img  *ngIf="!fileName && isLoggedIn  "
+
+  <img  
   id="profile-img"
   src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
   class="profile-img-card"
 />
 
 
-  <img *ngIf="isLoggedIn &&fileName "
-    id="profile-img"
-    [src]="getImageUrl()"
-    class="profile-img-card"
-  />
+  
   <form
-    *ngIf="!isLoggedIn"
     name="form"
     (ngSubmit)="f.form.valid && onSubmit()"
     #f="ngForm"
@@ -76,10 +67,6 @@
       </div>
     </div>
   </form>
-  <a *ngIf="!isLoggedIn" class="forgot-password" routerLink="/forgetpwd">Forgot Password?</a>
+  <a  class="forgot-password" routerLink="/forgetpwd">Forgot Password?</a>
 
-  <div class="alert alert-success" *ngIf="isLoggedIn">
-    Logged in as {{ roles }}.
-  
-  </div>
 </div>
