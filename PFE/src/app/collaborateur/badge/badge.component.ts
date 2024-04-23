@@ -7,7 +7,9 @@ import {ScriptStyleLoaderService} from 'src/app/Service/ScriptStyleLoaderService
 import {TokenStorageService} from 'src/app/_services/token-storage.service';
 import Swal from 'sweetalert2';
 
-@Component({selector: 'app-badge', templateUrl: './badge.component.html', styleUrls: ['./badge.component.css']})
+@Component({selector: 'app-badge',
+ templateUrl: './badge.component.html', 
+ styleUrls: ['./badge.component.css']})
 export class BadgeComponent implements OnInit {
     roles : string[] = [];
     fileName !: string; // Add fileName property to store the image file name
@@ -131,47 +133,47 @@ export class BadgeComponent implements OnInit {
 
 
     }
-    printBadge(): void {
-        this.isPrinting = true; // Set isPrinting to true when printing starts
+    // printBadge(): void {
+    //     this.isPrinting = true; // Set isPrinting to true when printing starts
 
-        const printContents = document.getElementById('badge-container').innerHTML;
-        const originalContents = document.body.innerHTML;
+    //     const printContents = document.getElementById('badge-container').innerHTML;
+    //     const originalContents = document.body.innerHTML;
 
-        // Replace the entire document body with the badge container content
-        document.body.innerHTML = printContents;
+    //     // Replace the entire document body with the badge container content
+    //     document.body.innerHTML = printContents;
 
-        // Function to check if all images have loaded
-        const checkImagesLoaded = () => {
-            const images = document.querySelectorAll('img');
-            let allLoaded = true;
-            images.forEach((img) => {
-                if (!img.complete || img.naturalWidth === 0) {
-                    allLoaded = false;
-                    return;
-                }
-            });
-            return allLoaded;
-        };
+    //     // Function to check if all images have loaded
+    //     const checkImagesLoaded = () => {
+    //         const images = document.querySelectorAll('img');
+    //         let allLoaded = true;
+    //         images.forEach((img) => {
+    //             if (!img.complete || img.naturalWidth === 0) {
+    //                 allLoaded = false;
+    //                 return;
+    //             }
+    //         });
+    //         return allLoaded;
+    //     };
 
-        // Check if all images are loaded before printing
-        const checkPrint = () => {
-            if (checkImagesLoaded()) { // Trigger the print dialog
-                window.print();
+    //     // Check if all images are loaded before printing
+    //     const checkPrint = () => {
+    //         if (checkImagesLoaded()) { // Trigger the print dialog
+    //             window.print();
 
-                // Restore the original document body content after printing
-                document.body.innerHTML = originalContents;
+    //             // Restore the original document body content after printing
+    //             document.body.innerHTML = originalContents;
 
-                this.isPrinting = false; // Set isPrinting back to false after printing
-                window.location.reload();
+    //             this.isPrinting = false; // Set isPrinting back to false after printing
+    //             window.location.reload();
 
-            } else { // If images are not loaded yet, wait and check again
-                setTimeout(checkPrint, 100);
-            }
-        };
+    //         } else { // If images are not loaded yet, wait and check again
+    //             setTimeout(checkPrint, 100);
+    //         }
+    //     };
 
-        // Initiate the printing process
-        checkPrint();
-    }
+    //     // Initiate the printing process
+    //     checkPrint();
+    // }
 
 
     loadScriptsAndStyles(): void {

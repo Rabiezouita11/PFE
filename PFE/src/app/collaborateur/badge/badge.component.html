@@ -497,7 +497,6 @@
             <hr class="hr">
             <div class="details-info">
               <p style="color: white;"><b>Email : </b></p>
-              <p style="color: white;">{{ badges[0]?.user?.email }}</p>
               <p style="color: white;"><b>Matricule No: </b></p>
               <p style="color: white;">{{ badges[0].matricule }}</p>
               <!-- <p style="color: white;"><b>Office Address:</b></p>
@@ -511,7 +510,7 @@
             <hr>
 
           </div>
-          <button class="btn btn-primary text-center hide-on-print"  *ngIf="!isPrinting"  (click)="printBadge()">Imprimer cette badge</button>
+          <button class="btn btn-primary text-center hide-on-print"  *ngIf="!isPrinting" >Imprimer cette badge</button>
 
         </div>
 

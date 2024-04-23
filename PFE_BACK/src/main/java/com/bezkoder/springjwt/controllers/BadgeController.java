@@ -133,7 +133,7 @@ public class BadgeController {
             List<Badge> badges = badgeRepository.findAll();
             return ResponseEntity.ok().body(badges);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving badges");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving badges: " + e.getMessage());
         }
     }
     @PutMapping("/accept/{badgeId}")

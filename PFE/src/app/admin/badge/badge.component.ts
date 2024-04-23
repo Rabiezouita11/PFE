@@ -24,6 +24,7 @@ export class BadgeComponent implements OnInit {
 
       return;
     }
+    console.log(authToken);
     this.badgeService.getAllBadges(authToken)
       .subscribe(
         data => {
