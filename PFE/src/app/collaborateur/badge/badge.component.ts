@@ -1,38 +1,38 @@
-import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Component, HostListener, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
-import {Badge} from 'src/app/Models/badge';
-import {BadgeService} from 'src/app/Service/BadgeService/BadgeService/badge-service.service';
-import {ScriptStyleLoaderService} from 'src/app/Service/ScriptStyleLoaderService/script-style-loader-service.service';
-import {TokenStorageService} from 'src/app/_services/token-storage.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Badge } from 'src/app/Models/badge';
+import { BadgeService } from 'src/app/Service/BadgeService/BadgeService/badge-service.service';
+import { ScriptStyleLoaderService } from 'src/app/Service/ScriptStyleLoaderService/script-style-loader-service.service';
+import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import Swal from 'sweetalert2';
 
-@Component({selector: 'app-badge', templateUrl: './badge.component.html', styleUrls: ['./badge.component.css']})
+@Component({ selector: 'app-badge', templateUrl: './badge.component.html', styleUrls: ['./badge.component.css'] })
 export class BadgeComponent implements OnInit {
-    roles : string[] = [];
+    roles: string[] = [];
     fileName !: string; // Add fileName property to store the image file name
     userId !: number; // Add userId property to store the user's ID
     image !: string; // Add image property to store the image URL
     imageBadge !: string; // Add image property to store the image URL
-    isPrinting : boolean = false;
+    isPrinting: boolean = false;
 
-    username : any;
-    dropdownOpen : boolean = false;
-    elementRef : any;
-    isUICollapsed : boolean = false;
+    username: any;
+    dropdownOpen: boolean = false;
+    elementRef: any;
+    isUICollapsed: boolean = false;
     badges !: Badge[];
-    selectedFile : File | null = null;
+    selectedFile: File | null = null;
     badgeId !: number;
 
     matricule !: string;
     createdBadge !: Badge;
-    Newusername : any;
-    Newmatricule : any;
-    showBadgeForm : boolean = false;
-    showBadgeRequestPending : boolean = false; // Declare the property here
-    showBadgeRequestAccepter : boolean = false;
-    showBadgeRequestRefuse : boolean = false;;
-    constructor(private http : HttpClient, private badgeService : BadgeService, private router : Router, private scriptStyleLoaderService : ScriptStyleLoaderService, private tokenStorage : TokenStorageService) {}
+    Newusername: any;
+    Newmatricule: any;
+    showBadgeForm: boolean = false;
+    showBadgeRequestPending: boolean = false; // Declare the property here
+    showBadgeRequestAccepter: boolean = false;
+    showBadgeRequestRefuse: boolean = false;;
+    constructor(private http: HttpClient, private badgeService: BadgeService, private router: Router, private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
     ngOnInit(): void {
         this.loadScriptsAndStyles();
@@ -48,15 +48,15 @@ export class BadgeComponent implements OnInit {
         this.fetchBadgesByUserId(this.userId); // Replace 123 with the actual user ID
 
     }
-    fetchBadgesByUserId(userId : number): void {
+    fetchBadgesByUserId(userId: number): void {
         const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage
-        if (! authToken) {
+        if (!authToken) {
             console.error('Authorization token not found');
             Swal.fire('Error!', 'Authorization token not found', 'error');
 
             return;
         }
-        this.badgeService.getBadgesByUserId(userId, authToken).subscribe((data : Badge[]) => {
+        this.badgeService.getBadgesByUserId(userId, authToken).subscribe((data: Badge[]) => {
             this.badges = data;
 
 
@@ -68,13 +68,13 @@ export class BadgeComponent implements OnInit {
 
     createBadge() {
         const authToken = this.tokenStorage.getToken();
-        if (! authToken) {
+        if (!authToken) {
             console.error('Authorization token not found');
             Swal.fire('Error!', 'Authorization token not found', 'error');
             return;
         }
 
-        this.badgeService.createBadgeForUser(this.userId, this.Newusername, this.Newmatricule, this.selectedFile, authToken).subscribe((data : Badge) => {
+        this.badgeService.createBadgeForUser(this.userId, this.Newusername, this.Newmatricule, this.selectedFile, authToken).subscribe((data: Badge) => {
             console.log('Badge created successfully:', data);
             Swal.fire('Success!', 'Badge created successfully', 'success');
             this.ngOnInit();
@@ -84,18 +84,18 @@ export class BadgeComponent implements OnInit {
             Swal.fire('Error!', 'Error creating badge', 'error');
         });
     }
-    onFileSelected(event : any) {
+    onFileSelected(event: any) {
         this.selectedFile = event.target.files[0];
     }
     checkBadgeStatus() {
         const authToken = this.tokenStorage.getToken();
-        if (! authToken) {
+        if (!authToken) {
             console.error('Authorization token not found');
             return;
         }
 
         // Make API request to check badge status
-        this.badgeService.getBadgeStatus(this.userId, authToken).subscribe((response : any) => {
+        this.badgeService.getBadgeStatus(this.userId, authToken).subscribe((response: any) => {
             console.log(response);
             if (response.status === 'accepter') { // User has a badge with status "accepter", display form and button to print
                 this.showBadgeForm = true;
@@ -120,32 +120,30 @@ export class BadgeComponent implements OnInit {
         });
     }
     getImageUrl(): string { // Assuming your backend endpoint for retrieving images is '/api/images/'
-        return `http://localhost:8080/api/auth/images/${
-            this.userId
-        }/${
-            this.fileName
-        }`;
+        return `http://localhost:8080/api/auth/images/${this.userId
+            }/${this.fileName
+            }`;
     }
-    getImageUrlBadge(badgeId : number, fileBadge : string): string {
+    getImageUrlBadge(badgeId: number, fileBadge: string): string {
         return `http://localhost:8080/api/badges/images/${badgeId}/${fileBadge}`;
 
 
     }
     printBadge(): void {
         this.isPrinting = true; // Set isPrinting to true when printing starts
-    
+
         const badgeContainer = document.getElementById('badge-container');
         if (!badgeContainer) {
             console.error("Badge container not found");
             return;
         }
-    
+
         const printContents = badgeContainer.innerHTML;
         const originalContents = document.body.innerHTML;
-    
+
         // Replace the entire document body with the badge container content
         document.body.innerHTML = printContents;
-    
+
         // Function to check if all images have loaded
         const checkImagesLoaded = () => {
             const images = document.querySelectorAll('img');
@@ -158,27 +156,27 @@ export class BadgeComponent implements OnInit {
             });
             return allLoaded;
         };
-    
+
         // Check if all images are loaded before printing
         const checkPrint = () => {
             if (checkImagesLoaded()) { // Trigger the print dialog
                 window.print();
-    
+
                 // Restore the original document body content after printing
                 document.body.innerHTML = originalContents;
-    
+
                 this.isPrinting = false; // Set isPrinting back to false after printing
                 window.location.reload();
-    
+
             } else { // If images are not loaded yet, wait and check again
                 setTimeout(checkPrint, 100);
             }
         };
-    
+
         // Initiate the printing process
         checkPrint();
     }
-    
+
 
 
     loadScriptsAndStyles(): void {
@@ -208,11 +206,11 @@ export class BadgeComponent implements OnInit {
             'assets/frontoffice/images/favicon.png'
         ];
         this.scriptStyleLoaderService.loadScripts(SCRIPT_PATH_LIST),
-        this.scriptStyleLoaderService.loadStyles(STYLE_PATH_LIST)
+            this.scriptStyleLoaderService.loadStyles(STYLE_PATH_LIST)
         // Show the loader
 
     }
-    toggleDropdown(event : Event): void {
+    toggleDropdown(event: Event): void {
         event.stopPropagation(); // Prevent the click event from propagating to the document
 
         this.dropdownOpen = !this.dropdownOpen;
