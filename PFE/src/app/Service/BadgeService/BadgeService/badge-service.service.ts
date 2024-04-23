@@ -31,7 +31,16 @@ import {Badge} from 'src/app/Models/badge';
         }/${userId}`, formData, requestOptions);
     }
 
-
+    updateBadge(badgeId: number, username: string, matricule: string, image?: File): Observable<any> {
+        const formData: FormData = new FormData();
+        formData.append('username', username);
+        formData.append('matricule', matricule);
+        if (image) {
+          formData.append('image', image, image.name);
+        }
+        
+        return this.http.put(`${this.baseUrl}/${badgeId}`, formData);
+      }
     getBadgeStatus(userId : number, authToken : string): Observable < any > { // Construct headers with authorization token
         const headers = new HttpHeaders(
             {'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}`}

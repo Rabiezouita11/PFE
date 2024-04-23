@@ -8,5 +8,10 @@ export interface Badge {
     status: string;
     photos :string
     // Add other fields as needed
+    user: {
+      email: string;
+      username :string
+      // Add other user properties as needed
+  }
   }
   
