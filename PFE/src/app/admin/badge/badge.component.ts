@@ -1,6 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { $ } from 'protractor';
-import { Badge } from 'src/app/Models/badge';
 import { BadgeService } from 'src/app/Service/BadgeService/BadgeService/badge-service.service';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import Swal from 'sweetalert2';
@@ -12,17 +10,12 @@ import Swal from 'sweetalert2';
 })
 export class BadgeComponent implements OnInit {
   badges!: any[];
-  selectedBadge: Badge = { id: 0, userId: 0, username: '', matricule: '', status: '', photos: '', user: { email: '', username: '' } };
 
   constructor(private badgeService: BadgeService,private tokenStorage: TokenStorageService) { }
   ngOnInit(): void {
     this.fetchBadges();
   }
-  openUpdateModal(badge: Badge) {
-    this.selectedBadge = badge;
-    // Show modal using jQuery since Bootstrap 5 doesn't include JavaScript by default
-    $('#exampleModal').modal('show');
-}
+
   fetchBadges(): void {
     const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage
     if (!authToken) {
@@ -31,7 +24,6 @@ export class BadgeComponent implements OnInit {
 
       return;
     }
-    console.log(authToken);
     this.badgeService.getAllBadges(authToken)
       .subscribe(
         data => {
@@ -102,44 +94,4 @@ export class BadgeComponent implements OnInit {
       }
     });
   }
-
-  updateBadge(): void {
-    if (!this.selectedBadge || !this.selectedBadge.user) {
-        console.error('Selected badge or user is undefined.');
-        return;
-    }
-
-    const badgeId = this.selectedBadge.id;
-    const newUsername = this.selectedBadge.user?.username;
-    const newMatricule = this.selectedBadge.matricule;
-
-    // Call your service method to update the badge
-    this.badgeService.updateBadge(badgeId, newUsername, newMatricule).subscribe(
-        (response: any) => {
-            // If successful, update the badge list
-            this.fetchBadges();
-            // Show a success message using SweetAlert
-            Swal.fire({
-                icon: 'success',
-                title: 'Success',
-                text: 'Badge updated successfully.'
-            });
-            // Close the modal
-            $('#exampleModal').modal('hide');
-        },
-        (error: any) => {
-            console.error('Error updating badge:', error);
-            // Show an error message using SweetAlert
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Error updating badge. Please try again later.'
-            });
-        }
-    );
-}
-
-
-
-
 }

@@ -31,15 +31,21 @@ import {Badge} from 'src/app/Models/badge';
         }/${userId}`, formData, requestOptions);
     }
 
-    updateBadge(badgeId: number, username: string, matricule: string, image?: File): Observable<any> {
+    updateBadge(badgeId: number, username: string, matricule: string, image?: File, authToken?: string): Observable<any> {
         const formData: FormData = new FormData();
         formData.append('username', username);
         formData.append('matricule', matricule);
         if (image) {
           formData.append('image', image, image.name);
         }
-        
-        return this.http.put(`${this.baseUrl}/${badgeId}`, formData);
+    
+        let headers = new HttpHeaders();
+        if (authToken) {
+          headers = headers.set('Authorization', `Bearer ${authToken}`);
+        }
+        // Note: Content-Type will be automatically set to multipart/form-data by FormData
+    
+        return this.http.put(`${this.baseUrl2}/${badgeId}`, formData, { headers: headers });
       }
     getBadgeStatus(userId : number, authToken : string): Observable < any > { // Construct headers with authorization token
         const headers = new HttpHeaders(

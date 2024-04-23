@@ -457,6 +457,9 @@
                     <p>Votre demande a été refusée.</p>
                   </div>
                 </div>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                  modifier badge
+                </button>
               </div>
             </div>
           </div>
@@ -483,6 +486,12 @@
               <div class="bottom">
                 <p>{{ badges[0].username }}</p>
                 <p class="desi">Collaborateur Sopra HR</p>
+                
+                  <p class="desi"><b>Email : </b></p>
+                  <p class="desi">{{ badges[0]?.user?.email }}</p>
+                  <p class="desi"><b>Matricule No: </b></p>
+                  <p class="desi">{{ badges[0].matricule }}</p>
+                 
                 <div class="barcode">
                   <img src="assets/badge/qr sample.png">
                 </div>
@@ -492,31 +501,44 @@
               </div>
             </div>
           </div>
-          <div class="back">
-            <h1 class="Details">information</h1>
-            <hr class="hr">
-            <div class="details-info">
-              <p style="color: white;"><b>Email : </b></p>
-              <p style="color: white;">{{ badges[0]?.user?.email }}</p>
-              <p style="color: white;"><b>Matricule No: </b></p>
-              <p style="color: white;">{{ badges[0].matricule }}</p>
-              <!-- <p style="color: white;"><b>Office Address:</b></p>
-              <p style="color: white;">part-1,89 harinadad d...sdv..sdf..sfd..sd.road,india</p> -->
-            </div>
-            <!-- <div class="logo">
-              <img src="assets/badge/barcode.PNG">
-            </div> -->
-
-
-            <hr>
-
-          </div>
-          <button class="btn btn-primary text-center hide-on-print"  *ngIf="!isPrinting" >Imprimer cette badge</button>
-
+     
+          <button class="btn btn-primary text-center hide-on-print"  *ngIf="!isPrinting"  (click)="printBadge()">Imprimer cette badge</button>
+        
         </div>
-
+    
       </body>
-
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">User Information</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <!-- Input fields with values from badges -->
+              <div class="mb-3">
+                <label for="emailInput" class="form-label">username</label>
+                <input type="email" class="form-control" id="emailInput" [(ngModel)]="badges[0].username">
+              </div>
+              <div class="mb-3">
+                <label for="matriculeInput" class="form-label">Matricule</label>
+                <input type="text" class="form-control" id="matriculeInput" [(ngModel)]="badges[0].matricule">
+              </div>
+              <div class="mb-3">
+                <label for="imageInput" class="form-label">Image</label>
+                <input type="file" class="form-control" id="imageInput" (change)="onFileChange($event)">
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" (click)="updateBadge()" data-bs-dismiss="modal">Save changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      
+      
       <!-- content-wrapper ends -->
       <!-- partial:partials/_footer.html -->
       <footer class="footer">

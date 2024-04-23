@@ -7,7 +7,7 @@ import { ScriptStyleLoaderService } from 'src/app/Service/ScriptStyleLoaderServi
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import Swal from 'sweetalert2';
 
-@Component({selector: 'app-badge', templateUrl: './badge.component.html', styleUrls: ['./badge.component.css']})
+@Component({ selector: 'app-badge', templateUrl: './badge.component.html', styleUrls: ['./badge.component.css'] })
 export class BadgeComponent implements OnInit {
     roles: string[] = [];
     fileName !: string; // Add fileName property to store the image file name
@@ -31,7 +31,11 @@ export class BadgeComponent implements OnInit {
     showBadgeForm: boolean = false;
     showBadgeRequestPending: boolean = false; // Declare the property here
     showBadgeRequestAccepter: boolean = false;
-    showBadgeRequestRefuse: boolean = false;;
+    showBadgeRequestRefuse: boolean = false;
+
+    badgess: Badge[] = []; // Initialize badges array
+    imageFile: File | undefined; // Initialize imageFile variable
+
     constructor(private http: HttpClient, private badgeService: BadgeService, private router: Router, private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
     ngOnInit(): void {
@@ -58,7 +62,7 @@ export class BadgeComponent implements OnInit {
         }
         this.badgeService.getBadgesByUserId(userId, authToken).subscribe((data: Badge[]) => {
             this.badges = data;
-
+console.log(data)
 
         }, error => {
             console.log(error); // Handle error
@@ -129,47 +133,49 @@ export class BadgeComponent implements OnInit {
 
 
     }
-    // printBadge(): void {
-    //     this.isPrinting = true; // Set isPrinting to true when printing starts
-
-        const printContents = document.getElementById('badge-container').innerHTML;
+    printBadge(): void {
+        this.isPrinting = true; // Set isPrinting to true when printing starts
+        const printContents = document.getElementById('badge-container')?.innerHTML;
         const originalContents = document.body.innerHTML;
 
-    //     // Replace the entire document body with the badge container content
-    //     document.body.innerHTML = printContents;
 
-    //     // Function to check if all images have loaded
-    //     const checkImagesLoaded = () => {
-    //         const images = document.querySelectorAll('img');
-    //         let allLoaded = true;
-    //         images.forEach((img) => {
-    //             if (!img.complete || img.naturalWidth === 0) {
-    //                 allLoaded = false;
-    //                 return;
-    //             }
-    //         });
-    //         return allLoaded;
-    //     };
+        if (printContents !== undefined) {
+            document.body.innerHTML = printContents;
+        } else {
+            console.error('Badge container not found');
+        }
+        // Function to check if all images have loaded
+        const checkImagesLoaded = () => {
+            const images = document.querySelectorAll('img');
+            let allLoaded = true;
+            images.forEach((img) => {
+                if (!img.complete || img.naturalWidth === 0) {
+                    allLoaded = false;
+                    return;
+                }
+            });
+            return allLoaded;
+        };
 
-    //     // Check if all images are loaded before printing
-    //     const checkPrint = () => {
-    //         if (checkImagesLoaded()) { // Trigger the print dialog
-    //             window.print();
+        // Check if all images are loaded before printing
+        const checkPrint = () => {
+            if (checkImagesLoaded()) { // Trigger the print dialog
+                window.print();
 
-    //             // Restore the original document body content after printing
-    //             document.body.innerHTML = originalContents;
+                // Restore the original document body content after printing
+                document.body.innerHTML = originalContents;
 
-    //             this.isPrinting = false; // Set isPrinting back to false after printing
-    //             window.location.reload();
+                this.isPrinting = false; // Set isPrinting back to false after printing
+                window.location.reload();
 
-    //         } else { // If images are not loaded yet, wait and check again
-    //             setTimeout(checkPrint, 100);
-    //         }
-    //     };
+            } else { // If images are not loaded yet, wait and check again
+                setTimeout(checkPrint, 100);
+            }
+        };
 
-    //     // Initiate the printing process
-    //     checkPrint();
-    // }
+        // Initiate the printing process
+        checkPrint();
+    }
 
 
 
@@ -220,6 +226,49 @@ export class BadgeComponent implements OnInit {
     toggleUICollapse() {
         this.isUICollapsed = !this.isUICollapsed;
     }
+    onFileChange(event: any) {
+        this.imageFile = event.target.files[0];
+      }
+    updateBadge() {
+        const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage
+        if (!authToken) {
+          console.error('Authorization token not found');
+          Swal.fire('Error!', 'Authorization token not found', 'error');
+    
+          return;
+        }
+        if (this.badges.length > 0) {
+            const badgeId = this.badges[0].id; // Get badge ID from the first badge (assuming only one badge is displayed)
+            const username = this.badges[0].username; // Get username from the first badge's user email
+            const matricule = this.badges[0].matricule; // Get matricule from the first badge
 
+            // Call updateBadge method from the service to update the badge
+            this.badgeService.updateBadge(badgeId, username, matricule, this.imageFile,authToken)
+                .subscribe(
+                    (data) => {
+                        console.log('Badge updated successfully:', data);
+                        Swal.fire('Success', 'Badge updated successfully', 'success');
+                        // Handle success
+                        this.ngOnInit();
+                        this.resetImageInput(); // Reset image input field
 
+                    },
+                    (error) => {
+                        console.error('Error updating badge:', error);
+                        Swal.fire('Error', 'Error updating badge', 'error');
+                        // Handle error
+                    }
+                );
+        } else {
+            console.error('No badges to update');
+            // Handle error - no badges found
+        }
+    }
+
+    resetImageInput() {
+        this.imageFile = undefined; // Reset the value of the imageFile variable
+        const fileInput = document.getElementById('imageInput') as HTMLInputElement;
+        fileInput.value = ''; // Clear the value of the file input
+      }
+      
 }

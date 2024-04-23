@@ -179,7 +179,7 @@ public class BadgeController {
                                              @RequestParam(value = "image", required = false) MultipartFile image,
                                              @AuthenticationPrincipal UserDetails userDetails) throws IOException {
         // Check if the current user is allowed to update badges
-        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_MANAGER"))) {
+        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_COLLABORATEUR"))) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
         }
 
