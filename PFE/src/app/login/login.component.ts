@@ -3,6 +3,7 @@ import { AuthService } from '../_services/auth.service';
 import { TokenStorageService } from '../_services/token-storage.service';
 import { Router } from '@angular/router';
 import { ScriptStyleLoaderService } from '../Service/ScriptStyleLoaderService/script-style-loader-service.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -73,37 +74,49 @@ export class LoginComponent implements OnInit {
   }
   onSubmit(): void {
     const { username, password } = this.form;
-
+  
     this.authService.login(username, password).subscribe(
       data => {
         this.tokenStorage.saveToken(data.accessToken);
         this.tokenStorage.saveUser(data);
-
+  
         const userRoles = this.tokenStorage.getUser().roles;
-
-        // Check if ROLE_MANAGER exists in user roles
+  
         const isManager = userRoles.includes('ROLE_MANAGER');
-
-        // Check if ROLE_COLLABORATEUR exists in user roles
         const isCollaborateur = userRoles.includes('ROLE_COLLABORATEUR');
-
+  
         if (isManager) {
-          // If user is a manager, navigate to dashboard
-          this.router.navigate(['/dashboard']).then(() => {
-            window.location.reload();
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Login successful!'
+          }).then(() => {
+            this.router.navigate(['/dashboard']).then(() => {
+              window.location.reload();
+            });
           });
         } else if (isCollaborateur) {
-          // If user is a collaborateur, navigate to collaborateur/dashboard
-          this.router.navigate(['/collaborateur/dashboard']);
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Login successful!'
+          }).then(() => {
+            this.router.navigate(['/collaborateur/dashboard']);
+          });
         } else {
-          // If user is neither manager nor collaborateur, handle accordingly
-          // For example, redirect to a different page or display a message
-          console.log("User is not a manager or collaborateur");
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'User is not authorized.'
+          });
         }
-        
       },
       err => {
-        console.log(err)
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: err.error.message
+        });
         this.errorMessage = err.error.message;
         this.isLoginFailed = true;
       }
