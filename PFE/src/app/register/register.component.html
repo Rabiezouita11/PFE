@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Register</title>
   <!-- plugins:css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 </head>
 
@@ -52,16 +53,20 @@
 
                 </div>
                 <div class="form-group">
-
-                  <input type="password" class="form-control" name="password" [(ngModel)]="form.password" required
-                    minlength="6" #password="ngModel" placeholder="password" />
-                  <div class="alert-danger" *ngIf="password.errors && f.submitted">
-                    <div *ngIf="password.errors.required">Password is required</div>
-                    <div *ngIf="password.errors.minlength">
-                      Password must be at least 6 characters
+                  <div class="input-group">
+                    <input [type]="passwordHidden ? 'password' : 'text'" class="form-control" name="password" [(ngModel)]="form.password" required minlength="6" #password="ngModel" placeholder="Password" />
+                    <div class="input-group-append">
+                      <span class="input-group-text" (click)="togglePasswordVisibility()">
+                        <i class="fas" [ngClass]="{'fa-eye-slash': passwordHidden, 'fa-eye': !passwordHidden}"></i>
+                      </span>
                     </div>
                   </div>
+                  <div class="alert alert-danger" role="alert" *ngIf="password.errors && f.submitted">
+                    <div *ngIf="password.errors.required">Password is required</div>
+                    <div *ngIf="password.errors.minlength">Password must be at least 6 characters</div>
+                  </div>
                 </div>
+                
 
                 
                 <div class="mt-3">

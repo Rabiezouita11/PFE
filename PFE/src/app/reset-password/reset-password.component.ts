@@ -17,6 +17,8 @@ export class ResetPasswordComponent implements OnInit {
   form!: FormGroup;
   successMessage: string | null = null;
   errorMessage: string | null = null;
+  passwordHidden: boolean = true;
+  confirmPasswordHidden: boolean = true;
 
   constructor(private scriptStyleLoaderService: ScriptStyleLoaderService ,public service: UserService, public fb: FormBuilder,
     private router: Router, private route: ActivatedRoute,
@@ -32,7 +34,13 @@ export class ResetPasswordComponent implements OnInit {
 
     this.f.token.setValue(this.token);
   }
+  togglePasswordVisibility() {
+    this.passwordHidden = !this.passwordHidden;
+  }
 
+  toggleConfirmPasswordVisibility() {
+    this.confirmPasswordHidden = !this.confirmPasswordHidden;
+  }
   get f(): { [key: string]: AbstractControl } {
     return this.form.controls;
   }

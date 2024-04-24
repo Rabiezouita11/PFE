@@ -22,6 +22,7 @@ export class LoginComponent implements OnInit {
   fileName!: string; // Add fileName property to store the image file name
   userId!: number; // Add userId property to store the user's ID
   image!: string; // Add image property to store the image URL
+  passwordHidden: boolean = true;
 
   constructor(private scriptStyleLoaderService: ScriptStyleLoaderService ,private router: Router, private authService: AuthService, private tokenStorage: TokenStorageService) { }
 
@@ -122,7 +123,9 @@ export class LoginComponent implements OnInit {
       }
     );
   }
-
+  togglePasswordVisibility() {
+    this.passwordHidden = !this.passwordHidden;
+  }
   reloadPage(): void {
     window.location.reload();
   }
