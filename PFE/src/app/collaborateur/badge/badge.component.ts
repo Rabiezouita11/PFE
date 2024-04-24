@@ -46,6 +46,7 @@ export class BadgeComponent implements OnInit {
             this.fileName = this.tokenStorage.getUser().photos;
             this.username = this.tokenStorage.getUser().username;
             this.image = this.getImageUrl(); // Call getImageUrl() to construct the image URL
+            console.log("fileNamefileNamefileName"+this.fileName)
 
         }
         this.checkBadgeStatus();
@@ -62,7 +63,7 @@ export class BadgeComponent implements OnInit {
         }
         this.badgeService.getBadgesByUserId(userId, authToken).subscribe((data: Badge[]) => {
             this.badges = data;
-console.log(data)
+            console.log(data)
 
         }, error => {
             console.log(error); // Handle error
@@ -77,6 +78,8 @@ console.log(data)
             Swal.fire('Error!', 'Authorization token not found', 'error');
             return;
         }
+
+
 
         this.badgeService.createBadgeForUser(this.userId, this.Newusername, this.Newmatricule, this.selectedFile, authToken).subscribe((data: Badge) => {
             console.log('Badge created successfully:', data);
@@ -228,14 +231,14 @@ console.log(data)
     }
     onFileChange(event: any) {
         this.imageFile = event.target.files[0];
-      }
+    }
     updateBadge() {
         const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage
         if (!authToken) {
-          console.error('Authorization token not found');
-          Swal.fire('Error!', 'Authorization token not found', 'error');
-    
-          return;
+            console.error('Authorization token not found');
+            Swal.fire('Error!', 'Authorization token not found', 'error');
+
+            return;
         }
         if (this.badges.length > 0) {
             const badgeId = this.badges[0].id; // Get badge ID from the first badge (assuming only one badge is displayed)
@@ -243,7 +246,7 @@ console.log(data)
             const matricule = this.badges[0].matricule; // Get matricule from the first badge
 
             // Call updateBadge method from the service to update the badge
-            this.badgeService.updateBadge(badgeId, username, matricule, this.imageFile,authToken)
+            this.badgeService.updateBadge(badgeId, username, matricule, this.imageFile, authToken)
                 .subscribe(
                     (data) => {
                         console.log('Badge updated successfully:', data);
@@ -269,6 +272,6 @@ console.log(data)
         this.imageFile = undefined; // Reset the value of the imageFile variable
         const fileInput = document.getElementById('imageInput') as HTMLInputElement;
         fileInput.value = ''; // Clear the value of the file input
-      }
-      
+    }
+
 }

@@ -13,6 +13,7 @@ import {ForgetPasswordComponent} from './forget-password/forget-password.compone
 import {BadgeComponent} from './badge/badge.component';
 import {AuthGuard} from './auth.guard';
 import {ComponentComponent} from './admin/component/component.component';
+import {ComponentComponentCollaborateur} from './collaborateur/component/component.component';
 import {PageNotFoundComponent} from './page-not-found/page-not-found.component';
 import { CollaborateurGuard } from './guard/collaborateur.guard';
 
@@ -29,6 +30,7 @@ const routes: Routes = [
     
     {
         path: 'collaborateur',
+        component : ComponentComponentCollaborateur,
         loadChildren: () => import ('./collaborateur/collaborateur.module').then((m) => m.CollaborateurModule),
         canActivate: [CollaborateurGuard] // Apply AuthGuard to this route
     },

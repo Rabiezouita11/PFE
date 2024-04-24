@@ -1,24 +1,22 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ScriptStyleLoaderService } from 'src/app/Service/ScriptStyleLoaderService/script-style-loader-service.service';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css'],
-  
+  selector: 'app-component',
+  templateUrl: './component.component.html',
+  styleUrls: ['./component.component.css']
 })
-export class HomeComponent implements OnInit {
-  roles: string[] = [];
-  fileName!: string; // Add fileName property to store the image file name
-  userId!: number; // Add userId property to store the user's ID
-  image!: string; // Add image property to store the image URL
+export class ComponentComponentCollaborateur implements OnInit {
+  userId: any;
+  roles: any;
+  fileName: any;
   username: any;
-  elementRef: any;
-  isUICollapsed: boolean = false;
+  image!: string;
+  dropdownOpen: boolean = false;
 
-  constructor(private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
+  constructor(private router: Router, private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
     this.loadScriptsAndStyles();
@@ -67,30 +65,4 @@ export class HomeComponent implements OnInit {
 
   }
 
-  
- 
-
-  logout(): void {
-    this.tokenStorage.signOut(); // Clear token storage
-    this.router.navigate(['/login']); // Redirect to login page
-  }
-
-
-
-  toggleUICollapse() {
-    this.isUICollapsed = !this.isUICollapsed;
-  }
-
-
-
-
-
-
-
-
-
-
-
-  }
-  
-
+}

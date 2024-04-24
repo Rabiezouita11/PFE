@@ -9,10 +9,14 @@ import { BrowserModule } from '@angular/platform-browser';
 import { MaladeComponent } from './malade/malade.component';
 import { AttestaionsComponent } from './attestaions/attestaions.component';
 import { QuestionsRhComponent } from './questions-rh/questions-rh.component';
+import {  ComponentComponentCollaborateur } from './component/component.component';
+import { NavComponent } from './component/nav/nav.component';
+import { SidbarComponent } from './component/sidbar/sidbar.component';
+import { FooterComponent } from './component/footer/footer.component';
 
 
 @NgModule({
-  declarations: [HomeComponent, BadgeComponent, MaladeComponent, AttestaionsComponent, QuestionsRhComponent],
+  declarations: [HomeComponent, BadgeComponent, MaladeComponent, AttestaionsComponent, QuestionsRhComponent, ComponentComponentCollaborateur, NavComponent, SidbarComponent, FooterComponent],
   imports: [
     CommonModule,
     CollaborateurRoutingModule,
