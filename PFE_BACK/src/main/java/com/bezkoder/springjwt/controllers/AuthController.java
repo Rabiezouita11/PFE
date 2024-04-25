@@ -118,7 +118,9 @@ public class AuthController {
 
 
 	@PostMapping("/signup")
-	public ResponseEntity<?> registerUser(@Valid SignupRequest signUpRequest, @RequestParam(value = "image", required = false) MultipartFile multipartFile) throws IOException {
+	public ResponseEntity<?> registerUser(@Valid SignupRequest signUpRequest,
+										  @RequestParam(value = "image", required = false) MultipartFile multipartFile)
+			throws IOException {
 
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
 			return ResponseEntity
@@ -137,40 +139,14 @@ public class AuthController {
 				signUpRequest.getEmail(),
 				encoder.encode(signUpRequest.getPassword()));
 
-		// Set user's roles
-		Set<String> strRoles = signUpRequest.getRole();
-		System.out.println(strRoles);
-
+		// Fetch roles based on role names provided in SignUpRequest
 		Set<Role> roles = new HashSet<>();
-
-		if (strRoles == null) {
-			Role userRole = roleRepository.findByName(ERole.ROLE_COLLABORATEUR)
-					.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-			roles.add(userRole);
-		} else {
-			strRoles.forEach(role -> {
-				switch (role) {
-					case "admin":
-						Role adminRole = roleRepository.findByName(ERole.ROLE_GESTIONNAIRE)
-								.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-						roles.add(adminRole);
-						break;
-					case "mod":
-						Role modRole = roleRepository.findByName(ERole.ROLE_MANAGER)
-								.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-						roles.add(modRole);
-						break;
-					default:
-						Role userRole = roleRepository.findByName(ERole.ROLE_COLLABORATEUR)
-								.orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-						roles.add(userRole);
-						break;
-				}
-			});
+		for (String roleName : signUpRequest.getRole()) {
+			Role role = roleRepository.findByName(ERole.valueOf(roleName))
+					.orElseThrow(() -> new RuntimeException("Error: Role not found: " + roleName));
+			roles.add(role);
 		}
-
 		user.setRoles(roles);
-		System.out.println(user.getRoles());
 
 		// Check if multipartFile is not null before accessing it
 		String fileName = null;

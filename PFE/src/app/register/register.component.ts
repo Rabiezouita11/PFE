@@ -10,7 +10,8 @@ export class RegisterComponent implements OnInit {
         username: null,
         email: null,
         password: null,
-        image: null // Add image property
+        image: null,
+        role: null
     };
     isSuccessful = false;
     isSignUpFailed = false;
@@ -27,9 +28,16 @@ export class RegisterComponent implements OnInit {
         this.passwordHidden = !this.passwordHidden;
     }
     onSubmit(): void {
-        const {username, email, password, image} = this.form;
+        const {
+            username,
+            email,
+            password,
+            role,
+            image
+        } = this.form;
+        
 
-        this.authService.register(username, email, password, image).subscribe(data => {
+        this.authService.register(username, email, password, image,role).subscribe(data => {
             Swal.fire({icon: 'success', title: 'Success', text: 'Registration successful!'}).then((result) => {
                 if (result.isConfirmed) {
                     this.router.navigate(['/login']); // Redirect to login page
