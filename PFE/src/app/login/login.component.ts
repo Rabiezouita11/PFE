@@ -115,7 +115,9 @@ export class LoginComponent implements OnInit {
       title: title,
     }).then(() => {
       if (redirectUrl) {
-        this.router.navigate([redirectUrl]);
+        this.router.navigate([redirectUrl]).then(() => {
+          window.location.reload();
+        });
       }
     });
   }
