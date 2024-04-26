@@ -84,7 +84,8 @@ public class AuthController {
 												 userDetails.getId(), 
 												 userDetails.getUsername(),
 												 userDetails.getPhotos(),
-												 userDetails.getEmail(), 
+												 userDetails.getEmail(),
+												 userDetails.getStatus(),
 												 roles));
 	}
 	@GetMapping("/images/{userId}/{fileName}")

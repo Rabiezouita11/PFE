@@ -71,8 +71,8 @@
                   <label for="role">Role</label>
                   <select class="form-control" id="role" name="role" [(ngModel)]="form.role" required>
                       <option value="" disabled selected>Select Role</option>
-                      <option value="ROLE_GESTIONNAIRE">Gestionnaire</option>
-                      <option value="ROLE_COLLABORATEUR">Collaborateur</option>
+                      <option value="ROLE_COLLABORATEUR">COLLABORATEUR</option>
+                      <option value="ROLE_MANAGER">MANAGER</option>
                   </select>
                   <div *ngIf="f.form.controls.role.errors && f.submitted" class="alert alert-danger">
                       Role is required

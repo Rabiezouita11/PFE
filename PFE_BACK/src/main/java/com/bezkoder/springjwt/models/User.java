@@ -17,10 +17,10 @@ import javax.validation.constraints.Size;
 @Getter
 @Setter
 
-@Table(	name = "users", 
-		uniqueConstraints = { 
+@Table(	name = "users",
+		uniqueConstraints = {
 			@UniqueConstraint(columnNames = "username"),
-			@UniqueConstraint(columnNames = "email") 
+			@UniqueConstraint(columnNames = "email")
 		})
 public class User {
 	@Id
@@ -31,6 +31,7 @@ public class User {
 	private String username;
 	private String fileName;
 	private String resetToken;
+
 	private LocalDateTime dateToken;
 
 	@Size(max = 50)
@@ -40,21 +41,26 @@ public class User {
 	private String photos;
 	@Size(max = 120)
 	private String password;
+	private Boolean status; // Default value is null
 
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(	name = "user_roles", 
-				joinColumns = @JoinColumn(name = "user_id"), 
+	@JoinTable(	name = "user_roles",
+				joinColumns = @JoinColumn(name = "user_id"),
 				inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	private Set<Conger_Maladie> congers = new HashSet<>();
 	public User() {
+		this.status = null; // Initialize status to null
+
 	}
 
 	public User(String username, String email, String password) {
 		this.username = username;
 		this.email = email;
 		this.password = password;
+		this.status = null; // Initialize status to null
+
 	}
 
 	public Long getId() {

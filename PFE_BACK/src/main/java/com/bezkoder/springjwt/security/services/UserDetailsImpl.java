@@ -5,30 +5,40 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.bezkoder.springjwt.models.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+@Getter
+@Setter
 public class UserDetailsImpl implements UserDetails {
 	private static final long serialVersionUID = 1L;
 
+	@Getter
 	private Long id;
 
 	private String username;
 
+	@Getter
 	private String photos;
 
+	@Getter
 	private String email;
+
+	@Getter
+	private Boolean status;
+
 
 	@JsonIgnore
 	private String password;
 
 	private Collection<? extends GrantedAuthority> authorities;
 
-	public UserDetailsImpl(Long id, String username, String email, String password,String photos,
+	public UserDetailsImpl(Long id, String username, String email, String password,String photos,Boolean status,
 			Collection<? extends GrantedAuthority> authorities) {
 		this.id = id;
 		this.username = username;
@@ -36,6 +46,7 @@ public class UserDetailsImpl implements UserDetails {
 		this.password = password;
 		this.photos = photos;
 		this.authorities = authorities;
+		this.status =status;
 	}
 
 	public static UserDetailsImpl build(User user) {
@@ -49,6 +60,7 @@ public class UserDetailsImpl implements UserDetails {
 				user.getEmail(),
 				user.getPassword(),
 				user.getPhotos(),
+				user.getStatus(),
 				authorities);
 	}
 
@@ -56,15 +68,6 @@ public class UserDetailsImpl implements UserDetails {
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return authorities;
 	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-	public String getPhotos(){return photos;}
 
 	@Override
 	public String getPassword() {

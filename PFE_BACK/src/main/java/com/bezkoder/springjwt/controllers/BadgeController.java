@@ -126,7 +126,7 @@ public class BadgeController {
 
     @GetMapping("/")
     public ResponseEntity<?> getAllBadges(@AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ROLE_MANAGER"))) {
+        if (userDetails.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ROLE_GESTIONNAIRE"))) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
         }
         try {
@@ -147,7 +147,7 @@ public class BadgeController {
 
     @PutMapping("/refuse/{badgeId}")
     public ResponseEntity<?> refuseBadge(@PathVariable Long badgeId, @AuthenticationPrincipal UserDetails userDetails) {
-        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_MANAGER"))) {
+        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTIONNAIRE"))) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
         }
         badgeService.refuseBadge(badgeId);

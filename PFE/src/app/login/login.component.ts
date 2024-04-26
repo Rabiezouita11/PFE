@@ -82,47 +82,61 @@ export class LoginComponent implements OnInit {
         this.tokenStorage.saveUser(data);
   
         const userRoles = this.tokenStorage.getUser().roles;
+        const status = this.tokenStorage.getUser().status;
   
-        const isManager = userRoles.includes('ROLE_MANAGER');
+        const isGestionnaire = userRoles.includes('ROLE_GESTIONNAIRE');
         const isCollaborateur = userRoles.includes('ROLE_COLLABORATEUR');
   
-        if (isManager) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: 'Login successful!'
-          }).then(() => {
-            this.router.navigate(['/dashboard']).then(() => {
-              window.location.reload();
-            });
-          });
+        if (isGestionnaire) {
+          this.showSuccessMessage('Login successful!', '/dashboard');
         } else if (isCollaborateur) {
-          Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: 'Login successful!'
-          }).then(() => {
-            this.router.navigate(['/collaborateur/dashboard']);
-          });
+          if (status === null) {
+            this.showInfoMessage('Access Confirmation Required', 'Please confirm your access. Check your email for further instructions.');
+          } else if (status === false) {
+            this.showErrorMessage('Access Denied', 'Your access is denied.');
+          } else {
+            this.showSuccessMessage('Login successful!', '/collaborateur/dashboard');
+          }
         } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'User is not authorized.'
-          });
+          this.showErrorMessage('Error', 'User is not authorized.');
         }
       },
       err => {
-        Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: err.error.message
-        });
+        this.showErrorMessage('Error', err.error.message);
         this.errorMessage = err.error.message;
         this.isLoginFailed = true;
       }
     );
   }
+  
+  private showSuccessMessage(title: string, redirectUrl?: string): void {
+    Swal.fire({
+      icon: 'success',
+      title: title,
+    }).then(() => {
+      if (redirectUrl) {
+        this.router.navigate([redirectUrl]);
+      }
+    });
+  }
+  
+  private showInfoMessage(title: string, text: string): void {
+    Swal.fire({
+      icon: 'info',
+      title: title,
+      text: text
+    });
+  }
+  
+  private showErrorMessage(title: string, text: string): void {
+    Swal.fire({
+      icon: 'error',
+      title: title,
+      text: text
+    });
+  }
+  
+  
   togglePasswordVisibility() {
     this.passwordHidden = !this.passwordHidden;
   }

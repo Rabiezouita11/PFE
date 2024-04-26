@@ -61,10 +61,11 @@ public class InitialDataLoader implements CommandLineRunner {
         admin.setPassword(passwordEncoder.encode("admin"));
 
         Set<Role> roles = new HashSet<>();
-        Role managerRole = roleRepository.findByName(ERole.ROLE_MANAGER)
+        Role managerRole = roleRepository.findByName(ERole.ROLE_GESTIONNAIRE)
                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
         roles.add(managerRole);
         admin.setRoles(roles);
+        admin.setStatus(true); // Set status to true
 
         userRepository.save(admin);
     }

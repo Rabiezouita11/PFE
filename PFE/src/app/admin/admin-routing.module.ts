@@ -5,6 +5,7 @@ import { BadgeComponent } from './badge/badge.component';
 import { AttestationsComponent } from './attestations/attestations.component';
 import { AbsencesComponent } from './absences/absences.component';
 import { QuestionsRhComponent } from './questions-rh/questions-rh.component';
+import { UsersComponent } from './users/users.component';
 
 const routes: Routes = [
 
@@ -16,6 +17,7 @@ const routes: Routes = [
   { path: 'absences', component: AbsencesComponent , data: {title: 'Administrateur'}},
   { path: 'QuestionsRh', component: QuestionsRhComponent , data: {title: 'Administrateur'}},
 
+  { path: 'users', component: UsersComponent , data: {title: 'Administrateur'}},
 
 ];
 
