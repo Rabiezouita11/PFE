@@ -267,6 +267,11 @@ select.list-dt:focus {
     justify-content: center;
     align-items: center;
   }
-  
+  .avatar-img {
+    width: 100px; /* Set your desired width */
+    height: 100px; /* Set your desired height */
+    border-radius: 50%; /* Make it circular */
+  }
+    
   
   
