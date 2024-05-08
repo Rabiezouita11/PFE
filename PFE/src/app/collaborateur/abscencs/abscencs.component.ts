@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import * as $ from 'jquery';
+import { AbscencsService } from 'src/app/Service/Abscencs/abscencs.service';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import Swal from 'sweetalert2';
 
@@ -15,12 +16,16 @@ export class AbscencsComponent implements OnInit {
   fileName !: string;
   userId !: number;
   roles: any;
-  message: string = '';
-  start_date: string | null = null; // Declare start_date property
-  end_date: string | null = null;   // Declare end_date property
   username: any;
   image!: string;
-  constructor(private http: HttpClient, private router: Router, private tokenStorage: TokenStorageService) { }
+
+
+  message: string = '';
+  start_date: string | null = null;
+  end_date: string | null = null;
+  fileToUpload!: File;
+  constructor(private abscencsService: AbscencsService ,private http: HttpClient, private router: Router, private tokenStorage: TokenStorageService) { }
+
 
   ngOnInit(): void {
     if (this.tokenStorage.getToken()) {
@@ -108,7 +113,7 @@ export class AbscencsComponent implements OnInit {
 
         let isValid: boolean = true;
 
-        if (step.find('textarea[name="message"]').length > 0 && step.find('textarea[name="message"]').val().trim() === '') {
+        if (step.find('textarea[name="message"]').length > 0 && (step.find('textarea[name="message"]').val() as string).trim() === '') {
           // Show SweetAlert confirmation dialog
           Swal.fire({
             icon: 'warning',
@@ -120,7 +125,7 @@ export class AbscencsComponent implements OnInit {
         }
         
         // Check if "Depuis" and "Jusqu'au" fields are empty
-        if (step.find('input[name="start_date"]').length > 0 && step.find('input[name="start_date"]').val().trim() === '') {
+        if (step.find('input[name="start_date"]').length > 0 && (step.find('input[name="start_date"]').val() as string).trim() === '') {
           Swal.fire({
             icon: 'warning',
             title: 'Oops...',
@@ -129,7 +134,7 @@ export class AbscencsComponent implements OnInit {
           });
           isValid = false;
         }
-        if (step.find('input[name="end_date"]').length > 0 && step.find('input[name="end_date"]').val().trim() === '') {
+        if (step.find('input[name="end_date"]').length > 0 && (step.find('input[name="end_date"]').val() as string).trim() === '') {
           Swal.fire({
             icon: 'warning',
             title: 'Oops...',
@@ -188,6 +193,57 @@ export class AbscencsComponent implements OnInit {
 
   }
 
+  submitForm(): void {
+
+
+    console.log("start_date"+this.start_date)
+    console.log("end_date"+this.end_date)
+    const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage
+    if (!authToken) {
+      console.error('Authorization token not found');
+      Swal.fire('Error!', 'Authorization token not found', 'error');
+      return;
+    }
+  
+    if (this.message && this.start_date && this.end_date && this.fileToUpload) {
+      const formData = new FormData();
+      formData.append('file', this.fileToUpload);
+      formData.append('message', this.message);
+      formData.append('startDate', this.start_date);
+      formData.append('endDate', this.end_date);
+  console.log(formData);
+      this.abscencsService.submitLeaveRequest(formData, authToken).subscribe(
+        response => {
+          // Handle successful submission
+          console.log(response);
+          Swal.fire('Success!', 'Leave request submitted successfully!', 'success');
+        },
+        error => {
+          // Handle error
+          console.error(error);
+          let errorMessage = 'An error occurred while submitting the leave request.';
+          if (error && error.error && error.error.message) {
+            errorMessage = error.error.message;
+          }
+          Swal.fire('Error!', errorMessage, 'error');
+        }
+      );
+    } else {
+      // Handle validation error
+      console.log('Please fill in all required fields.');
+      Swal.fire('Error!', 'Please fill in all required fields.', 'error');
+    }
+  }
+  
+  formatDate(dateString: string): string {
+    // Assuming dateString is in format 'YYYY-MM-DD'
+    const parts = dateString.split('-');
+    return `${parts[0]}-${parts[1].padStart(2, '0')}-${parts[2].padStart(2, '0')}`;
+  }
+  onFileSelected(event: any): void {
+    this.fileToUpload = event.target.files[0];
+  }
+
 
   getImageUrl(): string { // Assuming your backend endpoint for retrieving images is '/api/images/'
     return `http://localhost:8080/api/auth/images/${this.userId
@@ -195,30 +251,15 @@ export class AbscencsComponent implements OnInit {
       }`;
   }
 
+
+  
   resetForm(): void {
-    // Reset form fields
-    this.message = ''; // Reset message field
-    this.start_date = null; // Reset start date field
-    this.end_date = null; // Reset end date field
-  
-    // Hide all fieldsets except the first one
-    const fieldsets = document.querySelectorAll('fieldset');
-    fieldsets.forEach((fieldset, index) => {
-      if (index === 0) {
-        fieldset.style.display = 'block'; // Show the first fieldset
-      } else {
-        fieldset.style.display = 'none'; // Hide all other fieldsets
-      }
-    });
-  
-    // Set the first step as active in the progress bar
-    const progressBar = document.getElementById('progressbar');
-    if (progressBar) {
-      progressBar.querySelector('li:first-child').classList.add('active');
-    }
+    // Reset form fields and state
+    this.message = '';
+    this.start_date = null;
+    this.end_date = null;
+    this.fileToUpload = null;
   }
-  
-  
   
 
 }
