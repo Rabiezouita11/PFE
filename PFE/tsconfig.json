@@ -1,6 +1,7 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
+    
     "typeRoots": ["node_modules/@types"],
     "types": ["glob"],
     "baseUrl": "./",
@@ -19,7 +20,9 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "skipLibCheck": true
+
   },
   "angularCompilerOptions": {
     "strictInjectionParameters": true,

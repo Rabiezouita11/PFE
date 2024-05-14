@@ -16,7 +16,20 @@ import { AdminModule } from './admin/admin.module';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { CollaborateurModule } from './collaborateur/collaborateur.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FullCalendarModule } from '@fullcalendar/angular';
+import dayGridPlugin from '@fullcalendar/daygrid'; // a plugin!
+import interactionPlugin from '@fullcalendar/interaction';
+import { CalenderComponent } from './calender/calender.component';
+import listPlugin from '@fullcalendar/list/main.js';
+import timeGridPlugin from '@fullcalendar/timegrid/main.js';
 
+FullCalendarModule.registerPlugins([
+  // register FullCalendar plugins
+  dayGridPlugin,
+  interactionPlugin,
+  listPlugin,
+  timeGridPlugin
+]);
 @NgModule({
   declarations: [
     AppComponent,
@@ -26,7 +39,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
     ForgetPasswordComponent,
     ResetPasswordComponent,
-    PageNotFoundComponent
+    PageNotFoundComponent,
+    CalenderComponent
   ],
   imports: [
     BrowserModule,
@@ -36,7 +50,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     CollaborateurModule,
     HttpClientModule,
     ReactiveFormsModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+  
+    BrowserModule,
+    FullCalendarModule
 
   ],
   providers: [authInterceptorProviders],

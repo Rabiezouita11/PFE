@@ -11,10 +11,14 @@ import {ComponentComponent} from './admin/component/component.component';
 import {ComponentComponentCollaborateur} from './collaborateur/component/component.component';
 import {PageNotFoundComponent} from './page-not-found/page-not-found.component';
 import { CollaborateurGuard } from './guard/collaborateur.guard';
+import { CalenderComponent } from './calender/calender.component';
 
 const routes: Routes = [
 
-
+    {
+        path: 'calender',
+        component: CalenderComponent
+    },
     {
         path: '',
         component: ComponentComponent,
