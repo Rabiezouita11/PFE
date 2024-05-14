@@ -79,20 +79,26 @@
 
 
 
-                  <td>
+                  <td  *ngIf="user.status == null">
                     <i class="fa fa-check text-success icon-large mr-2"
                     title="Accept"
                     (click)="acceptUser(user)"></i>
-                 <i class="fa fa-times text-danger icon-large" 
+                   <i class="fa fa-times text-danger icon-large" 
                     title="Refuse"
                     (click)="refuseUser(user)"></i>
                  
-                  <td>
+                  
+                    <td *ngIf="user.status == true" style="color: green;">
+                   Accepter
+                    </td>
+                    <td *ngIf="user.status == false" style="color:red">
+                      Refuser
+                       </td>
                     <!-- Button trigger modal -->
                  
                     <!-- Modal -->
                  
-                  </td>
+                
                 
 
                   <ng-template #statusIndicator>

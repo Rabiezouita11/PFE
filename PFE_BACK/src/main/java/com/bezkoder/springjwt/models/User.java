@@ -44,6 +44,11 @@ public class User {
 	private String password;
 	private Boolean status; // Default value is null
 
+
+	@OneToOne(mappedBy = "user")
+	private SoldeConger soldeConger;
+
+
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(	name = "user_roles",
 				joinColumns = @JoinColumn(name = "user_id"),

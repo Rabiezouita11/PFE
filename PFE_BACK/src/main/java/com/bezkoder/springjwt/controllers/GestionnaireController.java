@@ -1,12 +1,10 @@
 package com.bezkoder.springjwt.controllers;
 
-import com.bezkoder.springjwt.models.Conger_Maladie;
-import com.bezkoder.springjwt.models.ERole;
-import com.bezkoder.springjwt.models.Role;
-import com.bezkoder.springjwt.models.User;
+import com.bezkoder.springjwt.models.*;
 import com.bezkoder.springjwt.repository.CongerMaladieRepository;
 import com.bezkoder.springjwt.repository.RoleRepository;
 import com.bezkoder.springjwt.repository.UserRepository;
+import com.bezkoder.springjwt.repository.soldeCongerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
@@ -39,6 +37,8 @@ public class GestionnaireController {
     UserRepository userRepository;
     @Autowired
     RoleRepository roleRepository;
+    @Autowired
+    com.bezkoder.springjwt.repository.soldeCongerRepository soldeCongerRepository;
 
     @Autowired
     CongerMaladieRepository congerMaladieRepository;
@@ -69,8 +69,10 @@ public class GestionnaireController {
             User user = userOptional.get();
             user.setStatus(newStatus);
             userRepository.save(user); // Save the updated user
-
-            // Send email to the user
+            SoldeConger newSoldeConger = new SoldeConger();
+            newSoldeConger.setUser(user);
+            newSoldeConger.setSolde(30);
+            soldeCongerRepository.save(newSoldeConger);
             sendEmail(user.getEmail(), newStatus);
 
             return ResponseEntity.ok().body("{\"message\": \"User status updated successfully\"}");

@@ -64,7 +64,8 @@
                   <td><i class="fas fa-id-badge"></i> {{ conger.id }}</td> <!-- Update field names -->
                   <td>{{ conger.message }}</td>
                   <td>
-                    <ng-container *ngIf="conger.status === 'IN_PROGRESS'; else otherStatus"> <!-- Update status checks -->
+                    <ng-container *ngIf="conger.status === 'IN_PROGRESS'; else otherStatus">
+                      <!-- Update status checks -->
                       <i class="fas fa-hourglass-half"></i> {{ conger.status }}
                     </ng-container>
                     <ng-template #otherStatus>
@@ -81,12 +82,23 @@
 
                   <td>{{ conger.dateDebut }}</td> <!-- Update field names -->
                   <td>{{ conger.dateFin }}</td> <!-- Update field names -->
-                  <td><a [href]="'http://localhost:8080/uploads/' + conger.justificationPath" target="_blank">View Justification</a></td> <!-- Update field names -->
-                  <td>
-                    <ng-container *ngIf="conger.status === 'IN_PROGRESS'"> <!-- Display action buttons based on status -->
-                      <i class="fa fa-check text-success icon-large mr-2" (click)="updateStatus(conger.id, 'ACCEPTED')" title="Accept"></i>
-                      <i class="fa fa-times text-danger icon-large" (click)="updateStatus(conger.id, 'REFUSED')" title="Refuse"></i>
+                  <td><a [href]="'http://localhost:8080/uploads/' + conger.justificationPath" target="_blank">View
+                      Justification</a></td> <!-- Update field names -->
+                  <td *ngIf="conger.status === 'ACCEPTED'" style="color:green">
+                    Accepter
+                  </td>
+                  <td *ngIf="conger.status === 'REFUSED'" style="color:red">
+                    Refuser
+                  </td>
+                  <td *ngIf="conger.status === 'IN_PROGRESS'">
+                    <ng-container> <!-- Display action buttons based on status -->
+                      <i class="fa fa-check text-success icon-large mr-2" (click)="updateStatus(conger.id, 'ACCEPTED')"
+                        title="Accept"></i>
+                      <i class="fa fa-times text-danger icon-large" (click)="updateStatus(conger.id, 'REFUSED')"
+                        title="Refuse"></i>
                     </ng-container>
+
+
                   </td>
                 </tr>
               </tbody>
