@@ -277,8 +277,6 @@ showModalById(modalId: string) {
   
   
   submitForm(): void {
-
-
     console.log("start_date" + this.start_date)
     console.log("end_date" + this.end_date)
     const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage

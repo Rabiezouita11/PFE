@@ -135,5 +135,9 @@ public class CongerMaladieController {
         List<Conger_Maladie> refusedData = congerMaladieRepository.findByUserIdAndStatus(userId, "REFUSED");
         return ResponseEntity.ok(refusedData);
     }
-
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<Conger_Maladie>> getByUserId(@PathVariable Long userId) {
+        List<Conger_Maladie> data = congerMaladieRepository.findByUserId(userId);
+        return ResponseEntity.ok(data);
+    }
 }

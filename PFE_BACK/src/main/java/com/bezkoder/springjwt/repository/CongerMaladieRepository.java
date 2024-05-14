@@ -16,6 +16,7 @@ public interface CongerMaladieRepository extends JpaRepository<Conger_Maladie, L
     long countByUserIdAndStatus(@Param("userId") Long userId, @Param("status") String status);
 
     List<Conger_Maladie> findByUserIdAndStatus(Long userId, String status);
-
+    @Query("SELECT c FROM Conger_Maladie c WHERE c.user.id = :userId")
+    List<Conger_Maladie> findByUserId(Long userId);
 }
 

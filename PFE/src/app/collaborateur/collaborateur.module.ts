@@ -20,6 +20,8 @@ import { AbscencsComponent } from './abscencs/abscencs.component';
   imports: [
     CommonModule,
     CollaborateurRoutingModule,
+    FormsModule // Add FormsModule here
+
 
   ]
 })
