@@ -1,23 +1,103 @@
+<!-- Make sure to include the Font Awesome stylesheet -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
 <div class="container-fluid">
-    <div class="page-header">
-        <div class="row">
-            <div class="col-lg-6">
-                <div class="page-header-left">
-                    <h3>Absences
-                        <small> Admin</small>
-                    </h3>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <ol class="breadcrumb pull-right">
-                    <li class="breadcrumb-item">
-                        <a href="index.html">
-                            <i data-feather="home"></i>
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item active">Absences</li>
-                </ol>
-            </div>
+  <div class="page-header">
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="page-header-left">
+          <h3>Conger Maldier List <!-- Update title -->
+            <small>Multikart Admin panel</small>
+          </h3>
         </div>
+      </div>
+      <div class="col-lg-6">
+        <ol class="breadcrumb pull-right">
+          <li class="breadcrumb-item">
+            <a href="index.html">
+              <i data-feather="home"></i>
+            </a>
+          </li>
+          <li class="breadcrumb-item">Physical</li>
+          <li class="breadcrumb-item active">Conger Maldier List</li> <!-- Update breadcrumb -->
+        </ol>
+      </div>
     </div>
+  </div>
+</div>
+<!-- Container-fluid Ends-->
+
+<!-- Container-fluid starts-->
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="card">
+        <div class="card-header">
+          <form class="form-inline search-form search-box">
+            <div class="form-group">
+              <input class="form-control-plaintext" type="search" placeholder="Search..">
+            </div>
+          </form>
+        </div>
+
+        <div class="card-body">
+          <div class="table-responsive table-desi">
+            <table class="table all-package table-category " id="editableTable">
+
+              <thead>
+                <tr>
+                  <th>ID</th> <!-- Update column names -->
+                  <th>Message</th>
+                  <th>Status</th>
+                  <th>User Email</th> <!-- Update column names -->
+                  <th>User Name</th> <!-- Update column names -->
+
+                  <th>Start Date</th> <!-- Update column names -->
+                  <th>End Date</th> <!-- Update column names -->
+                  <th>Justification Path</th> <!-- Update column names -->
+                  <th>Action</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr *ngFor="let conger of congerMaldierList , let i=index"> <!-- Update ngFor loop variable -->
+                  <td><i class="fas fa-id-badge"></i> {{ conger.id }}</td> <!-- Update field names -->
+                  <td>{{ conger.message }}</td>
+                  <td>
+                    <ng-container *ngIf="conger.status === 'IN_PROGRESS'; else otherStatus"> <!-- Update status checks -->
+                      <i class="fas fa-hourglass-half"></i> {{ conger.status }}
+                    </ng-container>
+                    <ng-template #otherStatus>
+                      <ng-container *ngIf="conger.status === 'ACCEPTED'">
+                        <i class="fas fa-check-circle"></i> {{ conger.status }}
+                      </ng-container>
+                      <ng-container *ngIf="conger.status === 'REFUSED'">
+                        <i class="fas fa-times-circle"></i> {{ conger.status }}
+                      </ng-container>
+                    </ng-template>
+                  </td>
+                  <td><i class="fas fa-envelope"></i> {{ conger.user.email }}</td> <!-- Update field names -->
+                  <td><i class="fas fa-user"></i> {{ conger.user.username }}</td> <!-- Update field names -->
+
+                  <td>{{ conger.dateDebut }}</td> <!-- Update field names -->
+                  <td>{{ conger.dateFin }}</td> <!-- Update field names -->
+                  <td><a [href]="'http://localhost:8080/uploads/' + conger.justificationPath" target="_blank">View Justification</a></td> <!-- Update field names -->
+                  <td>
+                    <ng-container *ngIf="conger.status === 'IN_PROGRESS'"> <!-- Display action buttons based on status -->
+                      <i class="fa fa-check text-success icon-large mr-2" (click)="updateStatus(conger.id, 'ACCEPTED')" title="Accept"></i>
+                      <i class="fa fa-times text-danger icon-large" (click)="updateStatus(conger.id, 'REFUSED')" title="Refuse"></i>
+                    </ng-container>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div *ngIf="congerMaldierList?.length == 0" class="text-center">
+              <h3 style="text-align:center ; color: red;">No data </h3>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

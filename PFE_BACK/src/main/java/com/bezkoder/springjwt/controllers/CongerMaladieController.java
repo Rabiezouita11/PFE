@@ -21,6 +21,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/CongerMaladie")
@@ -100,4 +104,36 @@ public class CongerMaladieController {
             }
         }
     }
+
+    @GetMapping("/count/{userId}")
+    public ResponseEntity<?> countRequestsByUserId(@PathVariable Long userId) {
+        long inProgressCount = congerMaladieRepository.countByUserIdAndStatus(userId, "IN_PROGRESS");
+        long acceptedCount = congerMaladieRepository.countByUserIdAndStatus(userId, "ACCEPTED");
+        long refusedCount = congerMaladieRepository.countByUserIdAndStatus(userId, "REFUSED");
+
+        Map<String, Long> counts = new HashMap<>();
+        counts.put("inProgress", inProgressCount);
+        counts.put("accepted", acceptedCount);
+        counts.put("refused", refusedCount);
+
+        return ResponseEntity.ok(counts);
+    }
+        @GetMapping("/IN_PROGRESS/{userId}")
+        public ResponseEntity<List<Conger_Maladie>> getInProgressData(@PathVariable Long userId) {
+            List<Conger_Maladie> inProgressData = congerMaladieRepository.findByUserIdAndStatus(userId, "IN_PROGRESS");
+            return ResponseEntity.ok(inProgressData);
+        }
+
+    @GetMapping("/ACCEPTED/{userId}")
+    public ResponseEntity<List<Conger_Maladie>> getAcceptedData(@PathVariable Long userId) {
+        List<Conger_Maladie> acceptedData = congerMaladieRepository.findByUserIdAndStatus(userId, "ACCEPTED");
+        return ResponseEntity.ok(acceptedData);
+    }
+
+    @GetMapping("/REFUSED/{userId}")
+    public ResponseEntity<List<Conger_Maladie>> getRefusedData(@PathVariable Long userId) {
+        List<Conger_Maladie> refusedData = congerMaladieRepository.findByUserIdAndStatus(userId, "REFUSED");
+        return ResponseEntity.ok(refusedData);
+    }
+
 }

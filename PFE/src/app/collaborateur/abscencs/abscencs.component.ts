@@ -18,13 +18,18 @@ export class AbscencsComponent implements OnInit {
   roles: any;
   username: any;
   image!: string;
-
+  inProgressCount: number = 0;
+  acceptedCount: number = 0;
+  refusedCount: number = 0;
+  inProgressData: any[] = [];
+  acceptedData: any[] = [];
+  refusedData: any[] = [];
 
   message: string = '';
   start_date: string | null = null;
   end_date: string | null = null;
-  fileToUpload!: File;
-  constructor(private abscencsService: AbscencsService ,private http: HttpClient, private router: Router, private tokenStorage: TokenStorageService) { }
+  fileToUpload!: File | null;
+  constructor(private abscencsService: AbscencsService, private http: HttpClient, private router: Router, private tokenStorage: TokenStorageService) { }
 
 
   ngOnInit(): void {
@@ -123,7 +128,7 @@ export class AbscencsComponent implements OnInit {
           });
           isValid = false;
         }
-        
+
         // Check if "Depuis" and "Jusqu'au" fields are empty
         if (step.find('input[name="start_date"]').length > 0 && (step.find('input[name="start_date"]').val() as string).trim() === '') {
           Swal.fire({
@@ -143,7 +148,7 @@ export class AbscencsComponent implements OnInit {
           });
           isValid = false;
         }
-        
+
         // Check if start date is less than end date
         const startDateValue = new Date(step.find('input[name="start_date"]').val() as string);
         const endDateValue = new Date(step.find('input[name="end_date"]').val() as string);
@@ -157,66 +162,145 @@ export class AbscencsComponent implements OnInit {
           isValid = false;
         }
         let justificatifInput = step.find('input[name="justificatif"]');
+        let file: File | null = null;
         if (justificatifInput.length > 0) {
-            let file = justificatifInput[0].files[0];
-            if (!file) {
-                // No file selected
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Oops...',
-                    text: 'Please select a file!',
-                    confirmButtonText: 'OK'
-                });
-                isValid = false;
-            } else {
-                let validExtensions = ['.pdf', '.png', '.jpg', '.jpeg'];
-                let isValidExtension = validExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
-                if (!isValidExtension) {
-                    // Invalid file extension
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Oops...',
-                        text: 'Please select a file with a valid extension (.pdf, .png, .jpg, .jpeg)!',
-                        confirmButtonText: 'OK'
-                    });
-                    isValid = false;
-                }
+          const inputElement = justificatifInput[0] as HTMLInputElement; // Narrow down the type to HTMLInputElement
+          if (inputElement.files && inputElement.files.length > 0) {
+            file = inputElement.files[0];
+          }
+
+          if (!file) {
+            // No file selected
+            Swal.fire({
+              icon: 'warning',
+              title: 'Oops...',
+              text: 'Please select a file!',
+              confirmButtonText: 'OK'
+            });
+            isValid = false;
+          } else {
+            let validExtensions = ['.pdf', '.png', '.jpg', '.jpeg'];
+            let isValidExtension = validExtensions.some(ext => file?.name.toLowerCase().endsWith(ext));
+            if (!isValidExtension) {
+              // Invalid file extension
+              Swal.fire({
+                icon: 'warning',
+                title: 'Oops...',
+                text: 'Please select a file with a valid extension (.pdf, .png, .jpg, .jpeg)!',
+                confirmButtonText: 'OK'
+              });
+              isValid = false;
             }
+          }
         }
-      
+
         return isValid;
       }
-      
-      
+
+
     });
 
+    this.fetchRequestCounts();
+  
+  }
+  fetchRequestCounts(): void {
+    if (!this.userId) {
+      console.error('User ID not found.');
+      return;
+    }
 
+    this.http.get<any>(`/api/CongerMaladie/count/${this.userId}`).subscribe(
+      response => {
+        this.inProgressCount = response.inProgress;
+        this.acceptedCount = response.accepted;
+        this.refusedCount = response.refused;
+      },
+      error => {
+        console.error('Error fetching request counts:', error);
+      }
+    );
   }
 
+  fetchData(status: string) {
+    
+    this.http.get<any[]>(`/api/CongerMaladie/${status}/${this.userId}`).subscribe(
+      (data) => {
+        // Process the fetched data and display it in the modal
+        switch (status) {
+          case 'IN_PROGRESS':
+            this.inProgressData = data;
+            break;
+          case 'ACCEPTED':
+            this.acceptedData = data;
+            break;
+          case 'REFUSED':
+            this.refusedData = data;
+            break;
+          default:
+            break;
+        }
+        console.log(data);
+      },
+      (error) => {
+        console.error('Error fetching data:', error);
+      }
+    );
+  }
+
+  showModal(status: string) {
+    switch (status) {
+        case 'IN_PROGRESS':
+            this.fetchData('IN_PROGRESS');
+
+            break;
+        case 'ACCEPTED':
+          this.fetchData('ACCEPTED');
+
+            break;
+        case 'REFUSED':
+          this.fetchData('REFUSED');
+            break;
+        default:
+            break;
+    }
+}
+
+showModalById(modalId: string) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.classList.add('show');
+        modal.setAttribute('aria-modal', 'true');
+    }
+}
+
+
+  
+  
   submitForm(): void {
 
 
-    console.log("start_date"+this.start_date)
-    console.log("end_date"+this.end_date)
+    console.log("start_date" + this.start_date)
+    console.log("end_date" + this.end_date)
     const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage
     if (!authToken) {
       console.error('Authorization token not found');
       Swal.fire('Error!', 'Authorization token not found', 'error');
       return;
     }
-  
+
     if (this.message && this.start_date && this.end_date && this.fileToUpload) {
       const formData = new FormData();
       formData.append('file', this.fileToUpload);
       formData.append('message', this.message);
       formData.append('startDate', this.start_date);
       formData.append('endDate', this.end_date);
-  console.log(formData);
+      console.log(formData);
       this.abscencsService.submitLeaveRequest(formData, authToken).subscribe(
         response => {
           // Handle successful submission
           console.log(response);
           Swal.fire('Success!', 'Leave request submitted successfully!', 'success');
+          this.ngOnInit();
         },
         error => {
           // Handle error
@@ -234,7 +318,7 @@ export class AbscencsComponent implements OnInit {
       Swal.fire('Error!', 'Please fill in all required fields.', 'error');
     }
   }
-  
+
   formatDate(dateString: string): string {
     // Assuming dateString is in format 'YYYY-MM-DD'
     const parts = dateString.split('-');
@@ -252,7 +336,7 @@ export class AbscencsComponent implements OnInit {
   }
 
 
-  
+
   resetForm(): void {
     // Reset form fields and state
     this.message = '';
@@ -260,6 +344,6 @@ export class AbscencsComponent implements OnInit {
     this.end_date = null;
     this.fileToUpload = null;
   }
-  
+
 
 }

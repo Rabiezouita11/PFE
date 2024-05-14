@@ -21,7 +21,7 @@ public class Conger_Maladie {
     private User user; // Reference to the User entity
     @Temporal(TemporalType.DATE)
     private Date dateDebut;
-
+    private String status = "IN_PROGRESS";
     @Temporal(TemporalType.DATE)
     private Date dateFin;
     private String justificationPath; // Path to the file

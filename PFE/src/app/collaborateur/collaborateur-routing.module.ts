@@ -6,6 +6,7 @@ import { AttestaionsComponent } from './attestaions/attestaions.component';
 import { MaladeComponent } from './malade/malade.component';
 import { QuestionsRhComponent } from './questions-rh/questions-rh.component';
 import { AbscencsComponent } from './abscencs/abscencs.component';
+import { CalenderComponent } from './calender/calender.component';
 
 const routes: Routes = [
 
@@ -15,6 +16,7 @@ const routes: Routes = [
   { path: 'malade', component: MaladeComponent },
   { path: 'questionsRh', component: QuestionsRhComponent },
   { path: 'Abscences', component: AbscencsComponent },
+  { path: 'calender', component: CalenderComponent },
 
 ];
 

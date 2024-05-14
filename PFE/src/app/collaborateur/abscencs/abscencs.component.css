@@ -273,5 +273,49 @@ select.list-dt:focus {
     border-radius: 50%; /* Make it circular */
   }
     
+
+  /* CSS for request counts */
+.request-counts {
+    text-align: center;
+}
+
+.request-counts p {
+    margin-bottom: 5px;
+}
+
+/* Styling for different status */
+.request-counts p {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.request-counts p.in-progress {
+    color: blue; /* Change color for in-progress */
+}
+
+.request-counts p.accepted {
+    color: green; /* Change color for accepted */
+}
+
+.request-counts p.refused {
+    color: red; /* Change color for refused */
+}
+.justification-link {
+    color: #007bff; /* Blue color */
+    text-decoration: none; /* Remove underline */
+}
+
+.justification-link:hover {
+    text-decoration: underline; /* Underline on hover */
+}
+
   
-  
+.custom-primary {
+    background-color: blue;
+    border-color: blue;
+}
+.custom-danger {
+    background-color: red;
+    border-color: red;
+}
+
