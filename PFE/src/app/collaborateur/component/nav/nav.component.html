@@ -81,8 +81,8 @@
                   </ng-template>
                 </a>
               <div class="dropdown-menu dropdown-menu-right navbar-dropdown" [ngClass]="{ 'show': dropdownOpen }" aria-labelledby="profileDropdown">
-                <a class="dropdown-item">
-                  <i class="ti-settings text-primary"></i>
+                <a class="dropdown-item" routerLink="Profile">
+                  <i class="ti-settings text-primary" ></i>
                   Settings
                 </a>
                 <a (click)="logout()" class="dropdown-item">

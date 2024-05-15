@@ -17,7 +17,9 @@ const routes: Routes = [
 
     {
         path: 'calender',
-        component: CalenderComponent
+        component: CalenderComponent,
+        canActivate: [CollaborateurGuard] // Apply AuthGuard to this route
+
     },
     {
         path: '',

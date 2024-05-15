@@ -8,10 +8,23 @@ import { User } from 'src/app/Models/User';
 })
 export class UsersService {
   private baseUrl = 'http://localhost:8080/api/Gestionnaire/users';
+  private baseUrl2 = 'http://localhost:8080/api/auth/';
+
+
   private authToken!: string; // Add authToken property
 
   constructor(private http : HttpClient) {}
 
+  updatePassword(userId: number, currentPassword: string, newPassword: string, authToken: string): Observable<any> {
+    const headers = { 'Authorization': `Bearer ${authToken}` };
+    const body = { currentPassword, newPassword };
+    return this.http.put(`${this.baseUrl2}updatePassword/${userId}`, body, { headers });
+  }
+  // Method to update user profile
+  updateUserProfile(userId: number, formData: FormData, authToken: string): Observable<any> {
+    const headers = { 'Authorization': `Bearer ${authToken}` };
+    return this.http.put(`${this.baseUrl2}update/${userId}`, formData, { headers });
+  }
 
   getAllUsers(authToken : string): Observable<User[]> {
     // Create headers with authorization token

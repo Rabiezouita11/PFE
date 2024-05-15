@@ -29,8 +29,16 @@ export class AbscencsComponent implements OnInit {
   start_date: string | null = null;
   end_date: string | null = null;
   fileToUpload!: File | null;
+  totalLeaveDays!: number;
   constructor(private abscencsService: AbscencsService, private http: HttpClient, private router: Router, private tokenStorage: TokenStorageService) { }
 
+  refreshAndNavigateToCalendar(): void {
+    // Reload the current route to refresh the page
+    this.router.navigateByUrl('/calender').then(() => {
+      window.location.reload();
+      this.router.navigate(['/calender']);
+    });
+  }
 
   ngOnInit(): void {
     if (this.tokenStorage.getToken()) {
@@ -39,7 +47,7 @@ export class AbscencsComponent implements OnInit {
       this.fileName = this.tokenStorage.getUser().photos;
       this.username = this.tokenStorage.getUser().username;
       this.image = this.getImageUrl(); // Call getImageUrl() to construct the image URL
-
+       this.getTotalSolde(this.userId );
     }
 
 
@@ -342,6 +350,19 @@ showModalById(modalId: string) {
     this.end_date = null;
     this.fileToUpload = null;
   }
+  getTotalSolde(userId: number): void {
 
+    const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage
+    if (!authToken) {
+      console.error('Authorization token not found');
+      Swal.fire('Error!', 'Authorization token not found', 'error');
+      return;
+    }
+    this.abscencsService.getTotalSolde(userId, authToken)
+      .subscribe(data => {
+        this.totalLeaveDays = data;
+      });
+  }
+  
 
 }

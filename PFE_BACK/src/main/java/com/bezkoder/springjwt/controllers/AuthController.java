@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.bezkoder.springjwt.payload.request.UpdateUserRequest;
 import com.bezkoder.springjwt.security.services.UserService;
 import com.bezkoder.springjwt.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -244,6 +245,79 @@ public class AuthController {
 		return diff.toMinutes() >= EXPIRE_TOKEN_AFTER_MINUTES;
 	}
 
+	@PutMapping("/update/{userId}")
+	public ResponseEntity<?> updateUser(@PathVariable Long userId,
+										@RequestParam(value = "image", required = false) MultipartFile image,
+										@RequestParam(value = "username", required = false) String username,
+										@RequestParam(value = "email", required = false) String email
+										) throws IOException {
+		Optional<User> userOptional = userRepository.findById(userId);
+		if (userOptional.isEmpty()) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: User not found with ID: " + userId));
+		}
+
+		User user = userOptional.get();
+
+		// Update email if provided in the request
+		if (email != null && !email.isEmpty()) {
+			user.setEmail(email);
+		}
+
+		// Update username if provided in the request
+		if (username != null && !username.isEmpty()) {
+			user.setUsername(username);
+		}
+
+		// Update password if provided in the request
+
+
+		// Update user's photo if provided in the request
+		if (image != null) {
+			String fileName = StringUtils.cleanPath(Objects.requireNonNull(image.getOriginalFilename()));
+			user.setPhotos(fileName);
+
+			// Save image file
+			String uploadDir = "user-photos/" + userId;
+			FileUploadUtil.saveFile(uploadDir, fileName, image);
+		}
+
+		// Save updated user to the database
+		userRepository.save(user);
+
+		return ResponseEntity.ok(new MessageResponse("User updated successfully!"));
+	}
+
+	@PutMapping("/updatePassword/{userId}")
+	public ResponseEntity<?> updatePassword(@PathVariable Long userId, @RequestBody Map<String, String> passwordRequest) {
+		Optional<User> userOptional = userRepository.findById(userId);
+		if (userOptional.isEmpty()) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: User not found with ID: " + userId));
+		}
+
+		User user = userOptional.get();
+
+		String currentPassword = passwordRequest.get("currentPassword");
+		String newPassword = passwordRequest.get("newPassword");
+
+		// Check if the current password matches
+		if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+			return ResponseEntity
+					.badRequest()
+					.body(new MessageResponse("Error: Current password is incorrect"));
+		}
+
+		// Update password
+		user.setPassword(encoder.encode(newPassword));
+
+		// Save updated user to the database
+		userRepository.save(user);
+
+		return ResponseEntity.ok(new MessageResponse("Password updated successfully!"));
+	}
 
 }
 

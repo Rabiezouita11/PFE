@@ -14,9 +14,10 @@ import { NavComponent } from './component/nav/nav.component';
 import { SidbarComponent } from './component/sidbar/sidbar.component';
 import { FooterComponent } from './component/footer/footer.component';
 import { AbscencsComponent } from './abscencs/abscencs.component';
+import { ProfileComponent } from './profile/profile.component';
 
 @NgModule({
-  declarations: [HomeComponent, BadgeComponent, MaladeComponent, AttestaionsComponent, QuestionsRhComponent, ComponentComponentCollaborateur, NavComponent, SidbarComponent, FooterComponent, AbscencsComponent],
+  declarations: [HomeComponent, BadgeComponent, MaladeComponent, AttestaionsComponent, QuestionsRhComponent, ComponentComponentCollaborateur, NavComponent, SidbarComponent, FooterComponent, AbscencsComponent, ProfileComponent],
   imports: [
     CommonModule,
     CollaborateurRoutingModule,

@@ -7,6 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class AbscencsService {
   private baseUrl = 'http://localhost:8080/api/CongerMaladie';
+  private baseUrl2 = 'http://localhost:8080/api/CongerMaladie/totalLeaveDays';
 
   constructor(private http: HttpClient) { }
   submitLeaveRequest(formData: FormData, authToken: string): Observable<any> {
@@ -22,6 +23,16 @@ export class AbscencsService {
     return this.http.post(`${this.baseUrl}/submit`, formData, requestOptions);
   }
 
-  
+  getTotalSolde(userId: number, authToken: string): Observable<number> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${authToken}`
+    });
+
+    const requestOptions = {
+      headers: headers
+    };
+
+    return this.http.get<number>(`${this.baseUrl2}/${userId}`, requestOptions);
+  }
 }
 
