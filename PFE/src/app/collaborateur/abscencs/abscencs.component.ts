@@ -334,7 +334,14 @@ showModalById(modalId: string) {
     this.fileToUpload = event.target.files[0];
   }
 
-
+  refreshComponent(): void {
+    // Resetting the component state or navigating to the same route again
+    const currentRoute = this.router.url; // Get the current route
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+        // Navigate back to the current route
+        this.router.navigate([currentRoute]);
+    });
+}
   getImageUrl(): string { // Assuming your backend endpoint for retrieving images is '/api/images/'
     return `http://localhost:8080/api/auth/images/${this.userId
       }/${this.fileName

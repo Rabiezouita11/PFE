@@ -71,7 +71,9 @@ System.out.println("durationInDaysdurationInDays"+durationInDays);
 
         // Check if the duration of the leave request exceeds the remaining solde
         if (durationInDays > remainingSolde) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Insufficient leave balance."));
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Insufficient leave balance. Remaining balance: " + remainingSolde + " days."));
         }
         remainingSolde -= durationInDays;
 
