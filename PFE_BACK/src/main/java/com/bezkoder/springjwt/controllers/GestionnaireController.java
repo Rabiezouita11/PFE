@@ -124,6 +124,8 @@ public class GestionnaireController {
             statusMessage += "<br><br><strong>Conger Maladie Details:</strong><br>";
             statusMessage += "<ul>";
             statusMessage += "<li>ID: " + conger.getId() + "</li>";
+            statusMessage += "<li>Type de congé: " + conger.getTypeConger() + "</li>";
+
             statusMessage += "<li>Message: " + conger.getMessage() + "</li>";
             statusMessage += "<li>Date Debut: " + conger.getDateDebut() + "</li>";
             statusMessage += "<li>Date Fin: " + conger.getDateFin() + "</li>";
