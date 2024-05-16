@@ -102,6 +102,7 @@ System.out.println("durationInDaysdurationInDays"+durationInDays);
         congerMaladie.setDateFin(endDate);
         congerMaladie.setJustificationPath(fileName); // Set the file name as justification path
         congerMaladie.setUser(userRepository.findById(userDetails.getId()).orElse(null));
+        congerMaladie.setTypeConger(leaveRequest.getTypeConger());
 
         // Save the Conger_Maladie object to the database
         congerMaladieRepository.save(congerMaladie);

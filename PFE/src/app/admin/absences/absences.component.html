@@ -55,6 +55,7 @@
                   <th>Start Date</th> <!-- Update column names -->
                   <th>End Date</th> <!-- Update column names -->
                   <th>Justification Path</th> <!-- Update column names -->
+                  <th>type de congé</th>
                   <th>Action</th>
                 </tr>
               </thead>
@@ -84,6 +85,7 @@
                   <td>{{ conger.dateFin }}</td> <!-- Update field names -->
                   <td><a [href]="'http://localhost:8080/uploads/' + conger.justificationPath" target="_blank">View
                       Justification</a></td> <!-- Update field names -->
+                      <td>{{conger.typeConger}}</td>
                   <td *ngIf="conger.status === 'ACCEPTED'" style="color:green">
                     Accepter
                   </td>

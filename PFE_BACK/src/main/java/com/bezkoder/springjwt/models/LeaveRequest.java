@@ -10,5 +10,7 @@ public class LeaveRequest {
     private String startDate;
     private String endDate;
     private String justificationPath;
+
+    private String typeConger ;
 }
 

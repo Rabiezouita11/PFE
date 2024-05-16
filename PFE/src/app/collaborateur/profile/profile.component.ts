@@ -16,6 +16,7 @@ export class ProfileComponent implements OnInit {
   userId: any;
   currentPassword: string = '';
   newPassword: string = '';
+  username: any;
   constructor(
     private UsersService: UsersService,
     private http: HttpClient,
@@ -26,6 +27,9 @@ export class ProfileComponent implements OnInit {
   ngOnInit(): void {
     if (this.tokenStorage.getToken()) {
       this.userId = this.tokenStorage.getUser().id;
+      this.user.username = this.tokenStorage.getUser().username;
+      this.user.email = this.tokenStorage.getUser().email;
+
     }
   }
 

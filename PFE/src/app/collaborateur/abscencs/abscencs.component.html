@@ -1,6 +1,6 @@
 <div class="container-fluid" id="grad1">
     <div class="row justify-content-center mt-0">
-        <div class="col-11 col-sm-9 col-md-7 col-lg-6 text-center p-0 mt-3 mb-2">
+        <div class="col-11 col-sm-9 col-md-7 col-lg-8 text-center p-0 mt-3 mb-2">
          
             <div class="card px-0 pt-4 pb-0 mt-3 mb-3">
                 <div class="row justify-content-center mt-3">
@@ -69,12 +69,26 @@
                         <form id="msform" (ngSubmit)="submitForm()">
                             <!-- progressbar -->
                             <ul id="progressbar">
-                                <li class="active" id="account"><strong>Je préviens</strong></li>
+                                <li  class="active"  id="account"><strong>Type de congé</strong></li> <!-- New step for type of leave -->
+                                <li id="account"><strong>Je préviens</strong></li>
                                 <li id="personal"><strong>je déclare un arret</strong></li>
                                 <li id="payment"><strong>je justifie</strong></li>
                                 <li id="confirm"><strong>Finish</strong></li>
                             </ul>
                             <!-- fieldsets -->
+                           
+                            <fieldset >
+                                <div class="form-card">
+                                    <label for="congerType">Type de congé :</label>
+                                    <select class="form-control"name="congerType" id="congerType" [(ngModel)]="typeConger">
+                                        <option value="conger-maladie">Congé maladie</option>
+                                        <option value="conger-payer">Congé payé</option>
+                                    </select>
+                                </div>
+                                <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+                                <input type="button" name="next" class="next action-button" value="Next Step" />
+                            </fieldset>
+                            
                             <fieldset>
                                 <div class="form-card">
                                     <div class="avatar-container">

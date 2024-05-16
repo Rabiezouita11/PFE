@@ -24,6 +24,7 @@ export class AbscencsComponent implements OnInit {
   inProgressData: any[] = [];
   acceptedData: any[] = [];
   refusedData: any[] = [];
+  typeConger: string = ''; // Declare the typeConger variable
 
   message: string = '';
   start_date: string | null = null;
@@ -121,7 +122,7 @@ export class AbscencsComponent implements OnInit {
         return false;
       });
 
-      function isStepValid(step: JQuery<HTMLElement>): boolean {
+      function isStepValid(this: any, step: JQuery<HTMLElement>): boolean {
         // Check if the step is valid (e.g., message is entered)
 
         let isValid: boolean = true;
@@ -156,7 +157,15 @@ export class AbscencsComponent implements OnInit {
           });
           isValid = false;
         }
-
+        if (step.attr('id') === 'conger-type' && this.congerType === '') {
+          Swal.fire({
+              icon: 'warning',
+              title: 'Oops...',
+              text: 'Please select the type of leave!',
+              confirmButtonText: 'OK'
+          });
+          isValid = false;
+      }
         // Check if start date is less than end date
         const startDateValue = new Date(step.find('input[name="start_date"]').val() as string);
         const endDateValue = new Date(step.find('input[name="end_date"]').val() as string);
@@ -300,6 +309,8 @@ showModalById(modalId: string) {
       formData.append('message', this.message);
       formData.append('startDate', this.start_date);
       formData.append('endDate', this.end_date);
+      formData.append('typeConger', this.typeConger); // Append typeConger to formData
+
       console.log(formData);
       this.abscencsService.submitLeaveRequest(formData, authToken).subscribe(
         response => {
