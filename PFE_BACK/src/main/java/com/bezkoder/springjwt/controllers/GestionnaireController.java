@@ -105,6 +105,20 @@ public class GestionnaireController {
 
             conger.setStatus(newStatus);
             congerMaladieRepository.save(conger); // Save the updated conger
+
+            // Check if the new status is "REFUSED"
+            if ("REFUSED".equalsIgnoreCase(newStatus)) {
+                // Find the user's SoldeConger
+                Optional<SoldeConger> soldeCongerOptional = soldeCongerRepository.findByUserIds(conger.getUser().getId());
+                if (soldeCongerOptional.isPresent()) {
+                    SoldeConger soldeConger = soldeCongerOptional.get();
+                    // Update the solde and oldSoldConger
+
+
+                    soldeCongerRepository.save(soldeConger); // Save the updated SoldeConger
+                }
+            }
+
             sendCongerStatusEmailAsync(conger.getUser().getEmail(), oldStatus, newStatus, conger);
 
             return ResponseEntity.ok().body("{\"message\": \"Conger status updated successfully\"}");
@@ -112,6 +126,7 @@ public class GestionnaireController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @Async
     protected void sendCongerStatusEmailAsync(String userEmail, String oldStatus, String newStatus, Conger_Maladie conger) {
         MimeMessage message = javaMailSender.createMimeMessage();

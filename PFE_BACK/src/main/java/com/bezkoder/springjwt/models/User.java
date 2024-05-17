@@ -44,7 +44,7 @@ public class User {
 	private String password;
 	private Boolean status; // Default value is null
 
-
+	@JsonIgnore
 	@OneToOne(mappedBy = "user")
 	private SoldeConger soldeConger;
 

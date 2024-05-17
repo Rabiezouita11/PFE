@@ -64,10 +64,9 @@ public class CongerMaladieController {
         // Calculate the duration of the leave request in days
         long durationInMilliseconds = endDate.getTime() - startDate.getTime();
         long durationInDays = TimeUnit.MILLISECONDS.toDays(durationInMilliseconds);
-System.out.println("durationInDaysdurationInDays"+durationInDays);
         // Get the remaining leave balance (solde) for the user
         SoldeConger soldeConger = soldeCongerRepository.findByUserId(userDetails.getId());
-        int remainingSolde = soldeConger != null ? soldeConger.getSolde() : 0;
+        long remainingSolde = soldeConger != null ? soldeConger.getSolde() : 0;
 
         // Check if the duration of the leave request exceeds the remaining solde
         if (durationInDays > remainingSolde) {
@@ -78,7 +77,10 @@ System.out.println("durationInDaysdurationInDays"+durationInDays);
         remainingSolde -= durationInDays;
 
 
+
+
         if (soldeConger != null) {
+            soldeConger.setOldSoldConger(durationInDays);
             soldeConger.setSolde(remainingSolde);
             soldeCongerRepository.save(soldeConger);
         }
@@ -172,13 +174,13 @@ System.out.println("durationInDaysdurationInDays"+durationInDays);
     }
 
     @GetMapping("/totalLeaveDays/{userId}")
-    public ResponseEntity<Integer> getSoldeConger(@PathVariable Long userId) {
+    public ResponseEntity<Long> getSoldeConger(@PathVariable Long userId) {
         // Retrieve the user's SoldeConger object from the database based on the user ID
         SoldeConger soldeConger = soldeCongerRepository.findByUserId(userId);
 
         if (soldeConger == null) {
             // If SoldeConger object does not exist for the user, return 0 or handle the case accordingly
-            return ResponseEntity.ok(0);
+            return ResponseEntity.ok(0L);
         }
 
         // Return the solde (total leave days available)
