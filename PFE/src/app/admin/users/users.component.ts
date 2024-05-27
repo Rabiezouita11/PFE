@@ -97,10 +97,13 @@ export class UsersComponent implements OnInit {
       cancelButtonText: 'No, cancel!'
     }).then((result) => {
       if (result.isConfirmed) {
+        this.isLoading = true;
+
         this.userService.updateStatus(user.id, false, authToken).subscribe(
           response => {
             this.handleResponse(response);
             this.ngOnInit();
+            this.isLoading = false;
 
           },
           error => {
@@ -110,6 +113,8 @@ export class UsersComponent implements OnInit {
               title: 'Error',
               text: 'Failed to update user status',
             });
+            this.isLoading = false;
+
           }
         );
       } else if (result.dismiss === Swal.DismissReason.cancel) {
