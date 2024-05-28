@@ -108,7 +108,16 @@ public class BadgeController {
         }
         return new ResponseEntity<>(createdBadge, HttpStatus.CREATED);
     }
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<?> deleteBadgeRequest(@PathVariable Long userId ,@AuthenticationPrincipal UserDetails userDetails) {
+        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_COLLABORATEUR"))) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
+        }
 
+        // Call the service method to delete the badge request
+        badgeService.deleteBadgeRequestByUserId(userId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
     @GetMapping("/status/{userId}")
     public ResponseEntity<?> checkBadgeStatus(@PathVariable Long userId, @AuthenticationPrincipal UserDetails userDetails) {

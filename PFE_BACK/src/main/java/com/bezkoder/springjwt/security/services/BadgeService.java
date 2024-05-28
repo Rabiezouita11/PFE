@@ -5,6 +5,8 @@ import com.bezkoder.springjwt.repository.BadgeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
 public class BadgeService {
     @Autowired
@@ -29,5 +31,10 @@ public class BadgeService {
         Badge badge = badgeRepository.findById(badgeId).orElseThrow(() -> new RuntimeException("Badge not found"));
         badge.setStatus("refuser");
         badgeRepository.save(badge);
+    }
+
+    @Transactional
+    public void deleteBadgeRequestByUserId(Long userId) {
+        badgeRepository.deleteByUserId(userId);
     }
 }

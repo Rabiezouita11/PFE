@@ -46,7 +46,8 @@
               </div>
               <div *ngIf="showBadgeRequestRefuse" class="alert alert-danger" role="alert">
                 <p>Votre demande a été refusée.</p>
-              </div>
+                <button class="btn btn-warning" (click)="resetBadgeRequest()">Refaire la demande</button>
+            </div>
             </div>
             <button type="button" class="btn btn-success" *ngIf="showBadgeRequestAccepter" data-bs-toggle="modal" data-bs-target="#exampleModal">
               modifier badge

@@ -180,7 +180,28 @@ export class BadgeComponent implements OnInit {
         checkPrint();
     }
 
+    resetBadgeRequest() {
+        console.log(this.userId)
+        const authToken = this.tokenStorage.getToken();
+        if (!authToken) {
+            console.error('Authorization token not found');
+            Swal.fire('Error!', 'Authorization token not found', 'error');
+            return;
+        }
+    
+        // Call the service method to delete the old badge request
+        this.badgeService.deleteBadgeRequest(this.userId, authToken).subscribe(() => {
+            // After successful deletion, set the flag to show the badge request form
+          this.showBadgeRequestRefuse = false; // Set showBadgeRequestRefuse to false
 
+            Swal.fire('Success!', 'Ancienne demande de badge supprimée. Veuillez refaire la demande.', 'success');
+            this.ngOnInit();
+        }, (error) => {
+            console.error('Error deleting old badge request:', error);
+            Swal.fire('Error!', 'Error deleting old badge request', 'error');
+        });
+    }
+    
 
     loadScriptsAndStyles(): void {
         const SCRIPT_PATH_LIST = [

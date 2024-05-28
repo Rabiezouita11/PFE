@@ -123,4 +123,11 @@ import {Badge} from 'src/app/Models/badge';
             this.baseUrl2
         }/user/${userId}`, requestOptions);
     }
+
+    deleteBadgeRequest(userId: number, authToken: string): Observable<any> {
+        const headers = new HttpHeaders({
+          'Authorization': 'Bearer ' + authToken
+        });
+        return this.http.delete(`${this.baseUrl2}/${userId}`, { headers });
+      }
 }

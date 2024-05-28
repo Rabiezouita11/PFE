@@ -13,5 +13,6 @@ public interface BadgeRepository extends JpaRepository<Badge, Long> {
     Badge findByUserIdAndStatus(Long userId, String status);
     Badge findByUserId(Long userId);
     List<Badge> findByUser(User user);
+    void deleteByUserId(Long userId);
 
 }
