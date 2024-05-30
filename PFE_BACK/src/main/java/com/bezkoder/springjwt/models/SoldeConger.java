@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -15,7 +17,8 @@ public class SoldeConger {
     // Getters and setters
     // Constructors
     // Other fields and methods
-
+    @OneToMany(mappedBy = "soldeConger", cascade = CascadeType.ALL)
+    private List<Donner> donners;
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;

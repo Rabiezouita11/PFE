@@ -1,10 +1,7 @@
 package com.bezkoder.springjwt.controllers;
 
 import com.bezkoder.springjwt.models.*;
-import com.bezkoder.springjwt.repository.CongerMaladieRepository;
-import com.bezkoder.springjwt.repository.RoleRepository;
-import com.bezkoder.springjwt.repository.UserRepository;
-import com.bezkoder.springjwt.repository.soldeCongerRepository;
+import com.bezkoder.springjwt.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
@@ -44,6 +41,8 @@ public class GestionnaireController {
     CongerMaladieRepository congerMaladieRepository;
     @Autowired
     private JavaMailSender javaMailSender;
+    @Autowired
+    private DonnerRepository donnerRepository;
 
 
     @GetMapping("/users")
@@ -109,13 +108,15 @@ public class GestionnaireController {
             // Check if the new status is "REFUSED"
             if ("REFUSED".equalsIgnoreCase(newStatus)) {
                 // Find the user's SoldeConger
-                Optional<SoldeConger> soldeCongerOptional = soldeCongerRepository.findByUserIds(conger.getUser().getId());
-                if (soldeCongerOptional.isPresent()) {
-                    SoldeConger soldeConger = soldeCongerOptional.get();
-                    // Update the solde and oldSoldConger
+                Long durationInDays = donnerRepository.getDurationInDaysByCongerMaladieId(congerId);
+                if (durationInDays != null) {
+                    Optional<SoldeConger> soldeCongerOptional = Optional.ofNullable(soldeCongerRepository.findByUserId(conger.getUser().getId()));
 
-
-                    soldeCongerRepository.save(soldeConger); // Save the updated SoldeConger
+                    if (soldeCongerOptional.isPresent()) {
+                        SoldeConger soldeConger = soldeCongerOptional.get();
+                        soldeConger.setSolde(soldeConger.getSolde() + durationInDays);
+                        soldeCongerRepository.save(soldeConger); // Save the updated SoldeConger
+                    }
                 }
             }
 

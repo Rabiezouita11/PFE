@@ -38,7 +38,7 @@ public class User {
 	@Size(max = 50)
 	@Email
 	private String email;
-    @Column(length = 64)
+    @Column(length = 255)
 	private String photos;
 	@Size(max = 120)
 	private String password;

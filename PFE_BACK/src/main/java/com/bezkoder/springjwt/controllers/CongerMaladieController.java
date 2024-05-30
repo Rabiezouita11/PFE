@@ -1,10 +1,12 @@
 package com.bezkoder.springjwt.controllers;
 
 import com.bezkoder.springjwt.models.Conger_Maladie;
+import com.bezkoder.springjwt.models.Donner;
 import com.bezkoder.springjwt.models.LeaveRequest;
 import com.bezkoder.springjwt.models.SoldeConger;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.repository.CongerMaladieRepository;
+import com.bezkoder.springjwt.repository.DonnerRepository;
 import com.bezkoder.springjwt.repository.UserRepository;
 import com.bezkoder.springjwt.security.services.UserDetailsImpl;
 import com.bezkoder.springjwt.util.CustomDateDeserializer;
@@ -40,6 +42,8 @@ public class CongerMaladieController {
 
     @Autowired
     soldeCongerRepository soldeCongerRepository;
+    @Autowired
+    private DonnerRepository donnerRepository;
 
 
     // Define the directory where files will be stored
@@ -82,6 +86,7 @@ public class CongerMaladieController {
         if (soldeConger != null) {
             soldeConger.setOldSoldConger(durationInDays);
             soldeConger.setSolde(remainingSolde);
+
             soldeCongerRepository.save(soldeConger);
         }
         // Save the file to the backend folder
@@ -108,7 +113,13 @@ public class CongerMaladieController {
 
         // Save the Conger_Maladie object to the database
         congerMaladieRepository.save(congerMaladie);
+        Donner donner = new Donner();
+        donner.setSoldeConger(soldeConger);
+        donner.setCongerMaladie(congerMaladie);
+        donner.setDurationInDays(durationInDays);
 
+        // Save the Donner object to the database
+        donnerRepository.save(donner);
         // Return a success response
         return ResponseEntity.ok(new MessageResponse("Leave request submitted successfully!"));
     }
