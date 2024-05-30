@@ -1,7 +1,9 @@
 package com.bezkoder.springjwt.controllers;
 
+import com.bezkoder.springjwt.Dto.DonnerDTO;
 import com.bezkoder.springjwt.models.*;
 import com.bezkoder.springjwt.repository.*;
+import com.bezkoder.springjwt.security.services.DonnerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
@@ -43,7 +45,8 @@ public class GestionnaireController {
     private JavaMailSender javaMailSender;
     @Autowired
     private DonnerRepository donnerRepository;
-
+    @Autowired
+    private DonnerService donnerService;
 
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers(@AuthenticationPrincipal UserDetails userDetails) {
@@ -169,6 +172,14 @@ public class GestionnaireController {
         List<Conger_Maladie> congerMaladies = congerMaladieRepository.findAll();
         return ResponseEntity.ok().body(congerMaladies);
     }
-
+    @GetMapping("/donner/conger-maladie/{congerMaladieId}")
+    public ResponseEntity<DonnerDTO> getDonnerByCongerMaladieId(@PathVariable Long congerMaladieId) {
+        Optional<DonnerDTO> donner = donnerService.getDonnerByCongerMaladieId(congerMaladieId);
+        if (donner.isPresent()) {
+            return ResponseEntity.ok().body(donner.get());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 }

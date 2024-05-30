@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
+import { DonnerDTO } from 'src/app/Dto/donner-dto.model';
 import {CongerMaladieService} from 'src/app/Service/CongerMaladie/conger-maladie.service';
+import { DonnerServiceService } from 'src/app/Service/DonnerService/donner-service.service';
 import {TokenStorageService} from 'src/app/_services/token-storage.service';
 import Swal from 'sweetalert2';
 
@@ -7,13 +9,38 @@ import Swal from 'sweetalert2';
 export class AbsencesComponent implements OnInit {
     congerMaldierList : any[] = [];
     isLoading = false;
+    donners: DonnerDTO | undefined;
 
-    constructor(private congerMaladieService : CongerMaladieService, private tokenStorage : TokenStorageService) {}
+    constructor(private donnerService: DonnerServiceService ,private congerMaladieService : CongerMaladieService, private tokenStorage : TokenStorageService) {}
 
     ngOnInit(): void {
         this.loadCongerMaladieList();
 
     }
+    showDonnerDetails(congerMaladieId: number) {
+        this.donnerService.getDonnerByCongerMaladieId(congerMaladieId).subscribe(
+          (data: DonnerDTO) => {
+            this.donners = data;
+            // Use type assertion to access the 'modal' property
+            ($('#donnerModal') as any).modal('show');
+          },
+          (error: any) => {
+            console.error('Error fetching Donner data:', error);
+          }
+        );
+      }
+    
+    getDonner(congerMaladieId: number): void {
+        this.donnerService.getDonnerByCongerMaladieId(congerMaladieId).subscribe(
+          (data: DonnerDTO) => {
+            this.donners = data;
+        console.log(data);
+          },
+          (error: any) => {
+            console.error('Error fetching Donner data:', error);
+          }
+        );
+      }
     loadCongerMaladieList() {
 
         const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage
@@ -25,7 +52,7 @@ export class AbsencesComponent implements OnInit {
         }
         this.congerMaladieService.getAllCongerMaladie(authToken).subscribe((data : any) => {
             this.congerMaldierList = data;
-            console.log(this.congerMaldierList)
+            console.log(data)
         }, (error : any) => {
             console.log('Error fetching conger maladie list:', error);
         });
