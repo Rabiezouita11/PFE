@@ -1,4 +1,4 @@
-  <!-- Page Sidebar Start-->
+  <!-- Page Sidebar Start
 
   <div class="main-header-left d-none d-lg-block">
     <div class="logo-wrapper">
@@ -89,4 +89,48 @@
      
 
     </ul>
-</div>
+</div> -->
+
+
+
+
+<nav class="sidebar sidebar-offcanvas" id="sidebar">
+  <ul class="nav">
+    <li class="nav-item" [ngClass]="{'active': isActive('/dashboard')}">
+      <a class="nav-link" routerLink="/dashboard">
+        <i class="icon-grid menu-icon"></i>
+        <span class="menu-title">Dashboard</span>
+      </a>
+    </li>
+    <li class="nav-item" [ngClass]="{'active': isActive('/badge')}">
+      <a class="nav-link" routerLink="/badge">
+        <i class="fas fa-id-badge menu-icon"></i> <!-- Replace icon class here -->
+        <span class="menu-title">Badge</span>
+      </a>
+    </li>
+    <li class="nav-item" [ngClass]="{'active': isActive('/users')}">
+      <a class="nav-link" routerLink="/users">
+        <i class="fas fa-users menu-icon"></i> <!-- Replace icon class here -->
+        <span class="menu-title">Users</span>
+      </a>
+    </li>
+    <li class="nav-item" [ngClass]="{'active': isActive('/absences')}">
+      <a class="nav-link" routerLink="/absences">
+        <i class="fas fa-calendar-alt menu-icon"></i> <!-- Replace icon class here -->
+        <span class="menu-title">Absences</span>
+      </a>
+    </li>
+    <li class="nav-item" [ngClass]="{'active': isActive('/QuestionsRh')}">
+      <a class="nav-link" routerLink="/QuestionsRh">
+        <i class="fas fa-question-circle menu-icon"></i> <!-- Replace icon class here -->
+        <span class="menu-title">Questions RH</span>
+      </a>
+    </li>
+    <li class="nav-item" [ngClass]="{'active': isActive('/attestations')}">
+      <a class="nav-link" routerLink="/attestations">
+        <i class="far fa-file-alt menu-icon"></i> <!-- Replace icon class here -->
+        <span class="menu-title">Attestations</span>
+      </a>
+    </li>
+  </ul>
+</nav>

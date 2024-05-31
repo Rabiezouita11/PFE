@@ -34,11 +34,7 @@
     <div class="col-sm-12">
       <div class="card">
         <div class="card-header">
-          <form class="form-inline search-form search-box">
-            <div class="form-group">
-              <input class="form-control-plaintext" type="search" placeholder="Search..">
-            </div>
-          </form>
+         
         </div>
 
         <div class="card-body">
@@ -49,11 +45,9 @@
                   <th>ID</th>
                   <th>Message</th>
                   <th>Status</th>
-                  <th>User Email</th>
+                 
                   <th>User Name</th>
-                  <th>Start Date</th>
-                  <th>End Date</th>
-                  <th>Justification Path</th>
+                  
                   <th>Type de Congé</th>
                   <th>Action</th>
                 </tr>
@@ -76,25 +70,32 @@
                       </ng-container>
                     </ng-template>
                   </td>
-                  <td><i class="fas fa-envelope"></i> {{ conger.user.email }}</td>
                   <td><i class="fas fa-user"></i> {{ conger.user.username }}</td>
-                  <td>{{ conger.dateDebut }}</td>
-                  <td>{{ conger.dateFin }}</td>
-                  <td><a [href]="'http://localhost:8080/uploads/' + conger.justificationPath" target="_blank">View Justification</a></td>
+                  
                   <td>{{ conger.typeConger }}</td>
                   <td *ngIf="conger.status === 'ACCEPTED'" style="color:green">
-                    Accepter
+                    Accepter <i class="fas fa-dollar-sign text-info icon-large" (click)="showDonnerDetails(conger.id)" title="Details"></i> <i class="fas fa-arrow-alt-circle-right text-info icon-large" (click)="showDonnerDetails2(conger.id)" title="Details"></i>
                   </td>
                   <td *ngIf="conger.status === 'REFUSED'" style="color:red">
-                    Refuser
+                    Refuser  <i class="fas fa-dollar-sign text-info icon-large" (click)="showDonnerDetails(conger.id)" title="Details"></i> <i class="fas fa-arrow-alt-circle-right text-info icon-large" (click)="showDonnerDetails2(conger.id)" title="Details"></i>
                   </td>
+                  
+                   
                   <td *ngIf="conger.status === 'IN_PROGRESS'">
                     <ng-container>
                       <i class="fa fa-check text-success icon-large mr-2" (click)="updateStatus(conger.id, 'ACCEPTED')" title="Accept"></i>
                       <i class="fa fa-times text-danger icon-large" (click)="updateStatus(conger.id, 'REFUSED')" title="Refuse"></i>
-                      <i class="fa fa-info-circle text-info icon-large" (click)="showDonnerDetails(conger.id)" title="Details"></i>
+                      <i class="fas fa-dollar-sign text-info icon-large" (click)="showDonnerDetails(conger.id)" title="Details"></i>
+                      <i class="fas fa-arrow-alt-circle-right text-info icon-large" (click)="showDonnerDetails2(conger.id)" title="Details"></i>
                     </ng-container>
                   </td>
+                  <!-- <td>
+                    <i class="fas fa-dollar-sign text-info icon-large" (click)="showDonnerDetails(conger.id)" title="Details"></i>
+                  </td>
+                  <td>
+                    <i class="fas fa-arrow-alt-circle-right text-info icon-large" (click)="showDonnerDetails2(conger.id)" title="Details"></i>
+                  </td> -->
+
                 </tr>
               </tbody>
             </table>
@@ -121,10 +122,14 @@
       </div>
       <div class="modal-body">
         <ng-container *ngIf="donners">
-          <p><strong>ID:</strong> {{ donners.id }}</p>
-          <p><strong>Conger Maladie ID:</strong> {{ donners.congerMaladieId }}</p>
-          <p><strong>Solde Conger ID:</strong> {{ donners.soldeCongerId }}</p>
-          <p><strong>Duration in Days:</strong> {{ donners.durationInDays }}</p>
+          <div class="row">
+            <div class="col">
+              <p><strong>Duration in Days:</strong></p>
+            </div>
+            <div class="col">
+              <p>{{ donners.durationInDays }}</p>
+            </div>
+          </div>
         </ng-container>
       </div>
       <div class="modal-footer">
@@ -134,4 +139,40 @@
   </div>
 </div>
 
+
+
+<div class="modal fade" id="donnerModall" tabindex="-1" role="dialog" aria-labelledby="donnerModalLabell" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="donnerModalLabell">Donner Details</h5>
+        <button type="button" class="close" onclick="$('#donnerModall').modal('hide');" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <ng-container *ngIf="selectedConger">
+          <p><strong>ID:</strong> {{ selectedConger.id }}</p>
+          <p><strong>Message:</strong> {{ selectedConger.message }}</p>
+          <p><strong>Status:</strong> {{ selectedConger.status }}</p>
+          <p><strong>User Email:</strong> {{ selectedConger.user.email }}</p>
+          <p><strong>User Name:</strong> {{ selectedConger.user.username }}</p>
+          <p><strong>Start Date:</strong> {{ selectedConger.dateDebut }}</p>
+          <p><strong>End Date:</strong> {{ selectedConger.dateFin }}</p>
+          <p><strong>Justification Path:</strong> <a [href]="'http://localhost:8080/uploads/' + selectedConger.justificationPath" target="_blank">View Justification</a></p>
+          <p><strong>Type de Congé:</strong> {{ selectedConger.typeConger }}</p>
+          <p><strong>Additional Attribute 1:</strong> {{ selectedConger.additionalAttribute1 }}</p>
+          <p><strong>Additional Attribute 2:</strong> {{ selectedConger.additionalAttribute2 }}</p>
+        </ng-container>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="$('#donnerModall').modal('hide');" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
+
+
+</div>
+
+

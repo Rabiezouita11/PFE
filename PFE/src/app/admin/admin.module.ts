@@ -13,10 +13,11 @@ import { QuestionsRhComponent } from './questions-rh/questions-rh.component';
 import { AttestationsComponent } from './attestations/attestations.component';
 import { FormsModule } from '@angular/forms';
 import { UsersComponent } from './users/users.component';
+import { NavComponent } from './nav/nav.component';
 
 
 @NgModule({
-  declarations: [DashboardComponent, HeaderComponent, ComponentComponent, SidbarComponent, FooterComponent, BadgeComponent, AbsencesComponent, QuestionsRhComponent, AttestationsComponent, UsersComponent],
+  declarations: [DashboardComponent, HeaderComponent, ComponentComponent, SidbarComponent, FooterComponent, BadgeComponent, AbsencesComponent, QuestionsRhComponent, AttestationsComponent, UsersComponent, NavComponent],
   imports: [
     CommonModule,
     AdminRoutingModule,

@@ -4,18 +4,25 @@ import {CongerMaladieService} from 'src/app/Service/CongerMaladie/conger-maladie
 import { DonnerServiceService } from 'src/app/Service/DonnerService/donner-service.service';
 import {TokenStorageService} from 'src/app/_services/token-storage.service';
 import Swal from 'sweetalert2';
+declare var $: any; // Declare jQuery to avoid TypeScript errors
 
 @Component({selector: 'app-absences', templateUrl: './absences.component.html', styleUrls: ['./absences.component.css']})
 export class AbsencesComponent implements OnInit {
     congerMaldierList : any[] = [];
     isLoading = false;
     donners: DonnerDTO | undefined;
+    selectedConger: any;
 
     constructor(private donnerService: DonnerServiceService ,private congerMaladieService : CongerMaladieService, private tokenStorage : TokenStorageService) {}
 
     ngOnInit(): void {
+      
         this.loadCongerMaladieList();
-
+        if (typeof $ !== 'undefined') {
+          console.log('jQuery is loaded and initialized!');
+        } else {
+          console.error('jQuery is not loaded or initialized properly!');
+        }
     }
     showDonnerDetails(congerMaladieId: number) {
         this.donnerService.getDonnerByCongerMaladieId(congerMaladieId).subscribe(
@@ -29,6 +36,14 @@ export class AbsencesComponent implements OnInit {
           }
         );
       }
+
+      showDonnerDetails2(congerId: number): void {
+        this.selectedConger = this.congerMaldierList.find(conger => conger.id === congerId);
+        
+        ($('#donnerModall') as any).modal('show');
+      }
+    
+
     
     getDonner(congerMaladieId: number): void {
         this.donnerService.getDonnerByCongerMaladieId(congerMaladieId).subscribe(
