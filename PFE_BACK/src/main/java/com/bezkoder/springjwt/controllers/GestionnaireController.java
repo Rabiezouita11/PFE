@@ -3,35 +3,45 @@ package com.bezkoder.springjwt.controllers;
 import com.bezkoder.springjwt.Dto.DonnerDTO;
 import com.bezkoder.springjwt.models.*;
 import com.bezkoder.springjwt.repository.*;
+import com.bezkoder.springjwt.security.services.AttestationService;
 import com.bezkoder.springjwt.security.services.DonnerService;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 
 @RestController
 @RequestMapping("/api/Gestionnaire")
 public class GestionnaireController {
+    private static final String UPLOAD_DIR = "attestations";
+
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -47,7 +57,10 @@ public class GestionnaireController {
     private DonnerRepository donnerRepository;
     @Autowired
     private DonnerService donnerService;
-
+    @Autowired
+    private AttestationService attestationService;
+    @Autowired
+    private AttestationRepository attestationRepository;
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers(@AuthenticationPrincipal UserDetails userDetails) {
         if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTIONNAIRE"))) {
@@ -180,6 +193,146 @@ public class GestionnaireController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+    @PostMapping("/SaveAttestations")
+    public ResponseEntity<?> handleFileUpload(@RequestParam(value = "file", required = false) MultipartFile file,
+                                              @RequestParam("name") String name,
+                                              @RequestParam("isExist") boolean isExist) {
+        try {
+            if (file != null) {
+                String fileName = StringUtils.cleanPath(FilenameUtils.getBaseName(file.getOriginalFilename()) + "_" + System.currentTimeMillis() + "." + FilenameUtils.getExtension(file.getOriginalFilename()));
+                Path uploadDir = Paths.get(UPLOAD_DIR);
+                if (!Files.exists(uploadDir)) {
+                    Files.createDirectories(uploadDir);
+                }
+                Files.copy(file.getInputStream(), uploadDir.resolve(fileName));
+
+                String pdfPath = UPLOAD_DIR + "/" + fileName;
+
+                // Save attestation data into the database
+                Attestation attestation = new Attestation(name, pdfPath, isExist);
+                attestationService.saveAttestation(attestation);
+
+                // Return a success response with a custom message
+                return ResponseEntity.ok().body("Attestation saved successfully");
+            } else {
+                Attestation attestation = new Attestation(name, isExist);
+                attestationService.saveAttestation(attestation);
+                // If file is null, return a bad request response
+                return ResponseEntity.ok().body("Attestation saved successfully");
+            }
+        } catch (Exception e) {
+            // If an exception occurs, return a server error response
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file");
+        }
+    }
+
+    @PostMapping("/GeneratePdf")
+    public ResponseEntity<String> generatePdf(@RequestBody Map<String, String> pdfContentMap) {
+        try {
+
+
+            String pdfContent = pdfContentMap.get("pdfContent");
+            String pdfName = pdfContentMap.get("pdfName");
+
+
+            // Extract and trim the content
+            String content = pdfContent.trim();
+
+            // Remove double quotes from the extracted content
+            content = content.replace("\"", "");
+
+            // Create a new PDF document
+            PDDocument document = new PDDocument();
+            PDPage page = new PDPage();
+            document.addPage(page);
+
+            // Create a new content stream for writing to the PDF
+            PDPageContentStream contentStream = new PDPageContentStream(document, page);
+
+            // Set the font and font size for the title
+            contentStream.setFont(PDType1Font.HELVETICA_BOLD, 24);
+
+            // Calculate the width of the title
+            String title = "Attestations " + pdfName;
+            float titleWidth = PDType1Font.HELVETICA_BOLD.getStringWidth(title) / 1000f * 24;
+            float pageWidth = page.getMediaBox().getWidth();
+            float titleX = (pageWidth - titleWidth) / 2f; // Center the title horizontally
+
+            // Write the title to the PDF
+            contentStream.beginText();
+            contentStream.newLineAtOffset(titleX, 750); // Set the position for the title (top center)
+            contentStream.showText(title); // Display the title
+            contentStream.endText();
+
+            // Set the font and font size for the content
+            contentStream.setFont(PDType1Font.HELVETICA, 12);
+
+            // Split the content into lines with line breaks every 60 characters
+            List<String> lines = splitContent(content, 60);
+
+            // Starting y position for the content
+            float y = 700;
+
+            // Loop through each line of content
+            for (String line : lines) {
+                // Calculate the X offset to center the text horizontally
+                float textWidth = PDType1Font.HELVETICA.getStringWidth(line) / 1000f * 12;
+                float xOffset = (pageWidth - textWidth) / 2f;
+
+                // Write each line as a separate paragraph
+                contentStream.beginText();
+                contentStream.newLineAtOffset(xOffset, y); // Set the position for the text
+                contentStream.showText(line); // Display the line
+                contentStream.endText();
+                y -= 20; // Move to the next line
+            }
+
+            // Close the content stream
+            contentStream.close();
+
+            // Save the PDF document to a byte array
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            document.save(outputStream);
+            document.close();
+
+            // Specify the directory where you want to save the PDF
+            String uploadDir = "attestations";
+
+            // Create the directory if it doesn't exist
+            if (!Files.exists(Paths.get(uploadDir))) {
+                Files.createDirectories(Paths.get(uploadDir));
+            }
+
+            // Generate a unique file name for the PDF
+            String fileName = "generated_pdf_" + System.currentTimeMillis() + ".pdf";
+
+            // Write the PDF content to the file
+            FileUtils.writeByteArrayToFile(new File(uploadDir + File.separator + fileName), outputStream.toByteArray());
+            Attestation attestation = new Attestation();
+            attestation.setName(pdfName); // Set pdfName
+            String pdfPath = uploadDir + File.separator + fileName;
+            attestation.setPdfPath(pdfPath); // Set pdfName
+            attestation.setExist(true); // Set pdfName
+            attestationRepository.save(attestation); // Save the object using your repository
+
+            // Return the path to the saved PDF file
+            return ResponseEntity.ok(uploadDir + File.separator + fileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Return an error response if PDF generation fails
+            return ResponseEntity.status(500).body("Failed to generate PDF");
+        }
+    }
+
+    // Function to split the content into lines with line breaks every n characters
+    private List<String> splitContent(String content, int n) {
+        List<String> lines = new ArrayList<>();
+        for (int i = 0; i < content.length(); i += n) {
+            int endIndex = Math.min(i + n, content.length());
+            lines.add(content.substring(i, endIndex));
+        }
+        return lines;
     }
 
 }

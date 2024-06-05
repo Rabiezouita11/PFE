@@ -21,3 +21,41 @@
         </div>
     </div>
 </div>
+<div class="container">
+    <!-- Button to show the upload attestation form -->
+    <button class="btn btn-primary" [ngClass]="{ 'active': showUpload }" (click)="showUploadForm()">Upload Attestation</button>
+    <!-- Button to show the generate PDF form -->
+    <button class="btn btn-primary" [ngClass]="{ 'active': showGeneratePdf }" (click)="showGeneratePdfForm()">Generate PDF</button>
+<br><br>
+    <!-- Upload attestation form -->
+    <div *ngIf="showUpload">
+        <h2>Upload Attestation</h2>
+        <form (ngSubmit)="onSubmit()">
+            <div class="form-group">
+                <label for="file">Select File:</label>
+                <input type="file" #fileInput id="file" (change)="onFileSelected($event)" class="form-control-file">
+            </div>
+            <div class="form-group">
+                <label for="name">Name:</label>
+                <input type="text" id="name" [(ngModel)]="name" name="name" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+    <!-- Generate PDF form -->
+    <div *ngIf="showGeneratePdf">
+        <h2>Generate PDF</h2>
+        <form (ngSubmit)="generatePdf()">
+            <div class="form-group">
+                <label for="pdfContent">PDF Content:</label>
+                <textarea id="pdfContent" [(ngModel)]="pdfContent" name="pdfContent" class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="pdfName">Name:</label>
+                <input type="text" id="pdfName" [(ngModel)]="pdfName" name="pdfName" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Generate PDF</button>
+        </form>
+    </div>
+</div>
