@@ -358,11 +358,14 @@ public class GestionnaireController {
     @ResponseBody
     public ResponseEntity<Resource> getPdf(@PathVariable String fileName) throws IOException {
         // Adjust the base path according to your file storage configuration
-        String basePath = "/attestations/";
+        String basePath = "attestations";
         String filePath = Paths.get(basePath, fileName).toString();
+        System.out.println("filePath"+filePath);
         Path pdfPath = Paths.get(filePath);
-
+        System.out.println("pdfPath"+pdfPath);
         if (!Files.exists(pdfPath)) {
+            System.out.println("aaaaaaaaaaaa");
+
             return ResponseEntity.notFound().build();
         }
 
@@ -374,6 +377,26 @@ public class GestionnaireController {
         headers.setContentDispositionFormData("attachment", fileName);
 
         return new ResponseEntity<>(resource, headers, HttpStatus.OK);
+    }
+    @DeleteMapping("/attestations/{attestationId}")
+    public ResponseEntity<?> deleteAttestation(@PathVariable Long attestationId) throws IOException {
+        Optional<Attestation> attestationOptional = attestationRepository.findById(attestationId);
+        if (attestationOptional.isPresent()) {
+            // Delete the PDF file associated with the attestation
+            String pdfPath = attestationOptional.get().getPdfPath();
+            if (pdfPath != null && !pdfPath.isEmpty()) {
+
+                Files.deleteIfExists(Paths.get(pdfPath));
+            }
+
+            // Delete the attestation entry from the database
+            attestationRepository.deleteById(attestationId);
+
+            // Return a success response with a custom message
+            return ResponseEntity.ok().body("Attestation deleted successfully");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

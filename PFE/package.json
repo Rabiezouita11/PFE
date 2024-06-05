@@ -28,6 +28,7 @@
     "@fullcalendar/interaction": "^5.9.0",
     "@fullcalendar/list": "^5.9.0",
     "@fullcalendar/timegrid": "^5.9.0",
+    "bootstrap": "^5.3.3",
     "jquery": "^3.7.1",
     "rxjs": "~6.6.0",
     "sweetalert2": "^11.11.0",

@@ -51,5 +51,9 @@ export class AttestationServiceService {
         headers: headers
     });
 }
+deleteAttestation(attestationId: number, authToken: string): Observable<string> {
+  const headers = new HttpHeaders({ 'Authorization': `Bearer ${authToken}` });
 
+  return this.http.delete<string>(`${this.baseUrl}/attestations/${attestationId}`, { headers, responseType: 'text' as 'json' });
+}
 }
