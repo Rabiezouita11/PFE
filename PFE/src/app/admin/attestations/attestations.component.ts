@@ -19,12 +19,49 @@ export class AttestationsComponent implements OnInit {
   showGeneratePdf: boolean = false;
   @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
   pdfName: any;
+  attestations: any[] = [];
+  pdfData: any;
+  fileName: string = 'generated_pdf_1717595657203.pdf'; // Assuming this is the file name fetched from the backend
 
   constructor(private attestationService: AttestationServiceService, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
-  }
+    this.loadAttestations();
 
+  }
+  fetchPdf(): void {
+    const authToken = this.tokenStorage.getToken();
+
+    if (!authToken) {
+      console.error('Authorization token not found');
+      Swal.fire('Error!', 'Authorization token not found', 'error');
+      return;
+    }
+    this.attestationService.getPdf(this.fileName,authToken).subscribe(response => {
+      this.pdfData = response.body;
+      const blob = new Blob([this.pdfData], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      window.open(url);
+    });
+  }
+  loadAttestations(): void {
+    const authToken = this.tokenStorage.getToken();
+
+    if (!authToken) {
+      console.error('Authorization token not found');
+      Swal.fire('Error!', 'Authorization token not found', 'error');
+      return;
+    }
+    this.attestationService.getAllAttestations(authToken).subscribe(
+      data => {
+        this.attestations = data;
+        console.log(this.attestations)
+      },
+      error => {
+        console.log(error);
+      }
+    );
+  }
   onFileSelected(event: any): void {
     this.selectedFile = event.target.files[0];
     // If a file is selected, set isExist to true; otherwise, keep it as false
@@ -67,6 +104,7 @@ showGeneratePdfForm() {
         if (this.fileInputRef) {
           this.fileInputRef.nativeElement.value = '';
         }
+        this.loadAttestations();
       }, error => {
         if (error.error) {
           this.message = error.error;
@@ -99,6 +137,7 @@ showGeneratePdfForm() {
         Swal.fire('Success!', 'PDF generated successfully', 'success');
         this.pdfContent = '';
         this.pdfName = '';
+        this.loadAttestations();
       }, error => {
         console.error('Error:', error);
         Swal.fire('Error!', 'Failed to generate PDF', 'error');

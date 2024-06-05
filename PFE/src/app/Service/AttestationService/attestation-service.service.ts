@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { UploadResponse } from 'src/app/Models/UploadResponse';
@@ -34,4 +34,22 @@ export class AttestationServiceService {
       { headers: headers, responseType: 'text' as 'json' }
     );
   }
+
+  getAllAttestations(authToken: string): Observable<any[]> {
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${authToken}` });
+
+    return this.http.get<any[]>(`${this.baseUrl}/attestations`, { headers: headers });
+  }
+  getPdf(fileName: string, authToken: string): Observable<HttpResponse<Blob>> {
+    const headers = new HttpHeaders({ 
+        'Content-Type': 'application/pdf',
+        'Authorization': `Bearer ${authToken}` 
+    });
+    return this.http.get(`${this.baseUrl}/pdfs/${fileName}`, {
+        responseType: 'blob',
+        observe: 'response',
+        headers: headers
+    });
+}
+
 }

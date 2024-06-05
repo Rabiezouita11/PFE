@@ -34,6 +34,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 
@@ -61,6 +67,7 @@ public class GestionnaireController {
     private AttestationService attestationService;
     @Autowired
     private AttestationRepository attestationRepository;
+
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers(@AuthenticationPrincipal UserDetails userDetails) {
         if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTIONNAIRE"))) {
@@ -77,6 +84,7 @@ public class GestionnaireController {
         List<User> users = userRepository.findByRoleIds(Arrays.asList(roleManager.getId(), roleCollaborateur.getId()));
         return ResponseEntity.ok(users);
     }
+
     @PutMapping("/users/{userId}/status")
     public ResponseEntity<?> updateStatus(@PathVariable Long userId, @RequestParam boolean newStatus) {
         Optional<User> userOptional = userRepository.findById(userId);
@@ -110,6 +118,7 @@ public class GestionnaireController {
             e.printStackTrace();
         }
     }
+
     @Transactional // Ensure that the transaction is committed before sending the email
     @PutMapping("/conger-maladie/{congerId}/status")
     public ResponseEntity<?> updateCongerStatus(@PathVariable Long congerId, @RequestBody String newStatus) {
@@ -185,6 +194,7 @@ public class GestionnaireController {
         List<Conger_Maladie> congerMaladies = congerMaladieRepository.findAll();
         return ResponseEntity.ok().body(congerMaladies);
     }
+
     @GetMapping("/donner/conger-maladie/{congerMaladieId}")
     public ResponseEntity<DonnerDTO> getDonnerByCongerMaladieId(@PathVariable Long congerMaladieId) {
         Optional<DonnerDTO> donner = donnerService.getDonnerByCongerMaladieId(congerMaladieId);
@@ -194,6 +204,7 @@ public class GestionnaireController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @PostMapping("/SaveAttestations")
     public ResponseEntity<?> handleFileUpload(@RequestParam(value = "file", required = false) MultipartFile file,
                                               @RequestParam("name") String name,
@@ -333,6 +344,36 @@ public class GestionnaireController {
             lines.add(content.substring(i, endIndex));
         }
         return lines;
+    }
+
+    @GetMapping("/attestations")
+    public ResponseEntity<List<Attestation>> getAllAttestations() {
+        List<Attestation> attestations = attestationRepository.findAll();
+        return ResponseEntity.ok().body(attestations);
+
+
+    }
+
+    @GetMapping("/pdfs/{fileName:.+}")
+    @ResponseBody
+    public ResponseEntity<Resource> getPdf(@PathVariable String fileName) throws IOException {
+        // Adjust the base path according to your file storage configuration
+        String basePath = "/attestations/";
+        String filePath = Paths.get(basePath, fileName).toString();
+        Path pdfPath = Paths.get(filePath);
+
+        if (!Files.exists(pdfPath)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Resource resource = new UrlResource(pdfPath.toUri());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentLength(resource.contentLength());
+        headers.setContentDispositionFormData("attachment", fileName);
+
+        return new ResponseEntity<>(resource, headers, HttpStatus.OK);
     }
 
 }

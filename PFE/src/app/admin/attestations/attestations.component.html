@@ -4,7 +4,7 @@
             <div class="col-lg-6">
                 <div class="page-header-left">
                     <h3>Attestations
-                        <small> Admin</small>
+                        <small>Admin</small>
                     </h3>
                 </div>
             </div>
@@ -22,11 +22,13 @@
     </div>
 </div>
 <div class="container">
-    <!-- Button to show the upload attestation form -->
-    <button class="btn btn-primary" [ngClass]="{ 'active': showUpload }" (click)="showUploadForm()">Upload Attestation</button>
-    <!-- Button to show the generate PDF form -->
-    <button class="btn btn-primary" [ngClass]="{ 'active': showGeneratePdf }" (click)="showGeneratePdfForm()">Generate PDF</button>
-<br><br>
+    <!-- Buttons to toggle forms -->
+    <button class="btn btn-primary" [ngClass]="{ 'active': showUpload }" (click)="showUploadForm()">Upload
+        Attestation</button>
+    <button class="btn btn-primary" [ngClass]="{ 'active': showGeneratePdf }" (click)="showGeneratePdfForm()">Generate
+        PDF</button>
+    <br><br>
+
     <!-- Upload attestation form -->
     <div *ngIf="showUpload">
         <h2>Upload Attestation</h2>
@@ -58,4 +60,42 @@
             <button type="submit" class="btn btn-primary">Generate PDF</button>
         </form>
     </div>
+    <button (click)="fetchPdf()">Open PDF</button>
+
+    <br>
+    <br>
+    <!-- Table to display attestations -->
+    <div *ngIf="attestations.length > 0">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>PDF Path</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let attestation of attestations">
+                    <td>{{ attestation.name }}</td>
+                    <td *ngIf="attestation.pdfPath">{{ attestation.pdfPath }}</td>
+                    <td *ngIf="!attestation.pdfPath"> <span >
+                            <i class="fas fa-file"></i>
+                            No PDF
+                        </span></td>
+                    <td>
+                        <span [ngClass]="{ 'text-success': attestation.exist, 'text-danger': !attestation.exist }">
+                            <i class="fas" [ngClass]="attestation.exist ? 'fa-check-circle' : 'fa-times-circle'"></i>
+                            {{ attestation.exist ? 'Exists' : 'Does not exist' }}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-secondary">Edit</button>
+                        <button class="btn btn-danger">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
 </div>
