@@ -10,14 +10,45 @@
         </option>
       </select>
     </div>
-    <button type="submit" class="btn btn-primary">Submit Request</button>
+
+    <h3 style="text-align: center;" *ngIf="attestations && attestations.length == 0;">No attestations available</h3>
+
+    <button *ngIf="attestations && attestations.length > 0" type="submit" class="btn btn-primary">Submit Request</button>
   </form>
 
-  <button *ngIf="selectedAttestation && selectedAttestation.exist && selectedAttestation.pdfPath" class="btn btn-primary mt-3"
-          (click)="fetchPdf(removePrefix(selectedAttestation.pdfPath))">
+  <button *ngIf="selectedAttestation && selectedAttestation.exist && selectedAttestation.pdfPath" class="btn btn-primary mt-3" (click)="fetchPdf(removePrefix(selectedAttestation.pdfPath))">
     View PDF
   </button>
+
+  <div class="row mt-3">
+    <div class="col-md-4" (click)="openStatusModal('en cours')">
+      <div class="card bg-primary text-white">
+        <div class="card-body">
+          <h5 class="card-title">En Cours</h5>
+          <p class="card-text">{{ enCoursCount }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4" (click)="openStatusModal('accepter')">
+      <div class="card bg-success text-white">
+        <div class="card-body">
+          <h5 class="card-title">Accepter</h5>
+          <p class="card-text">{{ accepterCount }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4" (click)="openStatusModal('refuser')">
+      <div class="card bg-danger text-white">
+        <div class="card-body">
+          <h5 class="card-title">Refusér</h5>
+          <p class="card-text">{{ refuserCount }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 </div>
+
 
 
 <div #pdfModal class="modal fade" tabindex="-1" role="dialog">
@@ -39,3 +70,47 @@
       </div>
     </div>
   </div>
+
+
+  <div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="statusModalLabel">Status Modal</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table" *ngIf="filteredDemandes.length > 0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User ID</th>
+                                <th>Attestation ID</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let demande of filteredDemandes">
+                                <td>{{ demande.id }}</td>
+                                <td>{{ demande.user_id }}</td>
+                                <td>{{ demande.attestation_id }}</td>
+                                <td>{{ demande.isApproved }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-primary" (click)="fetchPdf2(demande.attestation_id)">View PDF</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div *ngIf="filteredDemandes.length === 0" class="text-center">
+                        <p>No data available</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
