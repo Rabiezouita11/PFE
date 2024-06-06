@@ -63,6 +63,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/api/CongerMaladie/**").permitAll()
 				.antMatchers("/api/Gestionnaire/**").permitAll()
 
+				.antMatchers("/api/DemandeAttestations/**").permitAll()
 				.antMatchers("/uploads/**").permitAll() // Allow access to uploads directory
 
 				.anyRequest().authenticated();
