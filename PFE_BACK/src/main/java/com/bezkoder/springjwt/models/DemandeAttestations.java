@@ -9,28 +9,31 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@Table(name = "demande_attestations")
+@Table(name = "DemandeAttestations")
 public class DemandeAttestations {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String isApproved = "en cours"; // Default value is "en cours"
 
-    private String pdfPath;
 
-    private boolean isExist;
 
-    private LocalDateTime createdAt;
+    private String user_id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "attestation_id")
-    private Attestation attestation;
 
-    // Constructors, getters, and setters
+    private String attestation_id;
+
+    public DemandeAttestations() {
+    }
+    // Constructor
+
+    public DemandeAttestations(Long id, String isApproved, String user_id, String attestation_id) {
+        this.id = id;
+        this.isApproved = isApproved;
+        this.user_id = user_id;
+        this.attestation_id = attestation_id;
+    }
 }

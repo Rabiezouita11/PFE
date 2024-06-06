@@ -35,8 +35,8 @@ export class AttestationsComponent implements OnInit {
   removePrefix(pdfPath: string): string {
     // Replace "attestations\" prefix with an empty string
     return pdfPath.replace(/attestations[\/\\]/, '');
-}
-  fetchPdf(fileName :string): void {
+  }
+  fetchPdf(fileName: string): void {
     const authToken = this.tokenStorage.getToken();
 
     if (!authToken) {
@@ -44,7 +44,7 @@ export class AttestationsComponent implements OnInit {
       Swal.fire('Error!', 'Authorization token not found', 'error');
       return;
     }
-    this.attestationService.getPdf(fileName,authToken).subscribe(response => {
+    this.attestationService.getPdf(fileName, authToken).subscribe(response => {
       this.pdfData = response.body;
       const blob = new Blob([this.pdfData], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
@@ -84,13 +84,13 @@ export class AttestationsComponent implements OnInit {
   showUploadForm() {
     this.showUpload = true;
     this.showGeneratePdf = false;
-}
+  }
 
-// Method to show the generate PDF form
-showGeneratePdfForm() {
+  // Method to show the generate PDF form
+  showGeneratePdfForm() {
     this.showUpload = false;
     this.showGeneratePdf = true;
-}
+  }
   onSubmit(): void {
     const authToken = this.tokenStorage.getToken();
 

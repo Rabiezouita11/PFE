@@ -8,7 +8,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/demande-attestations")
+@RequestMapping("/api/DemandeAttestations")
 public class DemandeAttestationsController {
 
 
@@ -22,8 +22,8 @@ public class DemandeAttestationsController {
     // Placeholder method to handle GET requests for fetching all demandes d'attestations
     @GetMapping
     public List<DemandeAttestations> getAllDemandeAttestations() {
-        // Implement logic to fetch all demandes d'attestations from the repository or service
-        return null; // Replace null with actual implementation
+        // Call the service method to fetch all demandes d'attestations
+        return demandeAttestationsRepository.findAll();
     }
 
     // Placeholder method to handle GET requests for fetching a demande d'attestation by ID
@@ -33,9 +33,11 @@ public class DemandeAttestationsController {
         return null; // Replace null with actual implementation
     }
 
-    @PostMapping
+    @PostMapping("/saveDemande")
     public DemandeAttestations createDemandeAttestations(@RequestBody DemandeAttestations demandeAttestations) {
         // Call the service method to save the demande d'attestation
+
+        System.out.println("demandeAttestations"+demandeAttestations);
         DemandeAttestations savedDemandeAttestations = demandeAttestationsRepository.save(demandeAttestations);
         return savedDemandeAttestations;
     }

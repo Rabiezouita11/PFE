@@ -1,1 +1,41 @@
-<p>attestaions works!</p>
+<p class="text-center mt-4">Attestations Works!</p>
+
+<div class="container mt-5">
+  <form (submit)="submitDemande()">
+    <div class="form-group">
+      <label for="attestationSelect">Select Attestation:</label>
+      <select id="attestationSelect" class="form-control" [(ngModel)]="selectedAttestation" name="attestation">
+        <option *ngFor="let attestation of attestations" [ngValue]="attestation">
+          {{ attestation.name }} - {{ attestation.exist ? 'Existe' : 'Inexiste' }}
+        </option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Request</button>
+  </form>
+
+  <button *ngIf="selectedAttestation && selectedAttestation.exist && selectedAttestation.pdfPath" class="btn btn-primary mt-3"
+          (click)="fetchPdf(removePrefix(selectedAttestation.pdfPath))">
+    View PDF
+  </button>
+</div>
+
+
+<div #pdfModal class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen" style="max-width: 800px;" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">PDF Viewer</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <iframe #pdfIframe width="100%" height="600" frameborder="0"></iframe>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" (click)="openFullscreen()">Full Screen</button>
+        </div>
+      </div>
+    </div>
+  </div>

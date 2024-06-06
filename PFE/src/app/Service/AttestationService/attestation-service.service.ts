@@ -51,6 +51,23 @@ export class AttestationServiceService {
         headers: headers
     });
 }
+
+
+pdfsUser(fileName: string, authToken: string, userId: string, username: string, email: string): Observable<HttpResponse<Blob>> {
+  const headers = new HttpHeaders({ 
+      'Content-Type': 'application/pdf',
+      'Authorization': `Bearer ${authToken}` 
+  });
+  const params = { userId, username, email };
+  return this.http.get(`${this.baseUrl}/pdfsUser/${fileName}`, {
+      params,
+      responseType: 'blob',
+      observe: 'response',
+      headers: headers
+  });
+}
+
+
 deleteAttestation(attestationId: number, authToken: string): Observable<string> {
   const headers = new HttpHeaders({ 'Authorization': `Bearer ${authToken}` });
 

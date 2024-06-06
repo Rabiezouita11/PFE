@@ -10,9 +10,11 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -27,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -280,7 +283,7 @@ public class GestionnaireController {
             contentStream.setFont(PDType1Font.HELVETICA, 12);
 
             // Split the content into lines with line breaks every 60 characters
-            List<String> lines = splitContent(content, 60);
+            List<String> lines = splitContent(content, pageWidth - 100, PDType1Font.HELVETICA, 12);
 
             // Starting y position for the content
             float y = 700;
@@ -337,14 +340,23 @@ public class GestionnaireController {
     }
 
     // Function to split the content into lines with line breaks every n characters
-    private List<String> splitContent(String content, int n) {
+    // Helper method to split content into lines with proper line wrapping
+    private List<String> splitContent(String content, float maxWidth, PDFont font, int fontSize) throws IOException {
         List<String> lines = new ArrayList<>();
-        for (int i = 0; i < content.length(); i += n) {
-            int endIndex = Math.min(i + n, content.length());
-            lines.add(content.substring(i, endIndex));
+        StringBuilder sb = new StringBuilder();
+
+        for (String word : content.split("\\s+")) {
+            if (font.getStringWidth(sb + word) / 1000 * fontSize > maxWidth) {
+                lines.add(sb.toString());
+                sb = new StringBuilder();
+            }
+            sb.append(word).append(" ");
         }
+        lines.add(sb.toString());
+
         return lines;
     }
+
 
     @GetMapping("/attestations")
     public ResponseEntity<List<Attestation>> getAllAttestations() {
@@ -353,6 +365,65 @@ public class GestionnaireController {
 
 
     }
+
+    @GetMapping("/pdfsUser/{fileName:.+}")
+    @ResponseBody
+    public ResponseEntity<Resource> getPdf(
+            @PathVariable String fileName,
+            @RequestParam(required = false) String userId,
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String email) throws IOException {
+        Path filePath = Paths.get("attestations").resolve(fileName).normalize();
+
+        if (!Files.exists(filePath)) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // Load existing PDF document
+        try (PDDocument document = PDDocument.load(filePath.toFile())) {
+            // Get the first page of the document
+            PDPage firstPage = document.getPage(0);
+
+            // Define the padding from the left and bottom edges
+            float padding = 50; // Adjust as needed
+
+            // Calculate the coordinates for the user details text
+            float x = padding;
+            float y = padding;
+
+            // Add user-specific data to the first page
+            try (PDPageContentStream contentStream = new PDPageContentStream(document, firstPage, PDPageContentStream.AppendMode.APPEND, true)) {
+                contentStream.setFont(PDType1Font.HELVETICA_BOLD, 12);
+                contentStream.beginText();
+
+                // Position the text at the specified coordinates
+                contentStream.newLineAtOffset(x, y);
+                contentStream.showText("User ID: " + userId);
+                contentStream.newLineAtOffset(0, -15);
+                contentStream.showText("Username: " + username);
+                contentStream.newLineAtOffset(0, -15);
+                contentStream.showText("Email: " + email);
+                contentStream.endText();
+            }
+
+            // Save the modified document to a ByteArrayOutputStream
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            document.save(baos);
+
+            // Return the modified PDF as a response
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            InputStreamResource modifiedResource = new InputStreamResource(bais);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentLength(baos.size());
+            headers.setContentDispositionFormData("inline", fileName);
+
+            return new ResponseEntity<>(modifiedResource, headers, HttpStatus.OK);
+        }
+    }
+
+
 
     @GetMapping("/pdfs/{fileName:.+}")
     @ResponseBody
