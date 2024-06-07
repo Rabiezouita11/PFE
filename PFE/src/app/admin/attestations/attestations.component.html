@@ -66,39 +66,43 @@
     <br>
     <!-- Table to display attestations -->
     <div *ngIf="attestations.length > 0">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>PDF Path</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let attestation of attestations">
-                    <td>{{ attestation.name }}</td>
-                    <td *ngIf="attestation.pdfPath">{{ attestation.pdfPath }}</td>
-                    <td *ngIf="!attestation.pdfPath"> <span >
-                            <i class="fas fa-file"></i>
-                            No PDF
-                        </span></td>
-                    <td>
-                        <span [ngClass]="{ 'text-success': attestation.exist, 'text-danger': !attestation.exist }">
-                            <i class="fas" [ngClass]="attestation.exist ? 'fa-check-circle' : 'fa-times-circle'"></i>
-                            {{ attestation.exist ? 'Exists' : 'Does not exist' }}
-                        </span>
-                    </td>
-                    <td>
-                        <button *ngIf="attestation.pdfPath" class="btn btn-primary" (click)="fetchPdf(removePrefix(attestation.pdfPath))">
-                            View PDF
-                        </button>
-                        <button class="btn btn-secondary">Edit</button>
-                        <button class="btn btn-danger" (click)="deleteAttestation(attestation.id)">Delete</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>PDF Path</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let attestation of attestations">
+                        <td>{{ attestation.name }}</td>
+                        <td *ngIf="attestation.pdfPath">{{ attestation.pdfPath }}</td>
+                        <td *ngIf="!attestation.pdfPath">
+                            <span><i class="fas fa-file"></i> No PDF</span>
+                        </td>
+                        <td>
+                            <span [ngClass]="{'text-success': attestation.exist, 'text-danger': !attestation.exist}">
+                                <i class="fas" [ngClass]="attestation.exist ? 'fa-check-circle' : 'fa-times-circle'"></i>
+                                {{ attestation.exist ? 'Exists' : 'Does not exist' }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex flex-wrap">
+                                <button *ngIf="attestation.pdfPath" class="btn btn-primary me-2" (click)="fetchPdf(removePrefix(attestation.pdfPath))">
+                                    View PDF
+                                </button>
+                                <button class="btn btn-secondary me-2">Edit</button>
+                                <button class="btn btn-danger" (click)="deleteAttestation(attestation.id)">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
     </div>
 
 </div>
