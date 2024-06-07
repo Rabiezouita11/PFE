@@ -132,5 +132,12 @@
         <span class="menu-title">Attestations</span>
       </a>
     </li>
+    <li class="nav-item" [ngClass]="{'active': isActive('/demandeattestations')}">
+      <a class="nav-link" routerLink="/demandeattestations">
+        <i class="fas fa-file-signature menu-icon"></i> <!-- Use the appropriate class for the new icon -->
+        <span class="menu-title">demande attestations</span>
+      </a>
+    </li>
+    
   </ul>
 </nav>

@@ -1,0 +1,41 @@
+
+
+<br>
+<br>
+<table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>User ID</th>
+        <th>Attestation ID</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let demande of demandeAttestations">
+        <td>{{ demande.id }}</td>
+        <td (click)="loadUsers(demande.user_id)" style="cursor: pointer">{{ demande.user_id }}</td>
+        <td>{{ demande.attestation_id }}</td>
+        <td>{{ demande.isApproved }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="modal fade" id="userDetailsModal" tabindex="-1" aria-labelledby="userDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="userDetailsModalLabel">User Details</h5>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <ul>
+            <li><strong>ID:</strong> {{ selectedUser.id }}</li>
+            <li><strong>Username:</strong> {{ selectedUser.username }}</li>
+            <li><strong>Email:</strong> {{ selectedUser.email }}</li>
+            <!-- Add more user details as needed -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  

@@ -3,6 +3,7 @@ package com.bezkoder.springjwt.controllers;
 import com.bezkoder.springjwt.models.DemandeAttestations;
 import com.bezkoder.springjwt.repository.DemandeAttestationsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -17,7 +18,6 @@ public class DemandeAttestationsController {
 
 
 
-    // Add autowired repositories or services here if needed
 
     // Placeholder method to handle GET requests for fetching all demandes d'attestations
     @GetMapping
@@ -26,12 +26,6 @@ public class DemandeAttestationsController {
         return demandeAttestationsRepository.findAll();
     }
 
-    // Placeholder method to handle GET requests for fetching a demande d'attestation by ID
-    @GetMapping("/{id}")
-    public DemandeAttestations getDemandeAttestationsById(@PathVariable Long id) {
-        // Implement logic to fetch a demande d'attestation by ID from the repository or service
-        return null; // Replace null with actual implementation
-    }
 
     @PostMapping("/saveDemande")
     public DemandeAttestations createDemandeAttestations(@RequestBody DemandeAttestations demandeAttestations) {
@@ -41,17 +35,28 @@ public class DemandeAttestationsController {
         DemandeAttestations savedDemandeAttestations = demandeAttestationsRepository.save(demandeAttestations);
         return savedDemandeAttestations;
     }
+    @PutMapping("/{id}/approve")
+    public ResponseEntity<?> approveDemandeAttestations(@PathVariable Long id) {
+        DemandeAttestations demandeAttestations = demandeAttestationsRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("DemandeAttestations", "id", id));
 
-    // Placeholder method to handle PUT requests for updating an existing demande d'attestation
-    @PutMapping("/{id}")
-    public DemandeAttestations updateDemandeAttestations(@PathVariable Long id, @RequestBody DemandeAttestations demandeAttestationsDetails) {
-        // Implement logic to update an existing demande d'attestation
-        return null; // Replace null with actual implementation
+        demandeAttestations.setIsApproved("accepted"); // Update the isApproved attribute
+
+        demandeAttestationsRepository.save(demandeAttestations); // Save the updated demande d'attestation
+
+        return ResponseEntity.ok().build();
+    }
+    @PutMapping("/{id}/refuse")
+    public ResponseEntity<?> refuseDemandeAttestations(@PathVariable Long id) {
+        DemandeAttestations demandeAttestations = demandeAttestationsRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("DemandeAttestations", "id", id));
+
+        demandeAttestations.setIsApproved("refused"); // Update the isApproved attribute to "refused"
+
+        demandeAttestationsRepository.save(demandeAttestations); // Save the updated demande d'attestation
+
+        return ResponseEntity.ok().build();
     }
 
-    // Placeholder method to handle DELETE requests for deleting a demande d'attestation by ID
-    @DeleteMapping("/{id}")
-    public void deleteDemandeAttestations(@PathVariable Long id) {
-        // Implement logic to delete a demande d'attestation by ID
-    }
+
 }
