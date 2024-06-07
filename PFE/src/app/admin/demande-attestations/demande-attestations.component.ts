@@ -190,6 +190,8 @@ export class DemandeAttestationsComponent implements OnInit {
   }
 
   fetchPdf(fileName: string): void {
+
+
     console.log(fileName);
     const authToken = this.tokenStorage.getToken();
 
@@ -199,7 +201,7 @@ export class DemandeAttestationsComponent implements OnInit {
       return;
     }
 
-    if (!fileName.startsWith('generated_pdf')) {
+    
       // Use getPdf API
       this.attestationService.getPdf(fileName, authToken)
         .subscribe(response => {
@@ -212,24 +214,7 @@ export class DemandeAttestationsComponent implements OnInit {
             Swal.fire('Error!', 'PDF content is null', 'error');
           }
         });
-    } else {
-      // Use pdfsUser API with user details
-      console.log(this.userId);
-      console.log(this.user.username);
-      console.log(this.user.email);
-
-      this.attestationService.pdfsUser(fileName, authToken, this.userId, this.user.username, this.user.email)
-        .subscribe(response => {
-          if (response.body) { // Check if the response body is not null
-            const blob = new Blob([response.body], { type: 'application/pdf' });
-            const url = window.URL.createObjectURL(blob);
-            this.showPdfInModal(url);
-          } else {
-            console.error('PDF content is null');
-            Swal.fire('Error!', 'PDF content is null', 'error');
-          }
-        });
-    }
+  
   }
   showPdfInModal(pdfUrl: string): void {
     // Set PDF URL to the iframe inside the modal
