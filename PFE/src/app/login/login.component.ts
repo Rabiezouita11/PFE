@@ -85,9 +85,11 @@ export class LoginComponent implements OnInit {
         const status = this.tokenStorage.getUser().status;
   
         const isGestionnaire = userRoles.includes('ROLE_GESTIONNAIRE');
+        const ROLE_MANAGER = userRoles.includes('ROLE_MANAGER');
+
         const isCollaborateur = userRoles.includes('ROLE_COLLABORATEUR');
   
-        if (isGestionnaire) {
+        if (isGestionnaire || ROLE_MANAGER) {
           this.showSuccessMessage('Login successful!', '/dashboard');
         } else if (isCollaborateur) {
           if (status === null) {

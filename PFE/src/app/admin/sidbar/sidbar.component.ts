@@ -13,6 +13,7 @@ export class SidbarComponent implements OnInit {
   isUICollapsed: boolean = false;
   dropdownOpen: boolean = false;
   currentRoute!: string;
+  role: any;
 
   constructor(private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { 
     this.currentRoute = this.router.url;
@@ -23,6 +24,13 @@ export class SidbarComponent implements OnInit {
     });
   }
   ngOnInit(): void {
+
+    if (this.tokenStorage.getToken()) {
+      
+      
+      this.role = this.tokenStorage.getUser().roles;
+
+    }
   }
   isActive(url: string): boolean {
     return this.currentRoute === url;

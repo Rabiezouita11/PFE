@@ -10,6 +10,7 @@ import { TokenStorageService } from 'src/app/_services/token-storage.service';
 })
 export class DashboardComponent implements OnInit {
   username: any;
+  role: any;
 
   constructor(private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
@@ -17,6 +18,7 @@ export class DashboardComponent implements OnInit {
     if (this.tokenStorage.getToken()) {
       
       this.username = this.tokenStorage.getUser().username;
+      this.role = this.tokenStorage.getUser().roles;
 
     }
   }

@@ -102,37 +102,37 @@
         <span class="menu-title">Dashboard</span>
       </a>
     </li>
-    <li class="nav-item" [ngClass]="{'active': isActive('/badge')}">
+    <li class="nav-item" *ngIf="role && role.includes('ROLE_GESTIONNAIRE')" [ngClass]="{'active': isActive('/badge')}">
       <a class="nav-link" routerLink="/badge">
         <i class="fas fa-id-badge menu-icon"></i> <!-- Replace icon class here -->
         <span class="menu-title">Badge</span>
       </a>
     </li>
-    <li class="nav-item" [ngClass]="{'active': isActive('/users')}">
+    <li class="nav-item" *ngIf="role && role.includes('ROLE_GESTIONNAIRE')" [ngClass]="{'active': isActive('/users')}">
       <a class="nav-link" routerLink="/users">
         <i class="fas fa-users menu-icon"></i> <!-- Replace icon class here -->
         <span class="menu-title">Users</span>
       </a>
     </li>
-    <li class="nav-item" [ngClass]="{'active': isActive('/absences')}">
+    <li class="nav-item" *ngIf="role && role.includes('ROLE_MANAGER')" [ngClass]="{'active': isActive('/absences')}">
       <a class="nav-link" routerLink="/absences">
         <i class="fas fa-calendar-alt menu-icon"></i> <!-- Replace icon class here -->
         <span class="menu-title">Absences</span>
       </a>
     </li>
-    <li class="nav-item" [ngClass]="{'active': isActive('/QuestionsRh')}">
+    <li class="nav-item" *ngIf="role && role.includes('ROLE_MANAGER')" [ngClass]="{'active': isActive('/QuestionsRh')}">
       <a class="nav-link" routerLink="/QuestionsRh">
         <i class="fas fa-question-circle menu-icon"></i> <!-- Replace icon class here -->
         <span class="menu-title">Questions RH</span>
       </a>
     </li>
-    <li class="nav-item" [ngClass]="{'active': isActive('/attestations')}">
+    <li class="nav-item"  *ngIf="role && role.includes('ROLE_GESTIONNAIRE')"  [ngClass]="{'active': isActive('/attestations')}">
       <a class="nav-link" routerLink="/attestations">
         <i class="far fa-file-alt menu-icon"></i> <!-- Replace icon class here -->
         <span class="menu-title">Attestations</span>
       </a>
     </li>
-    <li class="nav-item" [ngClass]="{'active': isActive('/demandeattestations')}">
+    <li class="nav-item" *ngIf="role && role.includes('ROLE_GESTIONNAIRE')" [ngClass]="{'active': isActive('/demandeattestations')}">
       <a class="nav-link" routerLink="/demandeattestations">
         <i class="fas fa-file-signature menu-icon"></i> <!-- Use the appropriate class for the new icon -->
         <span class="menu-title">demande attestations</span>

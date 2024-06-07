@@ -8,14 +8,14 @@ import { TokenStorageService } from './_services/token-storage.service';
 })
 export class AuthGuard implements CanActivate {
   constructor(private tokenStorage: TokenStorageService, private router: Router) {}
-
   canActivate(): boolean {
     const userRoles = this.tokenStorage.getUser().roles;
-    if (this.tokenStorage.getToken() && userRoles.includes('ROLE_GESTIONNAIRE')) {
+    if (this.tokenStorage.getToken() && (userRoles.includes('ROLE_GESTIONNAIRE') || userRoles.includes('ROLE_MANAGER'))) {
       return true; 
     } else {
       this.router.navigate(['/login']);
       return false;
     }
   }
+  
 }
