@@ -16,7 +16,7 @@ declare var $: any;
 export class AttestaionsComponent implements OnInit {
 
 
-  attestations: Attestation[] = [];
+  attestations: any[] = [];
 
   selectedAttestation: any;
   pdfData: any;
@@ -76,8 +76,8 @@ export class AttestaionsComponent implements OnInit {
   
         // Compute counts for each status
         this.enCoursCount = this.demandesAttestations.filter(demande => demande.isApproved === 'en cours').length;
-        this.accepterCount = this.demandesAttestations.filter(demande => demande.isApproved === 'accepter').length;
-        this.refuserCount = this.demandesAttestations.filter(demande => demande.isApproved === 'refusér').length;
+        this.accepterCount = this.demandesAttestations.filter(demande => demande.isApproved === 'accepted').length;
+        this.refuserCount = this.demandesAttestations.filter(demande => demande.isApproved === 'refused').length;
   
       
        
@@ -99,7 +99,7 @@ export class AttestaionsComponent implements OnInit {
       return;
     }
     this.attestationService.getAllAttestations(authToken).subscribe(
-      (data: Attestation[]) => { // Specify the type of data parameter
+      (data:any) => { // Specify the type of data parameter
         this.attestations = data;
         console.log(this.attestations); // Log the fetched attestations
       },
@@ -225,7 +225,7 @@ export class AttestaionsComponent implements OnInit {
     }
 
     this.attestationService.getAllAttestations(authToken).subscribe(
-      (data: Attestation[]) => { // Specify the type of data parameter
+      (data:any) => { // Specify the type of data parameter
         this.attestations = data;
         console.log(this.attestations); // Log the fetched attestations
 

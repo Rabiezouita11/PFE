@@ -27,4 +27,19 @@ export class DemandeAttestationsService {
 
     return this.http.get<DemandeAttestations[]>(this.baseUrl, { headers });
   }
+
+  approveDemande(id: number, authToken: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${authToken}`
+    });
+    return this.http.put(`${this.baseUrl}/${id}/approve`, {}, { headers });
+  }
+  
+  refuseDemande(id: number, authToken: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${authToken}`
+    });
+    return this.http.put(`${this.baseUrl}/${id}/refuse`, {}, { headers });
+  }
+  
 }

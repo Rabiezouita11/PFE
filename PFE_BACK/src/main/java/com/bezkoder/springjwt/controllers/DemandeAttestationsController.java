@@ -1,11 +1,21 @@
 package com.bezkoder.springjwt.controllers;
 
+import com.bezkoder.springjwt.models.Attestation;
 import com.bezkoder.springjwt.models.DemandeAttestations;
+import com.bezkoder.springjwt.models.User;
+import com.bezkoder.springjwt.repository.AttestationRepository;
 import com.bezkoder.springjwt.repository.DemandeAttestationsRepository;
+import com.bezkoder.springjwt.repository.UserRepository;
+import com.bezkoder.springjwt.security.services.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.mail.MessagingException;
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -16,8 +26,13 @@ public class DemandeAttestationsController {
     @Autowired
     private DemandeAttestationsRepository demandeAttestationsRepository;
 
+    @Autowired
+    private EmailService emailService; // Assuming you have an EmailService for sending emails
 
-
+    @Autowired
+    private UserRepository userRepository; // Assuming you have a UserRepository
+    @Autowired
+    private AttestationRepository attestationRepository;
 
     // Placeholder method to handle GET requests for fetching all demandes d'attestations
     @GetMapping
@@ -35,6 +50,8 @@ public class DemandeAttestationsController {
         DemandeAttestations savedDemandeAttestations = demandeAttestationsRepository.save(demandeAttestations);
         return savedDemandeAttestations;
     }
+
+
     @PutMapping("/{id}/approve")
     public ResponseEntity<?> approveDemandeAttestations(@PathVariable Long id) {
         DemandeAttestations demandeAttestations = demandeAttestationsRepository.findById(id)
@@ -44,10 +61,29 @@ public class DemandeAttestationsController {
 
         demandeAttestationsRepository.save(demandeAttestations); // Save the updated demande d'attestation
 
+        // Retrieve user email
+        User user = userRepository.findById(Long.valueOf(demandeAttestations.getUser_id()))
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", demandeAttestations.getUser_id()));
+        String userEmail = user.getEmail();
+
+        // Retrieve attestation details
+        Attestation attestation = attestationRepository.findById(Long.valueOf(demandeAttestations.getAttestation_id()))
+                .orElseThrow(() -> new ResourceNotFoundException("Attestation", "id", demandeAttestations.getAttestation_id()));
+
+        // Send email to the user
+        try {
+            emailService.sendDemandeAttestationsEmail(userEmail, demandeAttestations, attestation);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            // Handle the exception
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
         return ResponseEntity.ok().build();
     }
+
     @PutMapping("/{id}/refuse")
-    public ResponseEntity<?> refuseDemandeAttestations(@PathVariable Long id) {
+    public ResponseEntity<?> refuseDemandeAttestations(@PathVariable Long id) throws MessagingException {
         DemandeAttestations demandeAttestations = demandeAttestationsRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("DemandeAttestations", "id", id));
 
@@ -55,7 +91,27 @@ public class DemandeAttestationsController {
 
         demandeAttestationsRepository.save(demandeAttestations); // Save the updated demande d'attestation
 
-        return ResponseEntity.ok().build();
+        // Retrieve attestation details using attestation_id
+        Long attestationId = Long.valueOf(demandeAttestations.getAttestation_id());
+        Optional<Attestation> attestationOptional = attestationRepository.findById(attestationId);
+
+        // Check if attestation exists
+        if (attestationOptional.isPresent()) {
+            Attestation attestation = attestationOptional.get();
+            // Set attestation name to demandeAttestations
+
+            // Retrieve user email
+            User user = userRepository.findById(Long.valueOf(demandeAttestations.getUser_id()))
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "id", demandeAttestations.getUser_id()));
+            String userEmail = user.getEmail();
+
+            // Send email to the user with attestation details
+            emailService.sendDemandeAttestationsEmail(userEmail, demandeAttestations, attestation);
+
+            return ResponseEntity.ok().build();
+        } else {
+            throw new ResourceNotFoundException("Attestation", "id", attestationId);
+        }
     }
 
 
