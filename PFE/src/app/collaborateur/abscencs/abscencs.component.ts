@@ -32,15 +32,14 @@ export class AbscencsComponent implements OnInit {
   fileToUpload!: File | null;
   totalLeaveDays!: number;
   responseMessage!: string; // Store response message
-  errorMessage: any;
+  errorMessage!: string;
 
   minDate: string;
   
   constructor(private abscencsService: AbscencsService, private http: HttpClient, private router: Router, private tokenStorage: TokenStorageService) {
     const today = new Date();
     this.minDate = today.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
-    this.start_date = this.minDate;
-    this.end_date = this.minDate;
+
    }
 
   refreshAndNavigateToCalendar(): void {
@@ -328,18 +327,21 @@ showModalById(modalId: string) {
           console.log(response);
           Swal.fire('Success!', 'Leave request submitted successfully!', 'success');
           this.responseMessage = response.message; // Set the response message
+          this.resetForm(); // Reset the form
 
           this.ngOnInit();
         },
         error => {
 
-          this.errorMessage = error.message; // Set the response message
+        
           // Handle error
           console.error(error);
           let errorMessage = 'An error occurred while submitting the leave request.';
           if (error && error.error && error.error.message) {
             errorMessage = error.error.message;
           }
+          this.errorMessage = errorMessage; // Set the response message
+      
           Swal.fire('Error!', errorMessage, 'error');
         }
       );
@@ -376,10 +378,10 @@ showModalById(modalId: string) {
 
 
   resetForm(): void {
-    // Reset form fields and state
     this.message = '';
     this.start_date = null;
     this.end_date = null;
+    this.typeConger = '';
     this.fileToUpload = null;
   }
   getTotalSolde(userId: number): void {
