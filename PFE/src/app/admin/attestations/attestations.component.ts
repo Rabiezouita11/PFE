@@ -77,10 +77,28 @@ export class AttestationsComponent implements OnInit {
     );
   }
   onFileSelected(event: any): void {
-    this.selectedFile = event.target.files[0];
-    // If a file is selected, set isExist to true; otherwise, keep it as false
-    this.isExist = !!this.selectedFile;
+    const file: File = event.target.files[0];
+    const allowedExtensions = ['pdf'];
+  
+    if (!file) {
+      return; // Exit early if no file is selected
+    }
+  
+    const extension = file.name.split('.').pop()?.toLowerCase(); // Add null check with optional chaining operator (?)
+  
+    if (!extension || !allowedExtensions.includes(extension)) {
+      Swal.fire('Error!', 'Please select a PDF file.', 'error');
+      // Optionally clear the input field
+      if (this.fileInputRef) {
+        this.fileInputRef.nativeElement.value = '';
+      }
+      return;
+    }
+    this.selectedFile = file;
+    this.pdfPath = file.name; // Optionally set pdfPath to display the file name
   }
+  
+  
   showUploadForm() {
     this.showUpload = true;
     this.showGeneratePdf = false;
