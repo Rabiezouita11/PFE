@@ -112,15 +112,12 @@
                             <fieldset>
                                 <div class="form-card">
                                     <label for="start_date">Depuis:</label>
-                                    <input type="date" id="start_date" name="start_date" placeholder="Start Date"
-                                        [(ngModel)]="start_date" />
+                                    <input type="date" id="start_date" name="start_date" [(ngModel)]="start_date" [min]="minDate" />
                                     <label for="end_date">Jusqu'au:</label>
-                                    <input type="date" id="end_date" name="end_date" placeholder="End Date"
-                                        [(ngModel)]="end_date" />
-                                </div>
-                                <input type="button" name="previous" class="previous action-button-previous"
-                                    value="Previous" />
-                                <input type="button" name="next" class="next action-button" value="Next Step" />
+                                    <input type="date" id="end_date" name="end_date" [(ngModel)]="end_date" [min]="start_date" />
+                                  </div>
+                                  <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+                                  <input type="button" name="next" class="next action-button" value="Next Step" />
                             </fieldset>
                             <fieldset>
                                 <div class="form-card">
@@ -145,8 +142,8 @@
                                     <br><br>
                                     <div class="row justify-content-center">
                                         <div class="col-7 text-center">
-                                            <p>Your leave request has been successfully submitted. It will be reviewed
-                                                and processed by your manager. Thank you for your cooperation.</p>
+                                            <p>{{ responseMessage }}</p>
+
                                                 <button class="btn btn-info" (click)="refreshComponent()">
                                                     <i class="fas fa-sync-alt"></i> <!-- Font Awesome icon for refresh -->
                                                     <span class="text-white fw-bold">Refresh</span>

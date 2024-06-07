@@ -31,7 +31,17 @@ export class AbscencsComponent implements OnInit {
   end_date: string | null = null;
   fileToUpload!: File | null;
   totalLeaveDays!: number;
-  constructor(private abscencsService: AbscencsService, private http: HttpClient, private router: Router, private tokenStorage: TokenStorageService) { }
+  responseMessage!: string; // Store response message
+  errorMessage: any;
+
+  minDate: string;
+  
+  constructor(private abscencsService: AbscencsService, private http: HttpClient, private router: Router, private tokenStorage: TokenStorageService) {
+    const today = new Date();
+    this.minDate = today.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+    this.start_date = this.minDate;
+    this.end_date = this.minDate;
+   }
 
   refreshAndNavigateToCalendar(): void {
     // Reload the current route to refresh the page
@@ -317,9 +327,13 @@ showModalById(modalId: string) {
           // Handle successful submission
           console.log(response);
           Swal.fire('Success!', 'Leave request submitted successfully!', 'success');
+          this.responseMessage = response.message; // Set the response message
+
           this.ngOnInit();
         },
         error => {
+
+          this.errorMessage = error.message; // Set the response message
           // Handle error
           console.error(error);
           let errorMessage = 'An error occurred while submitting the leave request.';
