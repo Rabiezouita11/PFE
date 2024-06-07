@@ -12,7 +12,7 @@ declare var $: any;
 export class AttestationsComponent implements OnInit {
   selectedFile: File | null = null;
   name: string = '';
-  isExist: boolean = false;
+  isExist: boolean = true;
   message: string = '';
   pdfPath: string = '';
   pdfContent: string = ''; // New property to store PDF content
