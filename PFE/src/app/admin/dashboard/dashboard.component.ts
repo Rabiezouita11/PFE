@@ -36,7 +36,7 @@ export class DashboardComponent implements OnInit {
     },
   ];
   public barChartLegend = true;
-  public barChartType: ChartType = 'bar';
+  public barChartType: ChartType = 'line';
   public barChartPlugins = [];
  // Properties for badges chart
  public badgeChartData: ChartDataSets[] = [];

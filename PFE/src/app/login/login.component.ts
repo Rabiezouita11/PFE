@@ -89,7 +89,7 @@ export class LoginComponent implements OnInit {
 
         const isCollaborateur = userRoles.includes('ROLE_COLLABORATEUR');
   
-        if (isGestionnaire || ROLE_MANAGER) {
+        if (isGestionnaire) {
           this.showSuccessMessage('Login successful!', '/dashboard');
         } else if (isCollaborateur) {
           if (status === null) {
@@ -99,9 +99,18 @@ export class LoginComponent implements OnInit {
           } else {
             this.showSuccessMessage('Login successful!', '/collaborateur/dashboard');
           }
+        } else if (ROLE_MANAGER) {
+          if (status === null) {
+            this.showInfoMessage('Access Confirmation Required', 'Your access request has been submitted. Please wait for confirmation from the gestionnaire. Check your email for further instructions once the gestionnaire has responded.');
+          } else if (status === false) {
+            this.showErrorMessage('Access Denied', 'Your access is denied.');
+          } else {
+            this.showSuccessMessage('Login successful!', '/dashboard');
+          }
         } else {
           this.showErrorMessage('Error', 'User is not authorized.');
         }
+        
       },
       err => {
         this.showErrorMessage('Error', err.error.message);
