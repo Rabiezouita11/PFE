@@ -93,7 +93,7 @@ export class LoginComponent implements OnInit {
           this.showSuccessMessage('Login successful!', '/dashboard');
         } else if (isCollaborateur) {
           if (status === null) {
-            this.showInfoMessage('Access Confirmation Required', 'Please confirm your access. Check your email for further instructions.');
+            this.showInfoMessage('Access Confirmation Required', 'Your access request has been submitted. Please wait for confirmation from the gestionnaire. Check your email for further instructions once the gestionnaire has responded.');
           } else if (status === false) {
             this.showErrorMessage('Access Denied', 'Your access is denied.');
           } else {

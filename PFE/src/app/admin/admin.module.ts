@@ -16,6 +16,7 @@ import { UsersComponent } from './users/users.component';
 import { NavComponent } from './nav/nav.component';
 import { DemandeAttestationsComponent } from './demande-attestations/demande-attestations.component';
 import { SpinnerComponent } from './spinner/spinner.component';
+import { ChartsModule } from 'ng2-charts';
 
 
 @NgModule({
@@ -23,7 +24,9 @@ import { SpinnerComponent } from './spinner/spinner.component';
   imports: [
     CommonModule,
     AdminRoutingModule,
-    FormsModule
+    FormsModule,
+    ChartsModule
+
   ],
   exports: [HeaderComponent, FooterComponent],
 
