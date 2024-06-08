@@ -54,21 +54,22 @@ export class DashboardComponent implements OnInit {
  public badgeChartType: ChartType = 'pie'; // Change the chart type to pie
  public badgeChartPlugins = [];
 
-  // Properties for attestation demand chart
-  public attestationDemandChartData: ChartDataSets[] = [];
-  public attestationDemandChartLabels: Label[] = [];
-  public attestationDemandChartOptions: ChartOptions = {
-    responsive: true,
-  };
-  public attestationDemandChartColors: Color[] = [
-    {
-      borderColor: 'black',
-      backgroundColor: ['rgba(0, 255, 0, 0.5)', 'rgba(255, 0, 0, 0.5)'], // Green for Accepted, Red for Refused
-    },
-  ];
-  public attestationDemandChartLegend = true;
-  public attestationDemandChartType: ChartType = 'pie'; // Change the chart type to pie
-  public attestationDemandChartPlugins = [];
+ // Properties for attestation demand chart
+public attestationDemandChartData: ChartDataSets[] = [];
+public attestationDemandChartLabels: Label[] = [];
+public attestationDemandChartOptions: ChartOptions = {
+  responsive: true,
+};
+public attestationDemandChartColors: Color[] = [
+  {
+    borderColor: 'black',
+    backgroundColor: ['rgba(0, 255, 0, 0.5)', 'rgba(255, 0, 0, 0.5)',], // Green for Accepted, Red for Refused
+  },
+];
+public attestationDemandChartLegend = true;
+public attestationDemandChartType: ChartType = 'pie'; // Change the chart type to bar
+public attestationDemandChartPlugins = [];
+
 
   constructor(private userService: UsersService,private demandeAttestationsService: DemandeAttestationsService,private badgeService: BadgeService,private attestationService: AttestationServiceService ,private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
@@ -131,61 +132,75 @@ export class DashboardComponent implements OnInit {
     );
   }
   prepareAttestationDemandChartData(data: DemandeAttestations[]): void {
-    // Fetch users and attestations
+    // Fetch attestations
     const authToken = this.tokenStorage.getToken();
-  
+
     if (!authToken) {
-      console.error('Authorization token not found');
-      Swal.fire('Error!', 'Authorization token not found', 'error');
-      return;
+        console.error('Authorization token not found');
+        Swal.fire('Error!', 'Authorization token not found', 'error');
+        return;
     }
-  
-    // Fetch users
-    this.userService.getAllUsers(authToken).subscribe(
-      (users: User[]) => {
-        this.users = users;
-        console.log('Users:', this.users); // Log users
-  
-        // Fetch attestations
-        this.attestationService.getAllAttestations(authToken).subscribe(
-          (attestations: any[]) => {
-            this.attestations = attestations;
-            console.log('Attestations:', this.attestations); // Log attestations
-  
-            // Count attestation demands per user
-            const demandCountPerUser = data.reduce((acc, demand) => {
-              console.log('Demand:', demand); // Log demand object
-  
-              const user = this.users.find(user => user.id === demand.user_id);
-              const attestation = this.attestations.find(attestation => attestation.id === demand.attestation_id);
-              console.log('User:', user);
-              console.log('Attestation:', attestation);
-  
-              const userName = user ? user.username : 'Unknown';
-              const attestationName = attestation ? attestation.name : 'Unknown';
-  
-              const label = `${userName} - ${attestationName}`;
-              acc[label] = (acc[label] || 0) + 1;
-              return acc;
-            }, {} as { [key: string]: number });
-  
-            this.attestationDemandChartLabels = Object.keys(demandCountPerUser);
-            this.attestationDemandChartData = [
-              { data: Object.values(demandCountPerUser), label: 'Attestation Demands' }
-            ];
-          },
-          error => {
-            console.log('Error fetching attestations:', error);
-            // Handle error fetching attestations
-          }
-        );
-      },
-      error => {
-        console.log('Error fetching users:', error);
-        // Handle error fetching users
-      }
-    );
+
+   // Inside prepareAttestationDemandChartData function
+this.attestationService.getAllAttestations(authToken).subscribe(
+    (attestations: any[]) => {
+        this.attestations = attestations;
+
+        // Initialize an object to store demand counts per attestation
+        const demandCountPerAttestation: { [key: string]: number } = {};
+
+        // Initialize an array to store colors
+        const colors: string[] = [];
+
+        // Iterate through each attestation
+        this.attestations.forEach(attestation => {
+            // Filter demands based on the current attestation ID
+            const demandsForAttestation = data.filter(demand => {
+                // Convert attestation_id to number for comparison
+                const attestationId = Number(demand.attestation_id);
+                return attestationId === attestation.id;
+            });
+            // Count the number of demands for the current attestation
+            const demandCount = demandsForAttestation.length;
+
+            // Store the demand count for the current attestation name
+            demandCountPerAttestation[attestation.name] = demandCount;
+
+            // Generate a random color for the current attestation
+            const randomColor = this.getRandomColor();
+            colors.push(randomColor);
+        });
+
+        // Set chart data
+        this.attestationDemandChartLabels = Object.keys(demandCountPerAttestation);
+        this.attestationDemandChartData = [{
+            data: Object.values(demandCountPerAttestation),
+            label: 'Demand Count Per Attestation'
+        }];
+        this.attestationDemandChartColors = [{
+            backgroundColor: colors
+        }];
+    },
+    error => {
+        console.log('Error fetching attestations:', error);
+    }
+);
   }
+
+// Function to generate a random color
+getRandomColor(): string {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+
+
+
+  
   
   
   
@@ -239,6 +254,7 @@ export class DashboardComponent implements OnInit {
     this.attestationService.getAllAttestations(authToken).subscribe(
       data => {
         this.attestations = data;
+        console.log(" this.attestations" , this.attestations)
         this.prepareChartData(data);
 
       },
@@ -247,17 +263,24 @@ export class DashboardComponent implements OnInit {
       }
     );
   }
+
+
   prepareChartData(data: any[]): void {
+    // Filter out attestations that have exist: true
+    const attestationsWithPDF = data.filter(attestation => attestation.exist === true);
+  
     // Assuming you want to count attestations by name
-    const attestationNames = data.map(attestation => attestation.name);
+    const attestationNames = attestationsWithPDF.map(attestation => attestation.name);
     const attestationCounts = attestationNames.reduce((acc, name) => {
       acc[name] = (acc[name] || 0) + 1;
       return acc;
     }, {} as { [key: string]: number });
-
+  
     this.barChartLabels = Object.keys(attestationCounts);
     this.barChartData = [
-      { data: Object.values(attestationCounts).map(count => count as number), label: 'Attestations' }
+      { data: Object.values(attestationCounts).map(count => count as number), label: 'Attestations with PDF' }
     ];
   }
+  
+
 }
