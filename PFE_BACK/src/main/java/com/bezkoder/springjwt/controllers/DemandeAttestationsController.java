@@ -114,5 +114,28 @@ public class DemandeAttestationsController {
         }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteDemandeAttestations(@PathVariable Long id) {
+        // Find the demande attestation by id
+        Optional<DemandeAttestations> demandeAttestationsOptional = demandeAttestationsRepository.findById(id);
+
+        // Check if the demande attestation exists
+        if (demandeAttestationsOptional.isPresent()) {
+            DemandeAttestations demandeAttestations = demandeAttestationsOptional.get();
+
+            // Check if isApproved is "en cours"
+            if ("en cours".equals(demandeAttestations.getIsApproved())) {
+                // Delete the demande attestation
+                demandeAttestationsRepository.delete(demandeAttestations);
+                return ResponseEntity.ok().build();
+            } else {
+                // If isApproved is not "en cours", return a message indicating it's not eligible for deletion
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("The demande attestation is not in 'en cours' status and cannot be deleted.");
+            }
+        } else {
+            // If the demande attestation with the provided id does not exist, return a not found response
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 }

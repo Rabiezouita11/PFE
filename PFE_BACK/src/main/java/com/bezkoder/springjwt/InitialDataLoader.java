@@ -50,7 +50,7 @@ public class InitialDataLoader implements CommandLineRunner {
 
     private void initAdmin() {
         // Check if admin user exists
-        if (userRepository.existsByUsername("admin")) {
+        if (userRepository.existsByUsername("gestionnaire")) {
             return;
         }
 

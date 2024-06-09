@@ -22,6 +22,8 @@ export class AttestaionsComponent implements OnInit {
   pdfData: any;
   @ViewChild('pdfModal') pdfModal: any; // Reference to the modal element
   @ViewChild('pdfIframe') pdfIframe!: ElementRef;
+  @ViewChild('statusModal') statusModal!: ElementRef;
+
   userId: any;
   demandesAttestations: DemandeAttestations[] = [];
  // Define properties for status counts
@@ -254,8 +256,44 @@ export class AttestaionsComponent implements OnInit {
 }
   
   
-  
-  
+deleteDemande(id: number , status : string): void {
+  const authToken = this.tokenStorage.getToken();
+
+  if (!authToken) {
+    console.error('Authorization token not found');
+    Swal.fire('Error!', 'Authorization token not found', 'error');
+    return;
+  }
+
+  this.demandeAttestationsService.deleteDemande(id, authToken).subscribe(
+    () => {
+      console.log('Demande attestation deleted successfully');
+      Swal.fire('Success!', 'Demande attestation deleted successfully', 'success');
+      // Reload demande attestations after deletion
+      this.loadDemandeAttestations();
+      // Close and reopen the modal to refresh its content
+      this.closeAndOpenModal(status);
+    },
+    error => {
+      console.error('Error deleting demande attestation:', error);
+      Swal.fire('Error!', 'Failed to delete demande attestation', 'error');
+    }
+  );
+}
+
+closeAndOpenModal(status:string): void {
+  // Close the modal
+  $(this.statusModal.nativeElement).modal('hide');
+
+  // Open the modal again after a short delay
+  setTimeout(() => {
+    $(this.statusModal.nativeElement).modal('show');
+    const filteredDemandes = this.demandesAttestations.filter(demande => demande.isApproved === status);
+    
+    // Assign the filtered data to a component property
+    this.filteredDemandes = filteredDemandes;
+  }, 500); // adjust the delay as needed
+}
   
   
 }

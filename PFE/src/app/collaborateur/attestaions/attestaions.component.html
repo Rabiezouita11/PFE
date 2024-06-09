@@ -72,45 +72,47 @@
   </div>
 
 
-  <div class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+  <div #statusModal class="modal fade" id="statusModal" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="statusModalLabel">Status Modal</h5>
-                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="table-responsive">
-                    <table class="table" *ngIf="filteredDemandes.length > 0">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>User ID</th>
-                                <th>Attestation ID</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let demande of filteredDemandes">
-                                <td>{{ demande.id }}</td>
-                                <td>{{ demande.user_id }}</td>
-                                <td>{{ demande.attestation_id }}</td>
-                                <td>{{ demande.isApproved }}</td>
-                                <td>
-                                    <button type="button" class="btn btn-primary" (click)="fetchPdf2(demande.attestation_id)">View PDF</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div *ngIf="filteredDemandes.length === 0" class="text-center">
-                        <p>No data available</p>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="statusModalLabel">Status Modal</h5>
+          <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
         </div>
+        <div class="modal-body">
+          <div class="table-responsive">
+            <table class="table" *ngIf="filteredDemandes.length > 0">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>User ID</th>
+                  <th>Attestation ID</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let demande of filteredDemandes">
+                  <td>{{ demande.id }}</td>
+                  <td>{{ demande.user_id }}</td>
+                  <td>{{ demande.attestation_id }}</td>
+                  <td>{{ demande.isApproved }}</td>
+                  <td>
+                    <button type="button" class="btn btn-primary" (click)="fetchPdf2(demande.attestation_id)">View PDF</button>
+                    <button type="button" class="btn btn-danger" *ngIf="demande.isApproved === 'en cours'" (click)="demande.id && deleteDemande(demande.id,demande.isApproved)">Delete</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div *ngIf="filteredDemandes.length === 0" class="text-center">
+              <p>No data available</p>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
+  

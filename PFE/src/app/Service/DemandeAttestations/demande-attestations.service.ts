@@ -42,4 +42,10 @@ export class DemandeAttestationsService {
     return this.http.put(`${this.baseUrl}/${id}/refuse`, {}, { headers });
   }
   
+  deleteDemande(id: number, authToken: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${authToken}`
+    });
+    return this.http.delete(`${this.baseUrl}/${id}`, { headers });
+  }
 }
