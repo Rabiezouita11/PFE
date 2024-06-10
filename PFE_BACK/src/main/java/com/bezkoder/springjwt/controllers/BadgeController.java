@@ -121,6 +121,7 @@ public class BadgeController {
         data.put("fileName", oldfileName);
         data.put("message", message);
         data.put("username", username);
+        data.put("timestamp", notification.getTimestamp()); // Add timestamp to the data
 
         // Send notification through WebSocket
         messagingTemplate.convertAndSend("/topic/notification", data);

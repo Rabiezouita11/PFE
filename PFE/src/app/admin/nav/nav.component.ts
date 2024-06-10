@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ScriptStyleLoaderService } from 'src/app/Service/ScriptStyleLoaderService/script-style-loader-service.service';
 import { WebSocketService } from 'src/app/Service/WebSocket/web-socket.service';
@@ -20,11 +20,14 @@ export class NavComponent implements OnInit {
   elementRef: any;
   isUICollapsed: boolean = false;
   dropdownOpen = false;
-  public userNotifications: { userId: number, fileName: string , message : string , username :string , id : number}[] = [];
+  public userNotifications: { userId: number, fileName: string , message : string , username :string , id : number   ,  timestamp: string // Add timestamp property
+  }[] = [];
 
-  constructor(private webSocketService: WebSocketService ,private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
+  constructor(private changeDetectorRef: ChangeDetectorRef ,private webSocketService: WebSocketService ,private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
+    this.updateTimeDifference(); // Update the displayed time difference
+
     const authToken = this.tokenStorage.getToken();
 
     if (!authToken) {
@@ -39,7 +42,9 @@ export class NavComponent implements OnInit {
       stompClient.subscribe('/topic/notification', (message: { body: string; }) => {
         // Add new notification to the array
         let data = JSON.parse(message.body);
-        this.userNotifications.push({ userId: data.userId, fileName: data.fileName  ,  message:data.message , username : data.username  , id : data.id});
+        this.userNotifications.push({ userId: data.userId, fileName: data.fileName  ,  message:data.message , username : data.username  , id : data.id , timestamp : data.timestamp});
+        this.updateTimeDifference(); // Update the displayed time difference
+
       });
     });
     if (this.tokenStorage.getToken()) {
@@ -73,7 +78,10 @@ export class NavComponent implements OnInit {
     this.router.navigate(['/login']); // Redirect to login page
   }
 
-
+// Call this method whenever you need to update the displayed time difference
+updateTimeDifference(): void {
+  this.changeDetectorRef.detectChanges();
+}
 
   toggleUICollapse() {
     this.isUICollapsed = !this.isUICollapsed;
@@ -86,7 +94,19 @@ export class NavComponent implements OnInit {
     }
   }
 
-
+  calculateTimeDifference(timestamp: string): string {
+    const currentTime = new Date().getTime();
+    const notificationTime = new Date(timestamp).getTime();
+    const differenceInSeconds = Math.floor((currentTime - notificationTime) / 1000);
+  
+    if (differenceInSeconds < 60) {
+      return `${differenceInSeconds}s`;
+    } else {
+      const differenceInMinutes = Math.floor(differenceInSeconds / 60);
+      return `${differenceInMinutes}min`;
+    }
+  }
+  
 
   confirmDeleteNotification(id: number): void {
     Swal.fire({
