@@ -1,66 +1,10 @@
 import { Component, OnInit, Renderer2 } from '@angular/core';
 import { Router } from '@angular/router';
 import { ScriptStyleLoaderService } from 'src/app/Service/ScriptStyleLoaderService/script-style-loader-service.service';
+import { WebSocketService } from 'src/app/Service/WebSocket/web-socket.service';
 import { ScriptService } from 'src/app/Service/script/script.service';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
-const SCRIPT_PATH_LIST =[
-  "assets/admin/js/jquery-3.3.1.min.js",
 
-
-  "assets/admin/js/bootstrap.bundle.min.js",
-
-
-  "assets/admin/js/icons/feather-icon/feather.min.js",
-  "assets/admin/js/icons/feather-icon/feather-icon.js",
-
-
-  "assets/admin/js/sidebar-menu.js",
-
-
-
-
-
-
-
-
-  "assets/admin/js/lazysizes.min.js",
-
-  "assets/admin/js/prism/prism.min.js",
-  "assets/admin/js/clipboard/clipboard.min.js",
-  "assets/admin/js/custom-card/custom-card.js",
-
-
-  "assets/admin/js/counter/jquery.waypoints.min.js",
-  "assets/admin/js/counter/jquery.counterup.min.js",
-  "assets/admin/js/counter/counter-custom.js",
-
-
-  "assets/admin/js/chart/peity-chart/peity.jquery.js",
-
-
-  "https://cdn.jsdelivr.net/npm/apexcharts",
-
-
-  "assets/admin/js/chart/sparkline/sparkline.js",
-
-
-
-
-
-  "assets/admin/js/dashboard/default.js",
-
-
-  "assets/admin/js/chat-menu.js",
-
-
-  "assets/admin/js/height-equal.js",
-
-
-  "assets/admin/js/lazysizes.min.js",
-
-
-  "assets/admin/js/admin-script.js",
-  ]
 @Component({
   selector: 'app-component',
   templateUrl: './component.component.html',
@@ -74,8 +18,21 @@ export class ComponentComponent implements OnInit {
   username: any;
   image!: string;
   dropdownOpen: boolean = false;
+  message!: string;
 
-  constructor(private router: Router, private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
+  constructor( private webSocketService: WebSocketService ,private router: Router, private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) {
+
+      // Open connection with server socket
+      let stompClient = this.webSocketService.connect();
+      stompClient.connect({}, (frame: any) => {
+        // Subscribe to notification topic
+        stompClient.subscribe('/topic/notification', (notification: { body: string; }) => {
+          // Update message attribute with the recent message sent from the server
+          this.message = notification.body;
+        });
+      });
+   
+   }
 
   ngOnInit(): void {
     this.loadScriptsAndStyles();

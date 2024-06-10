@@ -1,6 +1,7 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ScriptStyleLoaderService } from 'src/app/Service/ScriptStyleLoaderService/script-style-loader-service.service';
+import { WebSocketService } from 'src/app/Service/WebSocket/web-socket.service';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 
 @Component({
@@ -18,10 +19,19 @@ export class NavComponent implements OnInit {
   elementRef: any;
   isUICollapsed: boolean = false;
   dropdownOpen = false;
+  public notifications: string[] = [];
 
-  constructor(private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
+  constructor(private webSocketService: WebSocketService ,private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
+
+    let stompClient = this.webSocketService.connect();
+    stompClient.connect({}, (frame: any) => {
+      stompClient.subscribe('/topic/notification', (badge: { body: string; }) => {
+        // Add new notification to the array
+        this.notifications.unshift(badge.body);
+      });
+    });
     if (this.tokenStorage.getToken()) {
       this.roles = this.tokenStorage.getUser().roles;
       this.userId = this.tokenStorage.getUser().id;
@@ -30,6 +40,7 @@ export class NavComponent implements OnInit {
       this.image = this.getImageUrl(); // Call getImageUrl() to construct the image URL
 
     }
+    
   }
   getImageUrl(): string {
     // Assuming your backend endpoint for retrieving images is '/api/images/'

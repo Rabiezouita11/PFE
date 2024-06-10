@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
@@ -40,7 +41,8 @@ public class BadgeController {
     private BadgeService badgeService;
     @Autowired
     UserRepository userRepository;
-
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @GetMapping("/images/{badgeid}/{fileName}")
     public ResponseEntity<byte[]> getImage(@PathVariable Long badgeid, @PathVariable String fileName , @AuthenticationPrincipal UserDetails userDetails) throws IOException {
@@ -106,6 +108,9 @@ public class BadgeController {
             String uploadDir = "badge-photos/" + createdBadge.getId();
             FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
         }
+        String username = user.getUsername();
+
+        messagingTemplate.convertAndSend("/topic/notification", "User " + username + " has requested a badge.");
         return new ResponseEntity<>(createdBadge, HttpStatus.CREATED);
     }
     @DeleteMapping("/{userId}")
