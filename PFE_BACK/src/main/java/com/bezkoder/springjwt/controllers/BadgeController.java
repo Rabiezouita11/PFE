@@ -113,14 +113,17 @@ public class BadgeController {
         String username = user.getUsername();
         String message = "User " + username + " has requested a badge.";
         String oldfileName = user.getPhotos();
-        Map<String, Object> data = new HashMap<>();
-        data.put("userId", userId);
-        data.put("fileName", oldfileName);
-        data.put("message",message );
-        data.put("username", username);
         Notification notification = notificationService.createNotification(userId, oldfileName, message, username);
 
-        messagingTemplate.convertAndSend("/topic/notification", notification);
+        Map<String, Object> data = new HashMap<>();
+        data.put("id", notification.getId()); // Add ID to the data
+        data.put("userId", userId);
+        data.put("fileName", oldfileName);
+        data.put("message", message);
+        data.put("username", username);
+
+        // Send notification through WebSocket
+        messagingTemplate.convertAndSend("/topic/notification", data);
         return new ResponseEntity<>(createdBadge, HttpStatus.CREATED);
     }
     @DeleteMapping("/{userId}")
@@ -234,6 +237,16 @@ public class BadgeController {
     public ResponseEntity<List<Notification>> getNotificationsForUser() {
         List<Notification> notifications = notificationService.getALLNotifications();
         return new ResponseEntity<>(notifications, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/notifications/{id}")
+    public ResponseEntity<?> deleteNotificationById(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
+        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTIONNAIRE"))) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
+        }
+
+        notificationService.deleteNotificationById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
 

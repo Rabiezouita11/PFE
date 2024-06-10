@@ -9,6 +9,7 @@ import * as Stomp from 'stompjs';
   providedIn: 'root'
 })
 export class WebSocketService {
+  private baseUrl = 'http://localhost:8080/api/badges';
 
   constructor(private http: HttpClient) {}
      // Open connection with the back-end socket
@@ -31,5 +32,11 @@ export class WebSocketService {
     };
     return this.http.get<any[]>(`http://localhost:8080/api/badges/GetAllnotifications`,requestOptions);
   }
-  
+  deleteNotificationById(id: number, authToken: string): Observable<void> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${authToken}`
+    });
+
+    return this.http.delete<void>(`${this.baseUrl}/notifications/${id}`, { headers });
+  }
 }

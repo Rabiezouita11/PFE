@@ -32,4 +32,9 @@ public class NotificationService {
     public List<Notification> getALLNotifications() {
         return notificationRepository.findAll();
     }
+    public void deleteNotificationById(Long id) {
+        notificationRepository.deleteById(id);
+    }
+
+
 }

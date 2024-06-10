@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ScriptStyleLoaderService } from 'src/app/Service/ScriptStyleLoaderService/script-style-loader-service.service';
 import { WebSocketService } from 'src/app/Service/WebSocket/web-socket.service';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-nav',
@@ -19,7 +20,7 @@ export class NavComponent implements OnInit {
   elementRef: any;
   isUICollapsed: boolean = false;
   dropdownOpen = false;
-  public userNotifications: { userId: number, fileName: string , message : string , username :string}[] = [];
+  public userNotifications: { userId: number, fileName: string , message : string , username :string , id : number}[] = [];
 
   constructor(private webSocketService: WebSocketService ,private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
@@ -38,7 +39,7 @@ export class NavComponent implements OnInit {
       stompClient.subscribe('/topic/notification', (message: { body: string; }) => {
         // Add new notification to the array
         let data = JSON.parse(message.body);
-        this.userNotifications.push({ userId: data.userId, fileName: data.fileName  ,  message:data.message , username : data.username});
+        this.userNotifications.push({ userId: data.userId, fileName: data.fileName  ,  message:data.message , username : data.username  , id : data.id});
       });
     });
     if (this.tokenStorage.getToken()) {
@@ -83,5 +84,34 @@ export class NavComponent implements OnInit {
     if (this.elementRef && this.elementRef.nativeElement && !this.elementRef.nativeElement.contains(event.target)) {
       this.dropdownOpen = false;
     }
+  }
+
+
+
+  confirmDeleteNotification(id: number): void {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you really want to delete this notification?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.deleteNotification(id);
+      }
+    });
+  }
+
+  deleteNotification(id: number): void {
+    const authToken = this.tokenStorage.getToken();
+    if (!authToken) {
+      console.error('Authorization token not found');
+      return;
+    }
+    this.webSocketService.deleteNotificationById(id, authToken).subscribe(() => {
+      this.userNotifications = this.userNotifications.filter(notification => notification.id !== id);
+      Swal.fire('Deleted!', 'The notification has been deleted.', 'success');
+    });
   }
 }
