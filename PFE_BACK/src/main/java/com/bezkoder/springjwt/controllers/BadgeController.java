@@ -1,10 +1,12 @@
 package com.bezkoder.springjwt.controllers;
 
 import com.bezkoder.springjwt.models.Badge;
+import com.bezkoder.springjwt.models.Notification;
 import com.bezkoder.springjwt.models.User;
 import com.bezkoder.springjwt.repository.BadgeRepository;
 import com.bezkoder.springjwt.repository.UserRepository;
 import com.bezkoder.springjwt.security.services.BadgeService;
+import com.bezkoder.springjwt.security.services.NotificationService;
 import com.bezkoder.springjwt.security.services.UserService;
 import com.bezkoder.springjwt.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +26,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 
@@ -43,6 +43,8 @@ public class BadgeController {
     UserRepository userRepository;
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+    @Autowired
+    private NotificationService notificationService;
 
     @GetMapping("/images/{badgeid}/{fileName}")
     public ResponseEntity<byte[]> getImage(@PathVariable Long badgeid, @PathVariable String fileName , @AuthenticationPrincipal UserDetails userDetails) throws IOException {
@@ -109,8 +111,16 @@ public class BadgeController {
             FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
         }
         String username = user.getUsername();
+        String message = "User " + username + " has requested a badge.";
+        String oldfileName = user.getPhotos();
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId);
+        data.put("fileName", oldfileName);
+        data.put("message",message );
+        data.put("username", username);
+        Notification notification = notificationService.createNotification(userId, oldfileName, message, username);
 
-        messagingTemplate.convertAndSend("/topic/notification", "User " + username + " has requested a badge.");
+        messagingTemplate.convertAndSend("/topic/notification", notification);
         return new ResponseEntity<>(createdBadge, HttpStatus.CREATED);
     }
     @DeleteMapping("/{userId}")
@@ -220,6 +230,10 @@ public class BadgeController {
         Badge updatedBadge = badgeRepository.save(badge);
         return ResponseEntity.ok(updatedBadge);
     }
-
+    @GetMapping("/GetAllnotifications")
+    public ResponseEntity<List<Notification>> getNotificationsForUser() {
+        List<Notification> notifications = notificationService.getALLNotifications();
+        return new ResponseEntity<>(notifications, HttpStatus.OK);
+    }
 }
 

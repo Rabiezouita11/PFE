@@ -19,16 +19,27 @@ export class ComponentComponent implements OnInit {
   image!: string;
   dropdownOpen: boolean = false;
   message!: string;
+  public userNotifications: { userId: number, fileName: string , message : string , username :string}[] = [];
 
   constructor( private webSocketService: WebSocketService ,private router: Router, private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) {
+    const authToken = this.tokenStorage.getToken();
 
+    if (!authToken) {
+      console.error('Authorization token not found');
+      return;
+    }
+    this.webSocketService.getAllNotifications(authToken).subscribe((notifications: any) => {
+      this.userNotifications = notifications;
+    });
       // Open connection with server socket
       let stompClient = this.webSocketService.connect();
       stompClient.connect({}, (frame: any) => {
         // Subscribe to notification topic
-        stompClient.subscribe('/topic/notification', (notification: { body: string; }) => {
+        stompClient.subscribe('/topic/notification', (message: { body: string; }) => {
           // Update message attribute with the recent message sent from the server
-          this.message = notification.body;
+          let data = JSON.parse(message.body);
+          this.userNotifications.push({ userId: data.userId, fileName: data.fileName  ,  message:data.message , username : data.username});
+
         });
       });
    

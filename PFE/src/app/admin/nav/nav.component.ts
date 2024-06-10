@@ -19,17 +19,26 @@ export class NavComponent implements OnInit {
   elementRef: any;
   isUICollapsed: boolean = false;
   dropdownOpen = false;
-  public notifications: string[] = [];
+  public userNotifications: { userId: number, fileName: string , message : string , username :string}[] = [];
 
   constructor(private webSocketService: WebSocketService ,private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
+    const authToken = this.tokenStorage.getToken();
 
+    if (!authToken) {
+      console.error('Authorization token not found');
+      return;
+    }
+    this.webSocketService.getAllNotifications(authToken).subscribe((notifications: any) => {
+      this.userNotifications = notifications;
+    });
     let stompClient = this.webSocketService.connect();
     stompClient.connect({}, (frame: any) => {
-      stompClient.subscribe('/topic/notification', (badge: { body: string; }) => {
+      stompClient.subscribe('/topic/notification', (message: { body: string; }) => {
         // Add new notification to the array
-        this.notifications.unshift(badge.body);
+        let data = JSON.parse(message.body);
+        this.userNotifications.push({ userId: data.userId, fileName: data.fileName  ,  message:data.message , username : data.username});
       });
     });
     if (this.tokenStorage.getToken()) {
@@ -46,7 +55,10 @@ export class NavComponent implements OnInit {
     // Assuming your backend endpoint for retrieving images is '/api/images/'
     return `http://localhost:8080/api/auth/images/${this.userId}/${this.fileName}`;
   }
-
+  getImageUrlNotifications(userId: number, fileName: string): string {
+    // Assuming your backend endpoint for retrieving images is '/api/images/'
+    return `http://localhost:8080/api/auth/images/${userId}/${fileName}`;
+  }
   toggleDropdown(event: Event): void {
     event.stopPropagation(); // Prevent the click event from propagating to the document
   

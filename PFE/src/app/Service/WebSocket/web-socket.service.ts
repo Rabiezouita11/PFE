@@ -1,4 +1,6 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 
 import * as SockJs from 'sockjs-client';
 import * as Stomp from 'stompjs';
@@ -7,6 +9,8 @@ import * as Stomp from 'stompjs';
   providedIn: 'root'
 })
 export class WebSocketService {
+
+  constructor(private http: HttpClient) {}
      // Open connection with the back-end socket
      public connect() {
       let socket = new SockJs(`http://localhost:8080/socket`);
@@ -15,4 +19,17 @@ export class WebSocketService {
 
       return stompClient;
   }
+
+  getAllNotifications(authToken :string): Observable<any[]> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${authToken}`
+    });
+
+    // Include headers in the request options
+    const requestOptions = {
+      headers: headers
+    };
+    return this.http.get<any[]>(`http://localhost:8080/api/badges/GetAllnotifications`,requestOptions);
+  }
+  
 }
