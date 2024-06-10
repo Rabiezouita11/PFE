@@ -17,10 +17,11 @@ import { NavComponent } from './nav/nav.component';
 import { DemandeAttestationsComponent } from './demande-attestations/demande-attestations.component';
 import { SpinnerComponent } from './spinner/spinner.component';
 import { ChartsModule } from 'ng2-charts';
+import { NotificationComponent } from './notification/notification.component';
 
 
 @NgModule({
-  declarations: [DashboardComponent, HeaderComponent, ComponentComponent, SidbarComponent, FooterComponent, BadgeComponent, AbsencesComponent, QuestionsRhComponent, AttestationsComponent, UsersComponent, NavComponent, DemandeAttestationsComponent, SpinnerComponent],
+  declarations: [DashboardComponent, HeaderComponent, ComponentComponent, SidbarComponent, FooterComponent, BadgeComponent, AbsencesComponent, QuestionsRhComponent, AttestationsComponent, UsersComponent, NavComponent, DemandeAttestationsComponent, SpinnerComponent, NotificationComponent],
   imports: [
     CommonModule,
     AdminRoutingModule,
@@ -28,6 +29,7 @@ import { ChartsModule } from 'ng2-charts';
     ChartsModule
 
   ],
+
   exports: [HeaderComponent, FooterComponent],
 
 })

@@ -7,6 +7,7 @@ import { AbsencesComponent } from './absences/absences.component';
 import { QuestionsRhComponent } from './questions-rh/questions-rh.component';
 import { UsersComponent } from './users/users.component';
 import { DemandeAttestationsComponent } from './demande-attestations/demande-attestations.component';
+import { NotificationComponent } from './notification/notification.component';
 
 const routes: Routes = [
 
@@ -20,7 +21,7 @@ const routes: Routes = [
   { path: 'demandeattestations', component: DemandeAttestationsComponent , data: {title: 'Administrateur'}},
 
   { path: 'users', component: UsersComponent , data: {title: 'Administrateur'}},
-
+  { path: 'Notification', component: NotificationComponent , data: {title: 'Administrateur'}},
 ];
 
 @NgModule({

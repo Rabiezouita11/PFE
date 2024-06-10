@@ -56,7 +56,7 @@ public class InitialDataLoader implements CommandLineRunner {
 
         // Create admin user
         User admin = new User();
-        admin.setUsername("admin");
+        admin.setUsername("gestionnaire");
         admin.setEmail("admin@admin.com");
         admin.setPassword(passwordEncoder.encode("admin"));
 
