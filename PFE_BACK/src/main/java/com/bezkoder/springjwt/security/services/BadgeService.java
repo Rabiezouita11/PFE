@@ -21,10 +21,11 @@ public class BadgeService {
         Badge badge = badgeRepository.findByUserId(userId);
         return badge != null ? badge.getStatus() : null;
     }
-    public void acceptBadge(Long badgeId) {
+    public Badge acceptBadge(Long badgeId) {
         Badge badge = badgeRepository.findById(badgeId).orElseThrow(() -> new RuntimeException("Badge not found"));
         badge.setStatus("accepter");
         badgeRepository.save(badge);
+        return badge;
     }
 
     public void refuseBadge(Long badgeId) {

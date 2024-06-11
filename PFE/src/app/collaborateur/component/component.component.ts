@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ScriptStyleLoaderService } from 'src/app/Service/ScriptStyleLoaderService/script-style-loader-service.service';
+import { WebsocketUserService } from 'src/app/Service/websocketUser/websocket-user.service';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 
 @Component({
@@ -16,9 +17,13 @@ export class ComponentComponentCollaborateur implements OnInit {
   image!: string;
   dropdownOpen: boolean = false;
 
-  constructor(private router: Router, private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
+  constructor(     private websocketUserService: WebsocketUserService
+,    private router: Router, private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
+    this.websocketUserService.connect();
+
+
     this.loadScriptsAndStyles();
     if (this.tokenStorage.getToken()) {
       this.roles = this.tokenStorage.getUser().roles;

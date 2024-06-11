@@ -169,10 +169,24 @@ public class BadgeController {
         if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTIONNAIRE"))) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
         }
-        badgeService.acceptBadge(badgeId);
+        Badge acceptedBadge = badgeService.acceptBadge(badgeId);
+        String message = "Your badge request has been accepted.";
+        sendBadgeNotification(acceptedBadge.getUser().getId(), acceptedBadge.getPhotos(), message, acceptedBadge.getUsername());
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
+    private void sendBadgeNotification(Long userId, String fileName, String message, String username) {
+        // Construct data object for WebSocket message
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId);
+        data.put("fileName", fileName);
+        data.put("message", message);
+        data.put("username", username);
+        // Add other necessary data fields
 
+        // Send notification through WebSocket
+        messagingTemplate.convertAndSendToUser(String.valueOf(userId), "/queue/notification", data);
+    }
     @PutMapping("/refuse/{badgeId}")
     public ResponseEntity<?> refuseBadge(@PathVariable Long badgeId, @AuthenticationPrincipal UserDetails userDetails) {
         if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTIONNAIRE"))) {
