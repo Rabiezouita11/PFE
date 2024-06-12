@@ -39,4 +39,17 @@ export class WebSocketService {
 
     return this.http.delete<void>(`${this.baseUrl}/notifications/${id}`, { headers });
   }
+
+  getNotificationsForUser(userId: number, authToken: string): Observable<any[]> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${authToken}`
+    });
+
+    // Include headers in the request options
+    const requestOptions = {
+      headers: headers
+    };
+
+    return this.http.get<any[]>(`${this.baseUrl}/notifications/${userId}`, requestOptions);
+  }
 }

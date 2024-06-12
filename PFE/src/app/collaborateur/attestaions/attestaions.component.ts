@@ -51,6 +51,7 @@ export class AttestaionsComponent implements OnInit {
     this.loadDemandeAttestations();
 
   }
+  
   openStatusModal(status: string): void {
     // Filter demandeAttestations based on the status
     const filteredDemandes = this.demandesAttestations.filter(demande => demande.isApproved === status);

@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.logging.Logger;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 
@@ -45,6 +46,7 @@ public class BadgeController {
     private SimpMessagingTemplate messagingTemplate;
     @Autowired
     private NotificationService notificationService;
+    private static final Logger logger = Logger.getLogger(NotificationService.class.getName());
 
     @GetMapping("/images/{badgeid}/{fileName}")
     public ResponseEntity<byte[]> getImage(@PathVariable Long badgeid, @PathVariable String fileName , @AuthenticationPrincipal UserDetails userDetails) throws IOException {
@@ -169,23 +171,36 @@ public class BadgeController {
         if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTIONNAIRE"))) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
         }
+
+        
         Badge acceptedBadge = badgeService.acceptBadge(badgeId);
         String message = "Your badge request has been accepted.";
-        sendBadgeNotification(acceptedBadge.getUser().getId(), acceptedBadge.getPhotos(), message, acceptedBadge.getUsername());
+        Notification notification = notificationService.createNotificationBadge(acceptedBadge.getUser().getId(),  acceptedBadge.getPhotos(), message, acceptedBadge.getUsername());
+
+        sendBadgeNotification(acceptedBadge.getUser().getId(), acceptedBadge.getPhotos(), message, acceptedBadge.getUsername(), notification);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
-    private void sendBadgeNotification(Long userId, String fileName, String message, String username) {
+    private void sendBadgeNotification(Long userId, String fileName, String message, String username, Notification notification) {
         // Construct data object for WebSocket message
         Map<String, Object> data = new HashMap<>();
         data.put("userId", userId);
         data.put("fileName", fileName);
         data.put("message", message);
         data.put("username", username);
+        data.put("timestamp", notification.getTimestamp()); // Add timestamp to the data
+        data.put("id", notification.getId()); // Add ID to the data
+
         // Add other necessary data fields
+        logger.info("Sending notification to user: " + userId);
+        logger.info("Notification data: " + data);
+
 
         // Send notification through WebSocket
         messagingTemplate.convertAndSendToUser(String.valueOf(userId), "/queue/notification", data);
+        logger.info("Notification sent to user: " + userId);
+
+
     }
     @PutMapping("/refuse/{badgeId}")
     public ResponseEntity<?> refuseBadge(@PathVariable Long badgeId, @AuthenticationPrincipal UserDetails userDetails) {
@@ -250,18 +265,27 @@ public class BadgeController {
     }
     @GetMapping("/GetAllnotifications")
     public ResponseEntity<List<Notification>> getNotificationsForUser() {
-        List<Notification> notifications = notificationService.getALLNotifications();
+        List<Notification> notifications = notificationService.getAllNotificationsForAdminUsers();
         return new ResponseEntity<>(notifications, HttpStatus.OK);
     }
 
     @DeleteMapping("/notifications/{id}")
     public ResponseEntity<?> deleteNotificationById(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
-        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTIONNAIRE"))) {
+        Set<String> allowedRoles = new HashSet<>(Arrays.asList("ROLE_GESTIONNAIRE", "ROLE_COLLABORATEUR"));
+
+        if (!userDetails.getAuthorities().stream().anyMatch(a -> allowedRoles.contains(a.getAuthority()))) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
         }
+    
 
         notificationService.deleteNotificationById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+    @GetMapping("/notifications/{userId}")
+    public ResponseEntity<List<Notification>> getNotificationsForUser(@PathVariable Long userId) {
+        List<Notification> notifications = notificationService.getNotificationsByUserId(userId);
+        return new ResponseEntity<>(notifications, HttpStatus.OK);
+    }
+
 }
 

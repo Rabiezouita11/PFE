@@ -1,0 +1,9 @@
+.message-delete-container {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .delete-button {
+    align-self: flex-end;
+  }
+  

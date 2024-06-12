@@ -21,53 +21,37 @@
       </ul>
       <ul class="navbar-nav navbar-nav-right">
         <li class="nav-item dropdown">
-          <a class="nav-link count-indicator dropdown-toggle" id="notificationDropdown" href="#" data-toggle="dropdown">
-            <i class="icon-bell mx-0"></i>
-            <span class="count"></span>
+          <a class="nav-link count-indicator dropdown-toggle" (click)="updateTimeDifference()" id="notificationDropdown" href="#" data-toggle="dropdown">
+            <i class="icon-bell mx-0">{{ userNotifications.length }}</i>
           </a>
           <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
             <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
-            <a class="dropdown-item preview-item">
-              <div class="preview-thumbnail">
-                <div class="preview-icon bg-success">
-                  <i class="ti-info-alt mx-0"></i>
+            <ng-container *ngFor="let notification of userNotifications">
+              <a class="dropdown-item preview-item">
+                <div class="preview-thumbnail">
+                  <ng-container *ngIf="notification.fileName !== null; else showAvatar">
+                    <img [src]="getImageUrlNotifications(notification.userId, notification.fileName)" alt="profile" />
+                  </ng-container>
+                  <ng-template #showAvatar>
+                    <div class="avatar" style="color: black;">{{ notification.username.charAt(0) }}{{ notification.username.charAt(1) }}</div>
+                  </ng-template>
                 </div>
-              </div>
-              <div class="preview-item-content">
-                <h6 class="preview-subject font-weight-normal">Application Error</h6>
-                <p class="font-weight-light small-text mb-0 text-muted">
-                  Just now
-                </p>
-              </div>
-            </a>
-            <a class="dropdown-item preview-item">
-              <div class="preview-thumbnail">
-                <div class="preview-icon bg-warning">
-                  <i class="ti-settings mx-0"></i>
+                <div class="preview-item-content">
+                  <div class="message-delete-container">
+                    <div class="message-content">
+                      <h6 class="preview-subject font-weight-normal">{{ notification.message }}</h6>
+                      <p class="font-weight-light small-text mb-0 text-muted">{{ calculateTimeDifference(notification.timestamp) }}</p>
+                    </div>
+                    <button (click)="confirmDeleteNotification(notification.id)" class="btn btn-danger btn-sm delete-button">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </div>
                 </div>
-              </div>
-              <div class="preview-item-content">
-                <h6 class="preview-subject font-weight-normal">Settings</h6>
-                <p class="font-weight-light small-text mb-0 text-muted">
-                  Private message
-                </p>
-              </div>
-            </a>
-            <a class="dropdown-item preview-item">
-              <div class="preview-thumbnail">
-                <div class="preview-icon bg-info">
-                  <i class="ti-user mx-0"></i>
-                </div>
-              </div>
-              <div class="preview-item-content">
-                <h6 class="preview-subject font-weight-normal">New user registration</h6>
-                <p class="font-weight-light small-text mb-0 text-muted">
-                  2 days ago
-                </p>
-              </div>
-            </a>
+              </a>
+            </ng-container>
           </div>
         </li>
+        
         <li class="nav-item nav-profile dropdown">
           
           <div class="dropdown" (click)="toggleDropdown($event)">

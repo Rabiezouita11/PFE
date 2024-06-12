@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import * as SockJs from 'sockjs-client';
 import * as Stomp from 'stompjs';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -19,16 +20,14 @@ export class WebsocketUserService {
     this.stompClient = Stomp.over(socket);
     this.stompClient.connect({ Authorization: `Bearer ${authToken}` }, () => {
       console.log('Connected to WebSocket');
-      // Subscribe to user-specific notification queue
       this.subscribeToUserNotifications();
     });
   }
 
-  public subscribeToUserNotifications() {
+  private subscribeToUserNotifications() {
     if (this.stompClient && this.userId) {
-      this.stompClient.subscribe(`  ${this.userId}/queue/notification`, (message) => {
+      this.stompClient.subscribe(`/user/${this.userId}/queue/notification`, (message) => {
         const notification = JSON.parse(message.body);
-        // Handle the received notification here
         console.log(notification);
       });
     }
