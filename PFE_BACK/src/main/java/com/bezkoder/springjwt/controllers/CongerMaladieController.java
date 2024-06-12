@@ -1,17 +1,16 @@
 package com.bezkoder.springjwt.controllers;
 
-import com.bezkoder.springjwt.models.Conger_Maladie;
-import com.bezkoder.springjwt.models.Donner;
-import com.bezkoder.springjwt.models.LeaveRequest;
-import com.bezkoder.springjwt.models.SoldeConger;
+import com.bezkoder.springjwt.models.*;
 import com.bezkoder.springjwt.payload.response.MessageResponse;
 import com.bezkoder.springjwt.repository.CongerMaladieRepository;
 import com.bezkoder.springjwt.repository.DonnerRepository;
 import com.bezkoder.springjwt.repository.UserRepository;
+import com.bezkoder.springjwt.security.services.NotificationService;
 import com.bezkoder.springjwt.security.services.UserDetailsImpl;
 import com.bezkoder.springjwt.util.CustomDateDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -44,8 +43,10 @@ public class CongerMaladieController {
     soldeCongerRepository soldeCongerRepository;
     @Autowired
     private DonnerRepository donnerRepository;
-
-
+    @Autowired
+    private NotificationService notificationService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
     // Define the directory where files will be stored
     // Define the directory where files will be stored within your backend project directory
     private static final String UPLOAD_DIR = "uploads/";
@@ -120,6 +121,22 @@ public class CongerMaladieController {
 
         // Save the Donner object to the database
         donnerRepository.save(donner);
+
+        String message = String.format("%s has submitted a leave request for %s, which is %d days long",
+                userDetails.getUsername(), // Remplacer par le nom de l'utilisateur
+                leaveRequest.getTypeConger(), // Type de congé demandé
+                durationInDays); // Durée du congé en jours
+
+        Notification notification = notificationService.createNotification(userDetails.getId(), fileName, message, userDetails.getUsername());
+        Map<String, Object> data = new HashMap<>();
+        data.put("id", notification.getId());
+        data.put("userId", userDetails.getId());
+        data.put("fileName", fileName);
+        data.put("message", message);
+        data.put("username", userDetails.getUsername());
+        data.put("timestamp", notification.getTimestamp());
+        messagingTemplate.convertAndSend("/topic/notification", data);
+
         // Return a success response
         return ResponseEntity.ok(new MessageResponse("Leave request submitted successfully!"));
     }

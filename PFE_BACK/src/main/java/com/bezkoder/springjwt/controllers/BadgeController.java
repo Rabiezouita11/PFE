@@ -207,7 +207,13 @@ public class BadgeController {
         if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTIONNAIRE"))) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
         }
-        badgeService.refuseBadge(badgeId);
+        Badge refusedBadge = badgeService.refuseBadge(badgeId);
+        String message = "Your badge request has been refused.";
+
+        Notification notification = notificationService.createNotificationBadge(refusedBadge.getUser().getId(), refusedBadge.getPhotos(), message, refusedBadge.getUsername());
+
+        sendBadgeNotification(refusedBadge.getUser().getId(), refusedBadge.getPhotos(), message, refusedBadge.getUsername(), notification);
+
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

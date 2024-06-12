@@ -28,10 +28,11 @@ public class BadgeService {
         return badge;
     }
 
-    public void refuseBadge(Long badgeId) {
+    public Badge refuseBadge(Long badgeId) {
         Badge badge = badgeRepository.findById(badgeId).orElseThrow(() -> new RuntimeException("Badge not found"));
         badge.setStatus("refuser");
         badgeRepository.save(badge);
+        return badge;
     }
 
     @Transactional

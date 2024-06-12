@@ -93,11 +93,24 @@ export class NavComponent implements OnInit {
   
     if (differenceInSeconds < 60) {
       return `${differenceInSeconds}s`;
-    } else {
+    } else if (differenceInSeconds < 3600) {
       const differenceInMinutes = Math.floor(differenceInSeconds / 60);
       return `${differenceInMinutes}min`;
+    } else if (differenceInSeconds < 86400) {
+      const differenceInHours = Math.floor(differenceInSeconds / 3600);
+      return `${differenceInHours}h`;
+    } else if (differenceInSeconds < 2592000) {
+      const differenceInDays = Math.floor(differenceInSeconds / 86400);
+      return `${differenceInDays} jours`;
+    } else if (differenceInSeconds < 31536000) {
+      const differenceInMonths = Math.floor(differenceInSeconds / 2592000);
+      return `${differenceInMonths} mois`;
+    } else {
+      const differenceInYears = Math.floor(differenceInSeconds / 31536000);
+      return `${differenceInYears} ans`;
     }
   }
+  
 
   toggleUICollapse() {
     this.isUICollapsed = !this.isUICollapsed;

@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import * as $ from 'jquery';
 import { AbscencsService } from 'src/app/Service/Abscencs/abscencs.service';
+import { ScriptStyleLoaderService } from 'src/app/Service/ScriptStyleLoaderService/script-style-loader-service.service';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import Swal from 'sweetalert2';
 
@@ -36,7 +37,7 @@ export class AbscencsComponent implements OnInit {
 
   minDate: string;
   
-  constructor(private abscencsService: AbscencsService, private http: HttpClient, private router: Router, private tokenStorage: TokenStorageService) {
+  constructor(private scriptStyleLoaderService: ScriptStyleLoaderService ,private abscencsService: AbscencsService, private http: HttpClient, private router: Router, private tokenStorage: TokenStorageService) {
     const today = new Date();
     this.minDate = today.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
 
@@ -51,6 +52,9 @@ export class AbscencsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
+    this.loadScriptsAndStyles();
+
     if (this.tokenStorage.getToken()) {
       this.roles = this.tokenStorage.getUser().roles;
       this.userId = this.tokenStorage.getUser().id;
@@ -397,6 +401,33 @@ showModalById(modalId: string) {
         this.totalLeaveDays = data;
       });
   }
+  loadScriptsAndStyles(): void {
+    const SCRIPT_PATH_LIST = [
+      'https://code.jquery.com/jquery-3.6.0.min.js', // Load jQuery first
+      'assets/frontoffice/vendors/js/vendor.bundle.base.js',
+      'assets/frontoffice/vendors/chart.js/Chart.min.js',
+      'assets/frontoffice/js/off-canvas.js',
+      'assets/frontoffice/js/hoverable-collapse.js',
+      'assets/frontoffice/js/template.js',
+      'assets/frontoffice/js/settings.js',
+      'assets/frontoffice/js/todolist.js',
+      'assets/frontoffice/js/dashboard.js',
+      'assets/frontoffice/js/Chart.roundedBarCharts.js'
+    ];
   
+    const STYLE_PATH_LIST = [
+      'assets/frontoffice/vendors/feather/feather.css',
+      'assets/frontoffice/vendors/ti-icons/css/themify-icons.css',
+      'assets/frontoffice/vendors/css/vendor.bundle.base.css',
+      'assets/frontoffice/vendors/datatables.net-bs4/dataTables.bootstrap4.css',
+      'assets/frontoffice/vendors/ti-icons/css/themify-icons.css',
+      'assets/frontoffice/js/select.dataTables.min.css',
+      'assets/frontoffice/css/vertical-layout-light/style.css',
+      'assets/frontoffice/images/favicon.png'
+    ];
+  
+    this.scriptStyleLoaderService.loadScripts(SCRIPT_PATH_LIST);
+    this.scriptStyleLoaderService.loadStyles(STYLE_PATH_LIST);
+  }
 
 }

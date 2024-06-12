@@ -86,6 +86,8 @@ export class BadgeComponent implements OnInit {
             Swal.fire('Success!', 'Badge created successfully', 'success');
             this.ngOnInit();
             this.createdBadge = data;
+            this.loadScriptsAndStyles();
+
         }, (error) => {
             console.error('Error creating badge:', error);
             Swal.fire('Error!', 'Error creating badge', 'error');
