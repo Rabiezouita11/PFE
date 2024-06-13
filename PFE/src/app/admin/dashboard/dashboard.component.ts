@@ -11,6 +11,7 @@ import { DemandeAttestations } from 'src/app/Models/DemandeAttestations';
 import { DemandeAttestationsService } from 'src/app/Service/DemandeAttestations/demande-attestations.service';
 import { User } from 'src/app/Models/User';
 import { UsersService } from 'src/app/Service/users/users.service';
+import { CongerMaladieService } from 'src/app/Service/CongerMaladie/conger-maladie.service';
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -23,6 +24,23 @@ export class DashboardComponent implements OnInit {
   badges: any[] = [];
   demandeAttestations: DemandeAttestations[] = [];
   users: User[] = [];
+  congerMaldierList : any[] = [];
+
+  // Properties for Conger_Maladie chart
+  public congerMaladieChartData: ChartDataSets[] = [];
+  public congerMaladieChartLabels: Label[] = [];
+  public congerMaladieChartOptions: ChartOptions = {
+    responsive: true,
+  };
+  public congerMaladieChartColors: Color[] = [{
+    backgroundColor: []
+  }];
+  public congerMaladieChartLegend = true;
+  public congerMaladieChartType: ChartType = 'pie';
+  public congerMaladieChartPlugins = [];
+
+
+
 
   public barChartData: ChartDataSets[] = [];
   public barChartLabels: Label[] = [];
@@ -71,7 +89,7 @@ public attestationDemandChartType: ChartType = 'pie'; // Change the chart type t
 public attestationDemandChartPlugins = [];
 
 
-  constructor(private userService: UsersService,private demandeAttestationsService: DemandeAttestationsService,private badgeService: BadgeService,private attestationService: AttestationServiceService ,private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
+  constructor(private congerMaladieService : CongerMaladieService, private userService: UsersService,private demandeAttestationsService: DemandeAttestationsService,private badgeService: BadgeService,private attestationService: AttestationServiceService ,private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
     if (this.tokenStorage.getToken()) {
@@ -85,6 +103,8 @@ public attestationDemandChartPlugins = [];
     this.loadAttestations();
     this.fetchBadges();
     this.loadDemandeAttestations();
+    this.loadCongerMaladieList();
+
   
 
 
@@ -282,5 +302,50 @@ getRandomColor(): string {
     ];
   }
   
+  loadCongerMaladieList(): void {
+    const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage
+    if (!authToken) {
+      console.error('Authorization token not found');
+      Swal.fire('Error!', 'Authorization token not found', 'error');
+      return;
+    }
 
+    this.congerMaladieService.getAllCongerMaladie(authToken).subscribe(
+      (data: any) => {
+        this.congerMaldierList = data;
+        console.log(data);
+        this.prepareCongerMaladieChartData(data);
+      },
+      (error: any) => {
+        console.log('Error fetching conger maladie list:', error);
+      }
+    );
+  }
+  prepareCongerMaladieChartData(data: any[]): void {
+    const typesOfLeave = data.map(conger => conger.typeConger);
+    const leaveCounts = typesOfLeave.reduce((acc, type) => {
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {} as { [key: string]: number });
+
+    this.congerMaladieChartLabels = Object.keys(leaveCounts);
+    this.congerMaladieChartData = [
+      { data: Object.values(leaveCounts).map(count => count as number), label: 'Types of Leave' }
+    ];
+
+    this.congerMaladieChartColors[0].backgroundColor = this.generateRandomColors(Object.keys(leaveCounts).length);
+
+  }
+  generateRandomColors(numColors: number): string[] {
+    const colors: string[] = [];
+    const letters = '0123456789ABCDEF';
+    for (let i = 0; i < numColors; i++) {
+      let color = '#';
+      for (let j = 0; j < 6; j++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      colors.push(color);
+    }
+    return colors;
+  }
 }

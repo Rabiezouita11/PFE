@@ -53,4 +53,25 @@
       </div>
     </div>
   </div>
+
+
+  <div class="row mt-4" *ngIf="role == 'ROLE_MANAGER'">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Types of Leave Chart</h5>
+          <canvas baseChart
+                  [datasets]="congerMaladieChartData"
+                  [labels]="congerMaladieChartLabels"
+                  [options]="congerMaladieChartOptions"
+                  [colors]="congerMaladieChartColors"
+                  [legend]="congerMaladieChartLegend"
+                  [chartType]="congerMaladieChartType"
+                  [plugins]="congerMaladieChartPlugins">
+          </canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 </div>
