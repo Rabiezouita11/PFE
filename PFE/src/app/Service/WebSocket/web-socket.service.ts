@@ -32,6 +32,19 @@ export class WebSocketService {
     };
     return this.http.get<any[]>(`http://localhost:8080/api/badges/GetAllnotifications`,requestOptions);
   }
+
+  
+  getAllNotificationsManager(authToken :string): Observable<any[]> {
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${authToken}`
+    });
+
+    // Include headers in the request options
+    const requestOptions = {
+      headers: headers
+    };
+    return this.http.get<any[]>(`http://localhost:8080/api/badges/GetAllnotificationsManager`,requestOptions);
+  }
   deleteNotificationById(id: number, authToken: string): Observable<void> {
     const headers = new HttpHeaders({
       'Authorization': `Bearer ${authToken}`

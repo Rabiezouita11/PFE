@@ -19,6 +19,17 @@ public class NotificationService {
     private NotificationRepository notificationRepository;
 
 
+    public Notification createNotificationManager(Long userId, String fileName, String message, String username) {
+        Notification notification = new Notification();
+        notification.setUserId(userId);
+        notification.setFileName(fileName);
+        notification.setMessage(message);
+        notification.setUsername(username);
+        notification.setTimestamp(LocalDateTime.now());
+        notification.setAdmin(false);
+        notification.setManager(true);
+        return notificationRepository.save(notification);
+    }
     public Notification createNotification(Long userId, String fileName, String message, String username) {
         Notification notification = new Notification();
         notification.setUserId(userId);
@@ -27,6 +38,7 @@ public class NotificationService {
         notification.setUsername(username);
         notification.setTimestamp(LocalDateTime.now());
         notification.setAdmin(true);
+        notification.setManager(false);
 
         return notificationRepository.save(notification);
     }
@@ -38,6 +50,7 @@ public class NotificationService {
         notification.setUsername(username);
         notification.setTimestamp(LocalDateTime.now());
         notification.setAdmin(false);
+        notification.setManager(false);
 
         return notificationRepository.save(notification);
     }
@@ -49,6 +62,12 @@ public class NotificationService {
                 .filter(Notification::isAdmin)
                 .collect(Collectors.toList());
     }
+    public List<Notification> getAllNotificationsForManager() {
+        List<Notification> allNotifications = notificationRepository.findAll();
+        return allNotifications.stream()
+                .filter(Notification::isManager)
+                .collect(Collectors.toList());
+    }
     public void deleteNotificationById(Long id) {
         notificationRepository.deleteById(id);
     }
@@ -56,10 +75,11 @@ public class NotificationService {
         // Retrieve all notifications for the specified user
         List<Notification> notifications = notificationRepository.findByUserId(userId);
 
-        // Filter out notifications where isAdmin is false
+        // Filter out notifications where isAdmin is false and isManager is false
         return notifications.stream()
-                .filter(notification -> !notification.isAdmin())
+                .filter(notification -> !notification.isAdmin() && !notification.isManager())
                 .collect(Collectors.toList());
     }
+
 
 }

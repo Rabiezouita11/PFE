@@ -275,6 +275,13 @@ public class BadgeController {
         return new ResponseEntity<>(notifications, HttpStatus.OK);
     }
 
+    @GetMapping("/GetAllnotificationsManager")
+    public ResponseEntity<List<Notification>> getNotificationsForManger() {
+        List<Notification> notifications = notificationService.getAllNotificationsForManager();
+        return new ResponseEntity<>(notifications, HttpStatus.OK);
+    }
+
+
     @DeleteMapping("/notifications/{id}")
     public ResponseEntity<?> deleteNotificationById(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
         Set<String> allowedRoles = new HashSet<>(Arrays.asList("ROLE_GESTIONNAIRE", "ROLE_COLLABORATEUR" ,"ROLE_MANAGER"));

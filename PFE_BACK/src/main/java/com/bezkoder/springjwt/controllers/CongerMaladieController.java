@@ -127,7 +127,7 @@ public class CongerMaladieController {
                 leaveRequest.getTypeConger(), // Type de congé demandé
                 durationInDays); // Durée du congé en jours
 
-        Notification notification = notificationService.createNotification(userDetails.getId(), userDetails.getPhotos(), message, userDetails.getUsername());
+        Notification notification = notificationService.createNotificationManager(userDetails.getId(), userDetails.getPhotos(), message, userDetails.getUsername());
         Map<String, Object> data = new HashMap<>();
         data.put("id", notification.getId());
         data.put("userId", userDetails.getId());

@@ -5,6 +5,7 @@ import com.bezkoder.springjwt.models.*;
 import com.bezkoder.springjwt.repository.*;
 import com.bezkoder.springjwt.security.services.AttestationService;
 import com.bezkoder.springjwt.security.services.DonnerService;
+import com.bezkoder.springjwt.security.services.NotificationService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -19,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -70,7 +72,10 @@ public class GestionnaireController {
     private AttestationService attestationService;
     @Autowired
     private AttestationRepository attestationRepository;
-
+    @Autowired
+    private NotificationService notificationService;
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers(@AuthenticationPrincipal UserDetails userDetails) {
         if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTIONNAIRE"))) {
@@ -149,13 +154,48 @@ public class GestionnaireController {
             }
 
             sendCongerStatusEmailAsync(conger.getUser().getEmail(), oldStatus, newStatus, conger);
+            String message = String.format("Your leave request for %s from %s to %s has been %s.",
+                    conger.getTypeConger(),
+                    conger.getDateDebut(),
+                    conger.getDateFin(),
+                    newStatus.toLowerCase());
+
+            Notification notification = notificationService.createNotificationBadge(
+                    conger.getUser().getId(),
+                    conger.getUser().getPhotos(), // Assuming justificationPath is the path to the file
+                    message,
+                    conger.getUser().getUsername() // Assuming User has getUsername method
+            );
+
+            sendBadgeNotification(
+                    conger.getUser().getId(),
+                    conger.getUser().getPhotos(),
+                    message,
+                    conger.getUser().getUsername(),
+                    notification
+            );
 
             return ResponseEntity.ok().body("{\"message\": \"Conger status updated successfully\"}");
         } else {
             return ResponseEntity.notFound().build();
         }
     }
+    private void sendBadgeNotification(Long userId, String fileName, String message, String username, Notification notification) {
+        // Construct data object for WebSocket message
+        Map<String, Object> data = new HashMap<>();
+        data.put("userId", userId);
+        data.put("fileName", fileName);
+        data.put("message", message);
+        data.put("username", username);
+        data.put("timestamp", notification.getTimestamp()); // Add timestamp to the data
+        data.put("id", notification.getId()); // Add ID to the data
 
+        // Add other necessary data fields
+
+
+        // Send notification through WebSocket
+        messagingTemplate.convertAndSendToUser(String.valueOf(userId), "/queue/notification", data);
+    }
     @Async
     protected void sendCongerStatusEmailAsync(String userEmail, String oldStatus, String newStatus, Conger_Maladie conger) {
         MimeMessage message = javaMailSender.createMimeMessage();

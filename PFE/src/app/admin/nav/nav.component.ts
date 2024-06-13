@@ -68,7 +68,7 @@ export class NavComponent implements OnInit {
         console.error('Authorization token not found');
         return;
       }
-      this.webSocketService.getAllNotifications(authToken).subscribe((notifications: any) => {
+      this.webSocketService.getAllNotificationsManager(authToken).subscribe((notifications: any) => {
         this.userNotifications = notifications;
       });
       let stompClient = this.webSocketService.connect();

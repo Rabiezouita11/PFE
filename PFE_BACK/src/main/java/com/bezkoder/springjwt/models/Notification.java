@@ -21,6 +21,7 @@ public class Notification {
     private String username;
     private LocalDateTime timestamp;
     private boolean isAdmin; // New attribute
+    private boolean isManager; // New attribute
 
 
 }
