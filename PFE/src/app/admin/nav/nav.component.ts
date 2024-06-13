@@ -26,27 +26,8 @@ export class NavComponent implements OnInit {
   constructor(private changeDetectorRef: ChangeDetectorRef ,private webSocketService: WebSocketService ,private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
-    this.updateTimeDifference(); // Update the displayed time difference
 
-    const authToken = this.tokenStorage.getToken();
-
-    if (!authToken) {
-      console.error('Authorization token not found');
-      return;
-    }
-    this.webSocketService.getAllNotifications(authToken).subscribe((notifications: any) => {
-      this.userNotifications = notifications;
-    });
-    let stompClient = this.webSocketService.connect();
-    stompClient.connect({}, (frame: any) => {
-      stompClient.subscribe('/topic/notification', (message: { body: string; }) => {
-        // Add new notification to the array
-        let data = JSON.parse(message.body);
-        this.userNotifications.push({ userId: data.userId, fileName: data.fileName  ,  message:data.message , username : data.username  , id : data.id , timestamp : data.timestamp});
-        this.updateTimeDifference(); // Update the displayed time difference
-
-      });
-    });
+   
     if (this.tokenStorage.getToken()) {
       this.roles = this.tokenStorage.getUser().roles;
       this.userId = this.tokenStorage.getUser().id;
@@ -54,6 +35,52 @@ export class NavComponent implements OnInit {
       this.username = this.tokenStorage.getUser().username;
       this.image = this.getImageUrl(); // Call getImageUrl() to construct the image URL
 
+    }
+     if (this.roles.includes('ROLE_GESTIONNAIRE')) {
+      this.updateTimeDifference(); // Update the displayed time difference
+
+      const authToken = this.tokenStorage.getToken();
+  
+      if (!authToken) {
+        console.error('Authorization token not found');
+        return;
+      }
+      this.webSocketService.getAllNotifications(authToken).subscribe((notifications: any) => {
+        this.userNotifications = notifications;
+      });
+      let stompClient = this.webSocketService.connect();
+      stompClient.connect({}, (frame: any) => {
+        stompClient.subscribe('/topic/notification', (message: { body: string; }) => {
+          // Add new notification to the array
+          let data = JSON.parse(message.body);
+          this.userNotifications.push({ userId: data.userId, fileName: data.fileName  ,  message:data.message , username : data.username  , id : data.id , timestamp : data.timestamp});
+          this.updateTimeDifference(); // Update the displayed time difference
+  
+        });
+      });
+    } else if (this.roles.includes('ROLE_MANAGER'))
+    {
+      this.updateTimeDifference(); // Update the displayed time difference
+
+      const authToken = this.tokenStorage.getToken();
+  
+      if (!authToken) {
+        console.error('Authorization token not found');
+        return;
+      }
+      this.webSocketService.getAllNotifications(authToken).subscribe((notifications: any) => {
+        this.userNotifications = notifications;
+      });
+      let stompClient = this.webSocketService.connect();
+      stompClient.connect({}, (frame: any) => {
+        stompClient.subscribe('/manager/notification', (message: { body: string; }) => {
+          // Add new notification to the array
+          let data = JSON.parse(message.body);
+          this.userNotifications.push({ userId: data.userId, fileName: data.fileName  ,  message:data.message , username : data.username  , id : data.id , timestamp : data.timestamp});
+          this.updateTimeDifference(); // Update the displayed time difference
+  
+        });
+      });
     }
     
   }

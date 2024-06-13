@@ -277,7 +277,7 @@ public class BadgeController {
 
     @DeleteMapping("/notifications/{id}")
     public ResponseEntity<?> deleteNotificationById(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
-        Set<String> allowedRoles = new HashSet<>(Arrays.asList("ROLE_GESTIONNAIRE", "ROLE_COLLABORATEUR"));
+        Set<String> allowedRoles = new HashSet<>(Arrays.asList("ROLE_GESTIONNAIRE", "ROLE_COLLABORATEUR" ,"ROLE_MANAGER"));
 
         if (!userDetails.getAuthorities().stream().anyMatch(a -> allowedRoles.contains(a.getAuthority()))) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role

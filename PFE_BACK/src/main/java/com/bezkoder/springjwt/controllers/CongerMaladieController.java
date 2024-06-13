@@ -135,7 +135,7 @@ public class CongerMaladieController {
         data.put("message", message);
         data.put("username", userDetails.getUsername());
         data.put("timestamp", notification.getTimestamp());
-        messagingTemplate.convertAndSend("/topic/notification", data);
+        messagingTemplate.convertAndSend("/manager/notification", data);
 
         // Return a success response
         return ResponseEntity.ok(new MessageResponse("Leave request submitted successfully!"));
