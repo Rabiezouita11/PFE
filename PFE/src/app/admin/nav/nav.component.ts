@@ -62,6 +62,9 @@ export class NavComponent implements OnInit {
     return `http://localhost:8080/api/auth/images/${this.userId}/${this.fileName}`;
   }
   getImageUrlNotifications(userId: number, fileName: string): string {
+    console.log("userIduserIduserId"+userId);
+
+    console.log("fileNamefileNamefileNamefileName"+fileName);
     // Assuming your backend endpoint for retrieving images is '/api/images/'
     return `http://localhost:8080/api/auth/images/${userId}/${fileName}`;
   }

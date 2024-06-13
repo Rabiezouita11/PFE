@@ -2,10 +2,8 @@ package com.bezkoder.springjwt.models;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Setter
@@ -20,21 +18,29 @@ public class Attestation {
     private String name;
     private String pdfPath;
     private boolean isExist;
+    @Temporal(TemporalType.DATE)
+    @Column(name = "creation_date")
+    private Date creationDate;
 
     // Constructors, getters, and setters
 
     public Attestation() {
+        this.creationDate = new Date(); // Set current date
+
     }
 
     public Attestation(String name, String pdfPath, boolean isExist) {
         this.name = name;
         this.pdfPath = pdfPath;
         this.isExist = isExist;
+        this.creationDate = new Date(); // Set current date
+
     }
 
     public Attestation(String name, boolean isExist) {
         this.isExist = isExist;
         this.name = name;
+        this.creationDate = new Date(); // Set current date
 
     }
 

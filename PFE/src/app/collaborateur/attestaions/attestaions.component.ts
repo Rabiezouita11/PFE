@@ -205,18 +205,32 @@ export class AttestaionsComponent implements OnInit {
       return;
     }
     this.demandeAttestationsService.saveDemande(demandeAttestations, authToken).subscribe(
-      data => {
-        console.log('Demande attestation saved successfully:', data);
-        // Optionally, you can display a success message or perform any other action upon successful saving
-        Swal.fire('Success!', 'Demande attestation saved successfully', 'success');
-        this.ngOnInit();
+      response => {
+        // Check if the response is successful
+        if (response) {
+          // If the request was successful
+          console.log('Demande attestation saved successfully:', response);
+          // Display a success message
+          Swal.fire('Success!', 'Demande attestation saved successfully', 'success');
+          // Optionally, refresh data or perform any other action
+          this.ngOnInit();
+        } else {
+          // If the request failed
+          console.error('Failed to save demande attestation:', response);
+          // Display an error message
+          Swal.fire('Error!', 'Failed to save demande attestation', 'error');
+        }
       },
       error => {
+        // If there was an error in the HTTP request
         console.error('Error saving demande attestation:', error);
-        // Optionally, you can display an error message or perform any other action upon error
-        Swal.fire('Error!', 'Failed to save demande attestation', 'error');
+        // Display an error message
+        Swal.fire('Error!', error.error, 'error');
+        // Optionally, handle specific error cases or perform other actions
       }
     );
+    
+
   }
   fetchPdf2(attestationId: number): void {
     const authToken = this.tokenStorage.getToken();

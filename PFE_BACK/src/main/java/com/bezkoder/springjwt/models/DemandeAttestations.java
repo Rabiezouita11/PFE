@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,7 +19,8 @@ public class DemandeAttestations {
 
     private String isApproved = "en cours"; // Default value is "en cours"
 
-
+    @Column(name = "creation_date")
+    private LocalDate creationDate;
 
     private String user_id;
 

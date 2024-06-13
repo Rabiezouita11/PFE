@@ -6,7 +6,7 @@
       <label for="attestationSelect">Select Attestation:</label>
       <select id="attestationSelect" class="form-control" [(ngModel)]="selectedAttestation" name="attestation">
         <option *ngFor="let attestation of attestations" [ngValue]="attestation">
-          {{ attestation.name }} - {{ attestation.exist ? 'Existe' : 'Inexiste' }}
+          {{ attestation.name }} - {{ attestation.exist ? 'crée le ' + attestation.creationDate : 'Inexiste' }}
         </option>
       </select>
     </div>

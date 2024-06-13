@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,14 +45,37 @@ public class DemandeAttestationsController {
 
 
     @PostMapping("/saveDemande")
-    public DemandeAttestations createDemandeAttestations(@RequestBody DemandeAttestations demandeAttestations) {
-        // Call the service method to save the demande d'attestation
+    public ResponseEntity<Object> createDemandeAttestations(@RequestBody DemandeAttestations demandeAttestations) {
+        try {
+            // Set the creation date to the current date
+            demandeAttestations.setCreationDate(LocalDate.now());
 
-        System.out.println("demandeAttestations"+demandeAttestations);
-        DemandeAttestations savedDemandeAttestations = demandeAttestationsRepository.save(demandeAttestations);
-        return savedDemandeAttestations;
+            // Get the current month
+            YearMonth currentMonth = YearMonth.now();
+            LocalDate firstDayOfMonth = currentMonth.atDay(1);
+            LocalDate lastDayOfMonth = currentMonth.atEndOfMonth();
+
+            // Retrieve the list of DemandeAttestations for the given user_id and current month
+            List<DemandeAttestations> requestsForCurrentUserInCurrentMonth = demandeAttestationsRepository.findByUserIdAndCreationDateBetween(
+                    demandeAttestations.getUser_id(),
+                    firstDayOfMonth,
+                    lastDayOfMonth
+            );
+
+            // Check if the number of requests exceeds 3
+            if (requestsForCurrentUserInCurrentMonth.size() >= 3) {
+                String errorMessage = "You have reached the maximum limit for attestation requests this month (" + currentMonth.getMonth() + ").";
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+            }
+
+
+            // Call the service method to save the demande d'attestation
+            DemandeAttestations savedDemandeAttestations = demandeAttestationsRepository.save(demandeAttestations);
+            return ResponseEntity.ok().body(savedDemandeAttestations);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An internal server error occurred.");
+        }
     }
-
 
     @PutMapping("/{id}/approve")
     public ResponseEntity<?> approveDemandeAttestations(@PathVariable Long id) {
