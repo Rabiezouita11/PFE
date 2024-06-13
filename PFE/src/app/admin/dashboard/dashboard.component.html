@@ -73,5 +73,23 @@
       </div>
     </div>
   </div>
-  
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Leave Types Chart</h5>
+        <canvas baseChart
+                [datasets]="leaveTypesChartData"
+                [labels]="leaveTypesChartLabels"
+                [options]="leaveTypesChartOptions"
+                [colors]="leaveTypesChartColors"
+                [legend]="leaveTypesChartLegend"
+                [chartType]="leaveTypesChartType"
+                [plugins]="leaveTypesChartPlugins">
+        </canvas>
+      </div>
+    </div>
+  </div>
+
+
+
 </div>

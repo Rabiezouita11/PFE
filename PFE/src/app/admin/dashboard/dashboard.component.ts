@@ -36,9 +36,8 @@ export class DashboardComponent implements OnInit {
     backgroundColor: []
   }];
   public congerMaladieChartLegend = true;
-  public congerMaladieChartType: ChartType = 'pie';
+  public congerMaladieChartType: ChartType = 'bar';
   public congerMaladieChartPlugins = [];
-
 
 
 
@@ -88,7 +87,20 @@ public attestationDemandChartLegend = true;
 public attestationDemandChartType: ChartType = 'pie'; // Change the chart type to bar
 public attestationDemandChartPlugins = [];
 
-
+ // New chart properties
+ public leaveTypesChartData: ChartDataSets[] = [];
+ public leaveTypesChartLabels: Label[] = [];
+ public leaveTypesChartOptions: ChartOptions = {
+   responsive: true,
+  
+ };
+ public leaveTypesChartColors: Color[] = [{
+  backgroundColor: []
+ }];
+ 
+ public leaveTypesChartLegend = true;
+ public leaveTypesChartType: ChartType = 'pie';
+ public leaveTypesChartPlugins = [];
   constructor(private congerMaladieService : CongerMaladieService, private userService: UsersService,private demandeAttestationsService: DemandeAttestationsService,private badgeService: BadgeService,private attestationService: AttestationServiceService ,private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
@@ -315,26 +327,70 @@ getRandomColor(): string {
         this.congerMaldierList = data;
         console.log(data);
         this.prepareCongerMaladieChartData(data);
+        this.prepareLeaveTypesChartData(data);
+
       },
       (error: any) => {
         console.log('Error fetching conger maladie list:', error);
       }
     );
   }
-  prepareCongerMaladieChartData(data: any[]): void {
-    const typesOfLeave = data.map(conger => conger.typeConger);
-    const leaveCounts = typesOfLeave.reduce((acc, type) => {
-      acc[type] = (acc[type] || 0) + 1;
-      return acc;
-    }, {} as { [key: string]: number });
+  // prepareCongerMaladieChartData(data: any[]): void {
+  //   const typesOfLeave = data.map(conger => conger.typeConger);
+  //   const leaveCounts = typesOfLeave.reduce((acc, type) => {
+  //     acc[type] = (acc[type] || 0) + 1;
+  //     return acc;
+  //   }, {} as { [key: string]: number });
 
-    this.congerMaladieChartLabels = Object.keys(leaveCounts);
-    this.congerMaladieChartData = [
-      { data: Object.values(leaveCounts).map(count => count as number), label: 'Types of Leave' }
+  //   this.congerMaladieChartLabels = Object.keys(leaveCounts);
+  //   this.congerMaladieChartData = [
+  //     { data: Object.values(leaveCounts).map(count => count as number), label: 'Types of Leave' }
+  //   ];
+
+  //   this.congerMaladieChartColors[0].backgroundColor = this.generateRandomColors(Object.keys(leaveCounts).length);
+
+  // }
+  prepareCongerMaladieChartData(data: any[]): void {
+    // Initialize an object to store counts for each interval
+    const intervalCounts: { [key: string]: number } = {};
+
+    // Define intervals based on date ranges
+    const intervals = [
+      { label: '0-7 days', start: 0, end: 7 },
+      { label: '8-14 days', start: 8, end: 14 },
+      { label: '15-30 days', start: 15, end: 30 },
+      { label: '31+ days', start: 31, end: Infinity }
     ];
 
-    this.congerMaladieChartColors[0].backgroundColor = this.generateRandomColors(Object.keys(leaveCounts).length);
+    // Iterate through each conger and calculate its duration in days
+    data.forEach(conger => {
+      const dateDebut = new Date(conger.dateDebut);
+      const dateFin = new Date(conger.dateFin);
+      const durationInDays = this.getDurationInDays(dateDebut, dateFin);
 
+      // Find the appropriate interval for the duration
+      const interval = intervals.find(interval => durationInDays >= interval.start && durationInDays <= interval.end);
+
+      // Increment the count for the interval
+      if (interval) {
+        intervalCounts[interval.label] = (intervalCounts[interval.label] || 0) + 1;
+      }
+    });
+
+    // Prepare chart data
+    this.congerMaladieChartLabels = Object.keys(intervalCounts);
+    this.congerMaladieChartData = [{
+      data: Object.values(intervalCounts),
+      label: 'Conger Maladie Intervals'
+    }];
+
+    // Generate random colors for each interval
+    this.congerMaladieChartColors[0].backgroundColor = this.generateRandomColors(Object.keys(intervalCounts).length);
+  }
+  getDurationInDays(dateDebut: Date, dateFin: Date): number {
+    const diffTime = Math.abs(dateFin.getTime() - dateDebut.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
   }
   generateRandomColors(numColors: number): string[] {
     const colors: string[] = [];
@@ -348,4 +404,35 @@ getRandomColor(): string {
     }
     return colors;
   }
+  prepareLeaveTypesChartData(data: any[]): void {
+    const typesOfLeave = data.map(conger => conger.typeConger);
+    const leaveCounts = typesOfLeave.reduce((acc, type) => {
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {} as { [key: string]: number });
+  
+    this.leaveTypesChartLabels = Object.keys(leaveCounts);
+    this.leaveTypesChartData = [{
+      data: Object.values(leaveCounts).map(count => count as number),
+      label: 'Types of Leave'
+    }];
+  
+    // Generate random colors for the chart
+    this.leaveTypesChartColors[0].backgroundColor = this.generateRandomColorss(Object.keys(leaveCounts).length);
+  }
+  
+  generateRandomColorss(numColors: number): string[] {
+    const colors: string[] = [];
+    const letters = '0123456789ABCDEF';
+    for (let i = 0; i < numColors; i++) {
+      let color = '#';
+      for (let j = 0; j < 6; j++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      colors.push(color);
+    }
+    return colors;
+  }
+
+  
 }
