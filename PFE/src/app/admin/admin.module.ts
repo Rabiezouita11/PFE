@@ -18,10 +18,11 @@ import { DemandeAttestationsComponent } from './demande-attestations/demande-att
 import { SpinnerComponent } from './spinner/spinner.component';
 import { ChartsModule } from 'ng2-charts';
 import { NotificationComponent } from './notification/notification.component';
+import { ChatComponent } from './chat/chat/chat.component';
 
 
 @NgModule({
-  declarations: [DashboardComponent, HeaderComponent, ComponentComponent, SidbarComponent, FooterComponent, BadgeComponent, AbsencesComponent, QuestionsRhComponent, AttestationsComponent, UsersComponent, NavComponent, DemandeAttestationsComponent, SpinnerComponent, NotificationComponent],
+  declarations: [DashboardComponent, HeaderComponent, ComponentComponent, SidbarComponent, FooterComponent, BadgeComponent, AbsencesComponent, QuestionsRhComponent, AttestationsComponent, UsersComponent, NavComponent, DemandeAttestationsComponent, SpinnerComponent, NotificationComponent, ChatComponent],
   imports: [
     CommonModule,
     AdminRoutingModule,

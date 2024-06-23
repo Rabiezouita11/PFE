@@ -15,9 +15,10 @@ import { SidbarComponent } from './component/sidbar/sidbar.component';
 import { FooterComponent } from './component/footer/footer.component';
 import { AbscencsComponent } from './abscencs/abscencs.component';
 import { ProfileComponent } from './profile/profile.component';
+import { ChatComponent } from './chat/chat.component';
 
 @NgModule({
-  declarations: [HomeComponent, BadgeComponent, MaladeComponent, AttestaionsComponent, QuestionsRhComponent, ComponentComponentCollaborateur, NavComponent, SidbarComponent, FooterComponent, AbscencsComponent, ProfileComponent],
+  declarations: [HomeComponent, BadgeComponent, MaladeComponent, AttestaionsComponent, QuestionsRhComponent, ComponentComponentCollaborateur, NavComponent, SidbarComponent, FooterComponent, AbscencsComponent, ProfileComponent, ChatComponent],
   imports: [
     CommonModule,
     CollaborateurRoutingModule,

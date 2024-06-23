@@ -7,6 +7,7 @@ import { MaladeComponent } from './malade/malade.component';
 import { QuestionsRhComponent } from './questions-rh/questions-rh.component';
 import { AbscencsComponent } from './abscencs/abscencs.component';
 import { ProfileComponent } from './profile/profile.component';
+import { ChatComponent } from './chat/chat.component';
 
 const routes: Routes = [
 
@@ -17,6 +18,7 @@ const routes: Routes = [
   { path: 'questionsRh', component: QuestionsRhComponent },
   { path: 'Abscences', component: AbscencsComponent },
   { path: 'Profile', component: ProfileComponent },
+  { path: 'chat', component: ChatComponent },
 
 ];
 

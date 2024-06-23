@@ -1,0 +1,12 @@
+<div>
+    <h2>Collaborateur Chat</h2>
+    <div *ngFor="let msg of websocketChatService.publicMessages">{{ msg }}</div>
+    <input [(ngModel)]="message" placeholder="Type a message..." />
+    <button (click)="sendMessage()">Send</button>
+  </div>
+  
+  <div>
+    <h2>Private Notifications</h2>
+    <div *ngFor="let msg of websocketChatService.privateMessages">{{ msg }}</div>
+  </div>
+  

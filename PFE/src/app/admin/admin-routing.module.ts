@@ -8,6 +8,7 @@ import { QuestionsRhComponent } from './questions-rh/questions-rh.component';
 import { UsersComponent } from './users/users.component';
 import { DemandeAttestationsComponent } from './demande-attestations/demande-attestations.component';
 import { NotificationComponent } from './notification/notification.component';
+import { ChatComponent } from './chat/chat/chat.component';
 
 const routes: Routes = [
 
@@ -19,6 +20,7 @@ const routes: Routes = [
   { path: 'absences', component: AbsencesComponent , data: {title: 'Administrateur'}},
   { path: 'QuestionsRh', component: QuestionsRhComponent , data: {title: 'Administrateur'}},
   { path: 'demandeattestations', component: DemandeAttestationsComponent , data: {title: 'Administrateur'}},
+  { path: 'chat', component: ChatComponent , data: {title: 'Administrateur'}},
 
   { path: 'users', component: UsersComponent , data: {title: 'Administrateur'}},
   { path: 'Notification', component: NotificationComponent , data: {title: 'Administrateur'}},
