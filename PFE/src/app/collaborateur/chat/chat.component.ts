@@ -1,6 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { WebsocketChatService } from 'src/app/Service/websocketChat/websocket-chat.service';
-
+export interface Message {
+  sender: string;
+  content: string;
+  timestamp: string;
+}
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
@@ -8,11 +12,14 @@ import { WebsocketChatService } from 'src/app/Service/websocketChat/websocket-ch
 })
 export class ChatComponent implements OnInit, OnDestroy {
   public message: string = '';
+  public combinedMessages: Message[] = [];
 
   constructor(public websocketChatService: WebsocketChatService) { }
 
   ngOnInit(): void {
     this.websocketChatService.connect();
+    this.combinedMessages = this.websocketChatService.publicMessages.concat(this.websocketChatService.privateMessages2);
+
   }
 
   sendMessage(): void {
@@ -30,5 +37,17 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.websocketChatService.disconnect();
+  }
+  getCurrentTime(): string {
+    return new Date().toLocaleTimeString(); // Example format, adjust as needed
+  }
+   isCollaboratorMessage(msg: any): boolean {
+    // Assuming `publicMessages` is an array of `Message` objects
+    return this.websocketChatService.publicMessages.includes(msg);
+  }
+
+  isGestionnaireMessage(msg: any): boolean {
+    // Assuming `privateMessages2` is an array of strings
+    return this.websocketChatService.privateMessages2.includes(msg);
   }
 }

@@ -16,14 +16,15 @@ import { FooterComponent } from './component/footer/footer.component';
 import { AbscencsComponent } from './abscencs/abscencs.component';
 import { ProfileComponent } from './profile/profile.component';
 import { ChatComponent } from './chat/chat.component';
+import { SortByTimestampPipe } from '../sort-by-timestamp.pipe';
 
 @NgModule({
-  declarations: [HomeComponent, BadgeComponent, MaladeComponent, AttestaionsComponent, QuestionsRhComponent, ComponentComponentCollaborateur, NavComponent, SidbarComponent, FooterComponent, AbscencsComponent, ProfileComponent, ChatComponent],
+  declarations: [SortByTimestampPipe ,HomeComponent, BadgeComponent, MaladeComponent, AttestaionsComponent, QuestionsRhComponent, ComponentComponentCollaborateur, NavComponent, SidbarComponent, FooterComponent, AbscencsComponent, ProfileComponent, ChatComponent],
   imports: [
     CommonModule,
     CollaborateurRoutingModule,
-    FormsModule // Add FormsModule here
-
+    FormsModule, // Add FormsModule here
+    
 
   ]
 })

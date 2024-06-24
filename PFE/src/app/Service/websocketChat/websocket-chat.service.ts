@@ -3,13 +3,18 @@ import * as SockJS from 'sockjs-client';
 import * as Stomp from 'stompjs';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import { CollaboratorService } from '../collaborator/collaborator.service';
+import { Observable } from 'rxjs';
 
-interface Message {
+export interface Message {
   sender: string;
   content: string;
   timestamp: string;
 }
-
+export interface MessageGestionnaire {
+  sender: string;
+  content: string;
+  timestamp: string;
+}
 @Injectable({
   providedIn: 'root'
 })
@@ -20,7 +25,7 @@ export class WebsocketChatService {
   public publicMessages: Message[] = [];
   public privateMessages: { [collaboratorId: string]: Message[] } = {};
   public collaboratorNames: { [collaboratorId: string]: string } = {};
-  public privateMessages2: string[] = [];
+  public privateMessages2: MessageGestionnaire[] = [];
 
   constructor(
     private tokenStorageService: TokenStorageService,
@@ -29,7 +34,7 @@ export class WebsocketChatService {
     this.userId = this.tokenStorageService.getUser().id;
   }
 
-  public connect() {
+  public connect(): void {
     const authToken = this.tokenStorageService.getToken();
     const socket = new SockJS('http://localhost:8080/socket');
     this.stompClient = Stomp.over(socket);
@@ -42,17 +47,27 @@ export class WebsocketChatService {
     });
   }
 
-  private subscribeToPrivateMessages() {
+  private subscribeToPrivateMessages(): void {
     if (this.stompClient && this.userId) {
       this.stompClient.subscribe(`/user/${this.userId}/queue2/notification`, (message) => {
         const notification = JSON.parse(message.body);
         console.log('Private Message:', notification);
-        this.privateMessages2.push(notification.content);
+        
+        // Construct the message object with timestamp
+        const newMessage = {
+          sender: "Gestionnaire",
+          content: notification.content,
+          timestamp: new Date().toLocaleTimeString()  // Example, adjust format as needed
+        };
+  
+        // Push the message object into privateMessages2
+        this.privateMessages2.push(newMessage);
       });
     }
   }
+  
 
-  public subscribeToUserNotifications() {
+  public subscribeToUserNotifications(): void {
     if (this.stompClient && this.userId) {
       this.stompClient.subscribe(`/user/${this.userId}/queue2/notification`, (message) => {
         const notification = JSON.parse(message.body);
@@ -73,7 +88,7 @@ export class WebsocketChatService {
     }
   }
 
-  private fetchCollaboratorName(collaboratorId: string) {
+  private fetchCollaboratorName(collaboratorId: string): void {
     this.collaboratorService.getCollaboratorName(collaboratorId).subscribe({
       next: (name) => {
         this.collaboratorNames[collaboratorId] = name;
@@ -84,7 +99,7 @@ export class WebsocketChatService {
     });
   }
 
-  public sendMessage(messageContent: string) {
+  public sendMessage(messageContent: string): void {
     const message = {
       sender: this.userId,
       recipient: this.gestionnaireId,
@@ -95,7 +110,7 @@ export class WebsocketChatService {
     }
   }
 
-  public sendReply(recipientId: string, messageContent: string) {
+  public sendReply(recipientId: string, messageContent: string): void {
     const message = {
       sender: this.gestionnaireId,
       recipient: recipientId,
@@ -106,7 +121,7 @@ export class WebsocketChatService {
     }
   }
 
-  public disconnect() {
+  public disconnect(): void {
     if (this.stompClient) {
       this.stompClient.disconnect(() => {
         console.log('Disconnected from WebSocket');

@@ -22,6 +22,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { CalenderComponent } from './calender/calender.component';
 import listPlugin from '@fullcalendar/list/main.js';
 import timeGridPlugin from '@fullcalendar/timegrid/main.js';
+import { SortByTimestampPipe } from './sort-by-timestamp.pipe';
 
 FullCalendarModule.registerPlugins([
   // register FullCalendar plugins
@@ -40,7 +41,8 @@ FullCalendarModule.registerPlugins([
     ForgetPasswordComponent,
     ResetPasswordComponent,
     PageNotFoundComponent,
-    CalenderComponent
+    CalenderComponent,
+    
   ],
   imports: [
     BrowserModule,
