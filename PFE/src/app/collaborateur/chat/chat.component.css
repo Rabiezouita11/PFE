@@ -304,4 +304,21 @@
         overflow-x: auto
     }
 }
+.avatar {
+    width: 40px; /* Adjust size as needed */
+    height: 40px; /* Adjust size as needed */
+    background-color: #ccc; /* Placeholder background color */
+    color: #fff; /* Text color */
+    font-size: 18px; /* Font size of initials */
+    line-height: 40px; /* Center vertically */
+    text-align: center; /* Center horizontally */
+    border-radius: 50%; /* Circular shape */
+    display: inline-block; /* Ensure circular shape */
+  }
+  
+  .avatar-img {
+    width: 40px; /* Adjust size as needed */
+    height: 40px; /* Adjust size as needed */
+    border-radius: 50%; /* Circular shape */
+  }
   

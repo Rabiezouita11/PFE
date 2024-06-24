@@ -54,11 +54,27 @@
             <!-- chat.component.html -->
             <div class="chat-history">
               <ul class="m-b-0">
+
+
                 <li class="clearfix"
                   *ngFor="let msg of websocketChatService.publicMessages.concat(websocketChatService.privateMessages2) | sortByTimestamp">
-                  {{msg.sender}}
-                  <div *ngIf="msg.sender === 'Gestionnaire'">Gestionnaire: {{msg.content}} - {{msg.timestamp}}</div>
-                  <div *ngIf="msg.sender === 'collaborator'">Collaborateur: {{msg.content}} - {{msg.timestamp}}</div>
+
+                  <div class="message-data"
+                    [ngClass]="{ 'text-right': msg.sender === 'collaborator', 'text-left': msg.sender === 'Gestionnaire' }">
+                    <span *ngIf="msg.sender === 'collaborator'" class="message-data-time">{{ msg.timestamp }}</span>
+                    <div *ngIf="msg.sender === 'collaborator'">
+                      <ng-container *ngIf="fileName !== null; else showAvatar">
+                        <img [src]="getImageUrl()" alt="profile" />
+                      </ng-container>
+                      <ng-template #showAvatar>
+                        <div class="avatar">{{ username?.charAt(0) }}{{ username?.charAt(1) }}</div>
+                      </ng-template>
+                    </div>
+                  </div>
+                  <div class="message"
+                    [ngClass]="{ 'other-message float-right': msg.sender === 'collaborator', 'my-message': msg.sender === 'Gestionnaire' }">
+                    {{ msg.content }}
+                  </div>
                 </li>
               </ul>
             </div>

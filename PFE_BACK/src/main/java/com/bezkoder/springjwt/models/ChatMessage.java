@@ -9,6 +9,6 @@ public class ChatMessage {
     private String sender;
     private String recipient;
     private String content;
-
+    private String fileName;
     // Getters and setters
 }

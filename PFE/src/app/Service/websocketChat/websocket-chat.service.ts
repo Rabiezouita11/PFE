@@ -9,22 +9,27 @@ export interface Message {
   sender: string;
   content: string;
   timestamp: string;
+  fileName?: string;
 }
+
 export interface MessageGestionnaire {
   sender: string;
   content: string;
   timestamp: string;
+  fileName?: string;
 }
+
 @Injectable({
   providedIn: 'root'
 })
 export class WebsocketChatService {
   private stompClient: Stomp.Client | undefined;
   private userId: number | undefined;
-  private gestionnaireId: string = "1";
+  private gestionnaireId: string = '1';
   public publicMessages: Message[] = [];
   public privateMessages: { [collaboratorId: string]: Message[] } = {};
   public collaboratorNames: { [collaboratorId: string]: string } = {};
+  public collaboratorImages: { [collaboratorId: string]: string } = {}; // To store image URLs
   public privateMessages2: MessageGestionnaire[] = [];
 
   constructor(
@@ -38,6 +43,7 @@ export class WebsocketChatService {
     const authToken = this.tokenStorageService.getToken();
     const socket = new SockJS('http://localhost:8080/socket');
     this.stompClient = Stomp.over(socket);
+
     this.stompClient.connect({ Authorization: `Bearer ${authToken}` }, () => {
       console.log('Connected to WebSocket');
       this.subscribeToUserNotifications();
@@ -52,37 +58,38 @@ export class WebsocketChatService {
       this.stompClient.subscribe(`/user/${this.userId}/queue2/notification`, (message) => {
         const notification = JSON.parse(message.body);
         console.log('Private Message:', notification);
-        
-        // Construct the message object with timestamp
+
         const newMessage = {
-          sender: "Gestionnaire",
+          sender: 'Gestionnaire',
           content: notification.content,
-          timestamp: new Date().toLocaleTimeString()  // Example, adjust format as needed
+          timestamp: new Date().toLocaleTimeString(),
+          fileName: notification.fileName
         };
-  
-        // Push the message object into privateMessages2
+
         this.privateMessages2.push(newMessage);
       });
     }
   }
-  
 
   public subscribeToUserNotifications(): void {
     if (this.stompClient && this.userId) {
       this.stompClient.subscribe(`/user/${this.userId}/queue2/notification`, (message) => {
-        const notification = JSON.parse(message.body);
-        console.log('User Notification:', notification);
-        const collaboratorId = notification.sender;
+        console.log('User Notification:', message);
 
+        const notification = JSON.parse(message.body);
+        const collaboratorId = notification.sender;
+        console.log(' collaboratorId:', collaboratorId);
         if (!this.privateMessages[collaboratorId]) {
           this.privateMessages[collaboratorId] = [];
           this.fetchCollaboratorName(collaboratorId);
+          this.fetchCollaboratorImage(collaboratorId, notification.fileName);
         }
 
         this.privateMessages[collaboratorId].push({
           sender: notification.sender,
           content: notification.content,
-          timestamp: new Date().toLocaleTimeString() // Example, adjust format as needed
+          timestamp: new Date().toLocaleTimeString(),
+          fileName: notification.fileName
         });
       });
     }
@@ -99,11 +106,23 @@ export class WebsocketChatService {
     });
   }
 
-  public sendMessage(messageContent: string): void {
+  private fetchCollaboratorImage(collaboratorId: string, fileName: string | undefined): void {
+    const imageUrl = this.getImageUrl(parseInt(collaboratorId, 10), fileName);
+    this.collaboratorImages[collaboratorId] = imageUrl;
+  }
+
+  public getImageUrl(userId: number, fileName: string | undefined): string {
+    console.log("userId", userId);
+    console.log("fileName", fileName);
+    return fileName ? `http://localhost:8080/api/auth/images/${userId}/${fileName}` : 'https://bootdey.com/img/Content/avatar/avatar2.png';
+  }
+
+  public sendMessage(messageContent: string, fileName: string): void {
     const message = {
       sender: this.userId,
       recipient: this.gestionnaireId,
-      content: messageContent
+      content: messageContent,
+      fileName: fileName
     };
     if (this.stompClient && this.stompClient.connected) {
       this.stompClient.send('/app/chat', {}, JSON.stringify(message));

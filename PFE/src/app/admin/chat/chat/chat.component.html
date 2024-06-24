@@ -14,11 +14,11 @@
             </div>
             <ul class="list-unstyled chat-list mt-2 mb-0">
               <li class="clearfix" *ngFor="let collaboratorId of collaborateurIds" (click)="selectCollaborator(collaboratorId)">
-                <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">
+                <img [src]="getCollaboratorImage(collaboratorId)" alt="Collaborator Image" width="50" height="50">
                 <div class="about">
                   <div class="name">{{ getCollaboratorName(collaboratorId) }}</div>
                   <div class="status">
-                    <i class="fa fa-circle" ></i>
+                    <div class="status"><i class="fa fa-circle online"></i> online</div>
                    
                   </div>
                 </div>
@@ -26,11 +26,12 @@
             </ul>
           </div>
           <div class="chat" *ngIf="selectedCollaborator">
+            
             <div class="chat-header clearfix">
               <div class="row">
                 <div class="col-lg-6">
                   <a href="javascript:void(0);" data-toggle="modal" data-target="#view_info">
-                    <img src="https://bootdey.com/img/Content/avatar/avatar2.png" alt="avatar">
+                    <img [src]="getCollaboratorImage(selectedCollaborator)" alt="avatar">
                   </a>
                   <div class="chat-about">
                     <h6 class="m-b-0">{{ getCollaboratorName(selectedCollaborator) }}</h6>
@@ -48,7 +49,7 @@
             <div class="chat-history">
               <ul class="m-b-0">
                 <li class="clearfix" *ngFor="let msg of websocketChatService.privateMessages[selectedCollaborator]">
-                  
+                 
                   <div class="message-data" [ngClass]="{ 'text-right': msg.sender === 'gestionnaire', 'text-left': msg.sender !== 'gestionnaire' }">
                     <span *ngIf="msg.sender === 'gestionnaire'"  class="message-data-time">{{ msg.timestamp }}</span>
                     <img *ngIf="msg.sender === 'gestionnaire'" src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar">
