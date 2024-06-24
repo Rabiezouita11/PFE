@@ -3,6 +3,11 @@ import * as SockJS from 'sockjs-client';
 import * as Stomp from 'stompjs';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import { CollaboratorService } from '../collaborator/collaborator.service';
+interface Message {
+  sender: string;
+  content: string;
+  timestamp: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -11,8 +16,8 @@ export class WebsocketChatService {
   private stompClient: Stomp.Client | undefined;
   private userId: number | undefined;
   private gestionnaireId: string = "1";
-  public publicMessages: string[] = [];
-  public privateMessages: { [collaboratorId: string]: string[] } = {};
+  public publicMessages: Message[] = [];
+  public privateMessages: { [collaboratorId: string]: Message[] } = {};
   public collaboratorNames: { [collaboratorId: string]: string } = {};
   public privateMessages2: string[] = [];
 
@@ -57,10 +62,15 @@ export class WebsocketChatService {
           this.fetchCollaboratorName(collaboratorId);
         }
 
-        this.privateMessages[collaboratorId].push(notification.content);
+        this.privateMessages[collaboratorId].push({
+          sender: notification.sender,
+          content: notification.content,
+          timestamp: new Date().toLocaleTimeString() // Example, adjust format as needed
+        });
       });
     }
   }
+  
 
   private fetchCollaboratorName(collaboratorId: string) {
     this.collaboratorService.getCollaboratorName(collaboratorId).subscribe({
