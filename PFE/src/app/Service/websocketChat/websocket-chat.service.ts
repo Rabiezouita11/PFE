@@ -3,6 +3,7 @@ import * as SockJS from 'sockjs-client';
 import * as Stomp from 'stompjs';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import { CollaboratorService } from '../collaborator/collaborator.service';
+
 interface Message {
   sender: string;
   content: string;
@@ -36,11 +37,11 @@ export class WebsocketChatService {
       console.log('Connected to WebSocket');
       this.subscribeToUserNotifications();
       this.subscribeToPrivateMessages();
-
     }, (error) => {
       console.error('WebSocket connection error:', error);
     });
   }
+
   private subscribeToPrivateMessages() {
     if (this.stompClient && this.userId) {
       this.stompClient.subscribe(`/user/${this.userId}/queue2/notification`, (message) => {
@@ -50,6 +51,7 @@ export class WebsocketChatService {
       });
     }
   }
+
   public subscribeToUserNotifications() {
     if (this.stompClient && this.userId) {
       this.stompClient.subscribe(`/user/${this.userId}/queue2/notification`, (message) => {
@@ -70,7 +72,6 @@ export class WebsocketChatService {
       });
     }
   }
-  
 
   private fetchCollaboratorName(collaboratorId: string) {
     this.collaboratorService.getCollaboratorName(collaboratorId).subscribe({
@@ -82,7 +83,7 @@ export class WebsocketChatService {
       }
     });
   }
-  
+
   public sendMessage(messageContent: string) {
     const message = {
       sender: this.userId,
