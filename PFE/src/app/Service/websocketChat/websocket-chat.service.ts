@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import * as SockJS from 'sockjs-client';
 import * as Stomp from 'stompjs';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
+import { CollaboratorService } from '../collaborator/collaborator.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,9 +12,14 @@ export class WebsocketChatService {
   private userId: number | undefined;
   private gestionnaireId: string = "1";
   public publicMessages: string[] = [];
-  public privateMessages: string[] = [];
+  public privateMessages: { [collaboratorId: string]: string[] } = {};
+  public collaboratorNames: { [collaboratorId: string]: string } = {};
+  public privateMessages2: string[] = [];
 
-  constructor(private tokenStorageService: TokenStorageService) {
+  constructor(
+    private tokenStorageService: TokenStorageService,
+    private collaboratorService: CollaboratorService
+  ) {
     this.userId = this.tokenStorageService.getUser().id;
   }
 
@@ -24,21 +30,49 @@ export class WebsocketChatService {
     this.stompClient.connect({ Authorization: `Bearer ${authToken}` }, () => {
       console.log('Connected to WebSocket');
       this.subscribeToUserNotifications();
+      this.subscribeToPrivateMessages();
+
     }, (error) => {
       console.error('WebSocket connection error:', error);
     });
   }
-
+  private subscribeToPrivateMessages() {
+    if (this.stompClient && this.userId) {
+      this.stompClient.subscribe(`/user/${this.userId}/queue2/notification`, (message) => {
+        const notification = JSON.parse(message.body);
+        console.log('Private Message:', notification);
+        this.privateMessages2.push(notification.content);
+      });
+    }
+  }
   public subscribeToUserNotifications() {
     if (this.stompClient && this.userId) {
       this.stompClient.subscribe(`/user/${this.userId}/queue2/notification`, (message) => {
         const notification = JSON.parse(message.body);
         console.log('User Notification:', notification);
-        this.privateMessages.push(notification.content);
+        const collaboratorId = notification.sender;
+
+        if (!this.privateMessages[collaboratorId]) {
+          this.privateMessages[collaboratorId] = [];
+          this.fetchCollaboratorName(collaboratorId);
+        }
+
+        this.privateMessages[collaboratorId].push(notification.content);
       });
     }
   }
 
+  private fetchCollaboratorName(collaboratorId: string) {
+    this.collaboratorService.getCollaboratorName(collaboratorId).subscribe({
+      next: (name) => {
+        this.collaboratorNames[collaboratorId] = name;
+      },
+      error: (error) => {
+        console.error('Error fetching collaborator name:', error);
+      }
+    });
+  }
+  
   public sendMessage(messageContent: string) {
     const message = {
       sender: this.userId,

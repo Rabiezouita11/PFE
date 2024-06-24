@@ -1,6 +1,9 @@
 <div>
   <h2>Gestionnaire Chat</h2>
-  <div *ngFor="let msg of websocketChatService.privateMessages">{{ msg }}</div>
+  <div *ngFor="let collaboratorId of collaborateurIds">
+    <h3>{{ getCollaboratorName(collaboratorId) }}</h3>
+    <div *ngFor="let msg of websocketChatService.privateMessages[collaboratorId]">{{ msg }}</div>
+  </div>
   <input [(ngModel)]="recipientId" placeholder="Recipient ID" />
   <input [(ngModel)]="replyMessage" placeholder="Type a reply..." />
   <button (click)="sendReply()">Send Reply</button>

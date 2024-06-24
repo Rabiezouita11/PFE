@@ -6,7 +6,7 @@ import { WebsocketChatService } from 'src/app/Service/websocketChat/websocket-ch
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css']
 })
-export class ChatComponent implements OnInit, OnDestroy{
+export class ChatComponent implements OnInit, OnDestroy {
   public replyMessage: string = '';
   public recipientId: string = '';
   public selectedCollaborateur: string | null = null;
@@ -15,7 +15,6 @@ export class ChatComponent implements OnInit, OnDestroy{
 
   ngOnInit(): void {
     this.websocketChatService.connect();
-    this.websocketChatService.subscribeToUserNotifications();
   }
 
   selectCollaborateur(collaborateurId: string): void {
@@ -32,6 +31,10 @@ export class ChatComponent implements OnInit, OnDestroy{
 
   get collaborateurIds(): string[] {
     return Object.keys(this.websocketChatService.privateMessages);
+  }
+
+  getCollaboratorName(collaboratorId: string): string {
+    return this.websocketChatService.collaboratorNames[collaboratorId] || 'Unknown Collaborator';
   }
 
   ngOnDestroy(): void {

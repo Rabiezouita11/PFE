@@ -47,4 +47,10 @@ public class UserService {
         Optional<User> userOptional = repository.findById(userId);
         return userOptional.orElse(null);
     }
+    public String getUserNameById(Long userId) {
+        User user = repository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return user.getUsername();
+    }
+
 }

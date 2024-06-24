@@ -6,6 +6,7 @@ import com.bezkoder.springjwt.repository.*;
 import com.bezkoder.springjwt.security.services.AttestationService;
 import com.bezkoder.springjwt.security.services.DonnerService;
 import com.bezkoder.springjwt.security.services.NotificationService;
+import com.bezkoder.springjwt.security.services.UserService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -52,7 +53,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 @RequestMapping("/api/Gestionnaire")
 public class GestionnaireController {
     private static final String UPLOAD_DIR = "attestations";
-
+    @Autowired
+    private UserService userService;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -508,6 +510,11 @@ public class GestionnaireController {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/{userId}/name")
+    public String getUserName(@PathVariable Long userId) {
+        return userService.getUserNameById(userId);
     }
 
 }
