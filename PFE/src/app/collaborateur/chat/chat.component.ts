@@ -7,7 +7,7 @@ export interface Message {
   content: string;
   timestamp: string;
   fileName?: string; // Include fileName property if you are storing image file names
-  user_id?: string; // Include fileName property if you are storing image file names
+  userId?: string; // Include fileName property if you are storing image file names
 }
 
 @Component({
@@ -46,6 +46,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   sendMessage(): void {
+    console.log("thisuserIddd",this.userId)
     if (this.message.trim()) {
       this.websocketChatService.sendMessage(this.message, this.fileName);
       const newMessage: Message = {
@@ -53,7 +54,7 @@ export class ChatComponent implements OnInit, OnDestroy {
         content: this.message,
         timestamp: new Date().toLocaleTimeString(),
         fileName: this.fileName,
-        user_id : this.userId
+        userId : this.userId
       };
       console.log(newMessage);
       this.websocketChatService.publicMessages.push(newMessage);

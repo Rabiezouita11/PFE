@@ -1,16 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { User } from 'src/app/Models/User';
 import { UsersService } from 'src/app/Service/users/users.service';
-import { WebsocketChatService } from 'src/app/Service/websocketChat/websocket-chat.service';
+import { WebsocketChatService, Message } from 'src/app/Service/websocketChat/websocket-chat.service';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import Swal from 'sweetalert2';
-import { BehaviorSubject, Subscription } from 'rxjs';
-
-interface Message {
-  sender: string;
-  content: string;
-  timestamp: string;
-}
+import { Subscription, of } from 'rxjs';
+import { CollaboratorService } from 'src/app/Service/collaborator/collaborator.service';
+import { catchError, switchMap, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-chat',
@@ -23,9 +20,9 @@ export class ChatComponent implements OnInit, OnDestroy {
   public selectedCollaborator: string | null = null;
   public users: User[] = [];
   private messageSubscription!: Subscription;
-  private onlineStatusMap: { [collaboratorId: string]: BehaviorSubject<boolean> } = {};
 
   constructor(
+    private collaboratorService: CollaboratorService,
     private userService: UsersService,
     public websocketChatService: WebsocketChatService,
     private tokenStorage: TokenStorageService
@@ -34,19 +31,27 @@ export class ChatComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.websocketChatService.connect();
     this.loadUsers();
-
-   
   }
 
   selectCollaborator(collaboratorId: string): void {
+    console.log("collaboratorId",collaboratorId)
     this.selectedCollaborator = collaboratorId;
     this.recipientId = collaboratorId;
+    // Load messages for the selected collaborator
+    this.websocketChatService.getMessagesByUserId(parseInt(collaboratorId)).subscribe(
+      (messages: Message[]) => {
+        this.websocketChatService.privateMessages[collaboratorId] = messages;
+      },
+      error => {
+        console.error('Error fetching messages:', error);
+      }
+    );
   }
 
   sendReply(): void {
     if (this.replyMessage.trim() && this.recipientId.trim()) {
       const message: Message = {
-        sender: '1',
+        sender: 'gestionnaire',
         content: this.replyMessage,
         timestamp: new Date().toLocaleTimeString()
       };
@@ -62,9 +67,41 @@ export class ChatComponent implements OnInit, OnDestroy {
   get collaborateurIds(): string[] {
     return Object.keys(this.websocketChatService.privateMessages);
   }
+  getCollaboratorName(collaboratorId: string): Observable<string> {
+    if (this.websocketChatService.collaboratorNames[collaboratorId]) {
+      // If the collaborator's name is already cached, return it as an observable
+      console.log(`Cached name found for collaborator ${collaboratorId}: ${this.websocketChatService.collaboratorNames[collaboratorId]}`);
+      return of(this.websocketChatService.collaboratorNames[collaboratorId]);
+    } else {
+      // Otherwise, fetch the collaborator's name from the service
+      console.log(`Fetching name for collaborator ${collaboratorId} from service...`);
+      return this.collaboratorService.getCollaboratorName(collaboratorId).pipe(
+        switchMap(name => {
+          console.log(`Received name '${name}' for collaborator ${collaboratorId}. Caching and returning...`);
+          this.websocketChatService.collaboratorNames[collaboratorId] = name; // Cache the collaborator's name
+          return of(name); // Return the name wrapped in an observable
+        }),
+        catchError(error => {
+          console.error('Error fetching collaborator name:', error);
+          return of('Unknown Collaborator'); // Return default name on error
+        })
+      );
+    }
+  }
+  
 
-  getCollaboratorName(collaboratorId: string): string {
-    return this.websocketChatService.collaboratorNames[collaboratorId] || 'Unknown Collaborator';
+  
+
+  getCollaboratorNameAsync(collaboratorId: string): Subscription {
+    return this.collaboratorService.getCollaboratorName(collaboratorId).subscribe({
+      next: (name) => {
+        this.websocketChatService.collaboratorNames[collaboratorId] = name;
+      },
+      error: (error) => {
+        console.error('Error fetching collaborator name:', error);
+        // Handle error as needed
+      }
+    });
   }
 
   getCollaboratorImage(collaboratorId: string): string {
@@ -78,26 +115,27 @@ export class ChatComponent implements OnInit, OnDestroy {
       Swal.fire('Error!', 'Authorization token not found', 'error');
       return;
     }
+    
     this.userService.getAllUsers(authToken).subscribe(
       (data: User[]) => {
+        console.log("Users Data:", data);
+  
+        // Loop through each user and call selectCollaborator
+        data.forEach(user => {
+          const userIdToSelect = user.id.toString();
+          this.selectCollaborator(userIdToSelect);
+        });
+  
+        // Filter users and update this.users if needed
         this.users = data.filter(user => this.collaborateurIds.includes(user.id.toString()));
-        console.log(this.users);
       },
       error => {
         console.log('Error fetching users:', error);
       }
     );
   }
-
-  getImageUrl(userId: number, fileName: string | undefined): string {
-    console.log("userId", userId);
-    console.log("fileName", fileName);
-    return fileName ? `http://localhost:8080/api/auth/images/${userId}/${fileName}` : 'https://bootdey.com/img/Content/avatar/avatar2.png';
-  }
-
-  getCollaborator(collaboratorId: string): User | undefined {
-    return this.users.find(user => user.id.toString() == collaboratorId);
-  }
+  
+  
 
   ngOnDestroy(): void {
     this.websocketChatService.disconnect();

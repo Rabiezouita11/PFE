@@ -13,6 +13,8 @@ export interface Message {
   content: string;
   timestamp: string;
   fileName?: string;
+  user_id?: string; // Include fileName property if you are storing image file names
+
 }
 
 export interface MessageGestionnaire {
@@ -128,7 +130,8 @@ export class WebsocketChatService {
       sender: this.userId,
       recipient: this.gestionnaireId,
       content: messageContent,
-      fileName: fileName
+      fileName: fileName,
+      userId: this.userId
     };
     if (this.stompClient && this.stompClient.connected) {
       this.stompClient.send('/app/chat', {}, JSON.stringify(message));
