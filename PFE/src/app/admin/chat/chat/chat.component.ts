@@ -18,7 +18,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   public replyMessage: string = '';
   public recipientId: string = '';
   public selectedCollaborator: string | null = null;
-  public users: User[] = [];
+  public users!: User[];
   private messageSubscription!: Subscription;
 
   constructor(
@@ -26,7 +26,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     private userService: UsersService,
     public websocketChatService: WebsocketChatService,
     private tokenStorage: TokenStorageService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.websocketChatService.connect();
@@ -39,23 +39,20 @@ export class ChatComponent implements OnInit, OnDestroy {
       Swal.fire('Error!', 'Authorization token not found', 'error');
       return;
     }
-    
+  
     this.userService.getAllUsers(authToken).subscribe(
       (data: User[]) => {
         console.log("Users Data:", data);
         this.users = data;
-
-        // Loop through each user and call selectCollaborator
-        data.forEach(user => {
-          const userIdToSelect = user.id.toString();
-          this.selectCollaborator(userIdToSelect);
-        
-        
-        });
   
         // Filter users and update this.users if needed
-        this.users = data.filter(user => this.collaborateurIds.includes(user.id.toString()));
-    
+  
+        // Loop through each user and call selectCollaborator
+        this.users.forEach(user => {
+          const userIdToSelect = user.id.toString();
+          this.selectCollaborator(userIdToSelect);
+        });
+  
       },
       error => {
         console.log('Error fetching users:', error);
@@ -63,20 +60,31 @@ export class ChatComponent implements OnInit, OnDestroy {
     );
   }
   
+
   selectCollaborator(collaboratorId: string): void {
-    console.log("collaboratorId",collaboratorId)
+    console.log("Selected collaboratorId:", collaboratorId);
     this.selectedCollaborator = collaboratorId;
     this.recipientId = collaboratorId;
+
     // Load messages for the selected collaborator
-    this.websocketChatService.getMessagesByUserId(parseInt(collaboratorId)).subscribe(
+    this.websocketChatService.getMessagesByUserId(parseInt(collaboratorId, 10)).subscribe(
       (messages: Message[]) => {
         this.websocketChatService.privateMessages[collaboratorId] = messages;
+
+        // Fetch collaborator's photo and update if necessary
+        const user = this.users.find(user => user.id.toString() === collaboratorId);
+        console.log(user)
+        if (user && user.photos) {
+          const imageUrl = this.getImageUrl(user.id.toString(), user.photos);
+          this.websocketChatService.collaboratorImages[collaboratorId] = imageUrl;
+        }
       },
       error => {
         console.error('Error fetching messages:', error);
       }
     );
   }
+
 
   sendReply(): void {
     if (this.replyMessage.trim() && this.recipientId.trim()) {
@@ -115,9 +123,9 @@ export class ChatComponent implements OnInit, OnDestroy {
       );
     }
   }
-  
 
-  
+
+
 
   getCollaboratorNameAsync(collaboratorId: string): Subscription {
     return this.collaboratorService.getCollaboratorName(collaboratorId).subscribe({
@@ -131,17 +139,22 @@ export class ChatComponent implements OnInit, OnDestroy {
     });
   }
   getCollaboratorImage(collaboratorId: string): string {
-    const user = this.users.find(user => user.id.toString() === collaboratorId);
+    // Check if the collaborator's photo URL is cached
+    if (this.websocketChatService.collaboratorImages[collaboratorId]) {
+      return this.websocketChatService.collaboratorImages[collaboratorId];
+    }
   
+    // Fetch user based on collaboratorId
+    const user = this.users.find(user => user.id.toString() === collaboratorId);
     if (user && user.photos) {
       return this.getImageUrl(user.id.toString(), user.photos);
     } else {
-      return 'assets/man-avatar-profile-picture-vector-600nw-229692004.webp'; // Default image
+      return 'assets/man-avatar-profile-picture-vector-600nw-229692004.webp'; // Default image if no photo found
     }
   }
   
-  
-  
+
+
 
   // private fetchCollaboratorImage(collaboratorId: string, fileName: string | undefined): void {
   //   const imageUrl = this.getImageUrl(parseInt(collaboratorId, 10), fileName);
@@ -149,11 +162,10 @@ export class ChatComponent implements OnInit, OnDestroy {
   //   this.websocketChatService.collaboratorImages[collaboratorId] = imageUrl;
   // }
 
-  private getImageUrl(userId: string, fileName: string | undefined): string {
+  getImageUrl(userId: string, fileName: string | undefined): string {
     return fileName ? `http://localhost:8080/api/auth/images/${userId}/${fileName}` : 'assets/man-avatar-profile-picture-vector-600nw-229692004.webp';
   }
-  
-  
+
 
   ngOnDestroy(): void {
     this.websocketChatService.disconnect();
