@@ -58,8 +58,7 @@ public class User {
 	@JsonIgnore
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
 	private Set<Conger_Maladie> congers = new HashSet<>();
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private List<Message> messages;
+
 	public User() {
 		this.status = null; // Initialize status to null
 

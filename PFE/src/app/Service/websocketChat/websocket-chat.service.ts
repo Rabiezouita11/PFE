@@ -4,6 +4,9 @@ import * as Stomp from 'stompjs';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import { CollaboratorService } from '../collaborator/collaborator.service';
 import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { DateTimeService } from '../dateTime/date-time.service';
+import { map } from 'rxjs/operators';
 
 export interface Message {
   sender: string;
@@ -23,6 +26,7 @@ export interface MessageGestionnaire {
   providedIn: 'root'
 })
 export class WebsocketChatService {
+  
   private stompClient: Stomp.Client | undefined;
   private userId: number | undefined;
   private gestionnaireId: string = '1';
@@ -33,6 +37,8 @@ export class WebsocketChatService {
   public privateMessages2: MessageGestionnaire[] = [];
 
   constructor(
+    private dateTimeService: DateTimeService ,
+    private http: HttpClient,
     private tokenStorageService: TokenStorageService,
     private collaboratorService: CollaboratorService
   ) {
@@ -147,4 +153,13 @@ export class WebsocketChatService {
       });
     }
   }
+  public getPersistedMessages(userId: number): Observable<Message[]> {
+    return this.http.get<any[]>(`http://localhost:8080/api/messages/${userId}`).pipe(
+      map(messages => messages.map((message: any) => ({
+        ...message,
+        timestamp: this.dateTimeService.convertToTimeString(message.timestamp)
+      })))
+    );
+  }
+  
 }
