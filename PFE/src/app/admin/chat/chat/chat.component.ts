@@ -81,7 +81,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   sendReply(): void {
     if (this.replyMessage.trim() && this.recipientId.trim()) {
       const message: Message = {
-        sender: 'gestionnaire',
+        sender: '1',
         content: this.replyMessage,
         timestamp: new Date().toLocaleTimeString()
       };
@@ -131,22 +131,15 @@ export class ChatComponent implements OnInit, OnDestroy {
     });
   }
   getCollaboratorImage(collaboratorId: string): string {
-    // console.log("collaboratorId:",this.users.find(user => user.id.toString() === collaboratorId));
-    
-    // // Fetch user based on collaboratorId
-    // const user = this.users.find(user => user.id.toString() === collaboratorId);
-    // console.log("Found user:", user);
+    const user = this.users.find(user => user.id.toString() === collaboratorId);
   
-    // if (user && user.photos) {
-    //   console.log("User photos:", user.photos);
-    //   return this.getImageUrl(user.id.toString(), user.photos);
-    // } else {
-    //   console.log("No photos found for user");
-      return 'assets/man-avatar-profile-picture-vector-600nw-229692004.webp'; // Return default image if no image filename found
-    
-
-    
+    if (user && user.photos) {
+      return this.getImageUrl(user.id.toString(), user.photos);
+    } else {
+      return 'assets/man-avatar-profile-picture-vector-600nw-229692004.webp'; // Default image
+    }
   }
+  
   
   
 
