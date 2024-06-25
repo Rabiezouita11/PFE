@@ -46,7 +46,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   sendReply(): void {
     if (this.replyMessage.trim() && this.recipientId.trim()) {
       const message: Message = {
-        sender: 'gestionnaire',
+        sender: '1',
         content: this.replyMessage,
         timestamp: new Date().toLocaleTimeString()
       };

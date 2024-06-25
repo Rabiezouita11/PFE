@@ -58,10 +58,10 @@
 
                 <li class="clearfix"
                   *ngFor="let msg of websocketChatService.publicMessages.concat(websocketChatService.privateMessages2) | sortByTimestamp">
-{{msg.sender}}
+
 
                   <div class="message-data"
-                    [ngClass]="{ 'text-right': msg.sender != '1', 'text-left': msg.sender == '1' }">
+                    [ngClass]="{ 'text-right': msg.sender != '1', 'text-left': msg.sender == '1' || msg.sender == 'Gestionnaire' }">
                     <span *ngIf="msg.sender != '1'" class="message-data-time">{{ msg.timestamp }}</span>
                     <div *ngIf="msg.sender != '1'">
                       <ng-container *ngIf="fileName !== null; else showAvatar">
@@ -73,7 +73,7 @@
                     </div>
                   </div>
                   <div class="message"
-                    [ngClass]="{ 'other-message float-right':msg.sender != '1', 'my-message': msg.sender == '1' }">
+                    [ngClass]="{ 'other-message float-right':msg.sender != '1', 'my-message': msg.sender == '1' || msg.sender == 'Gestionnaire'  }">
                     {{ msg.content }}
                   </div>
                 </li>

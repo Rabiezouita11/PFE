@@ -66,7 +66,7 @@ export class WebsocketChatService {
         console.log('Private Message:', notification);
 
         const newMessage = {
-          sender: 'Gestionnaire',
+          sender: '1',
           content: notification.content,
           timestamp: new Date().toLocaleTimeString(),
           fileName: notification.fileName
