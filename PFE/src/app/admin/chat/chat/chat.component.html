@@ -49,12 +49,12 @@
             <div class="chat-history">
               <ul class="m-b-0">
                 <li class="clearfix" *ngFor="let msg of websocketChatService.privateMessages[selectedCollaborator]">
-                 
-                  <div class="message-data" [ngClass]="{ 'text-right': msg.sender === 'gestionnaire', 'text-left': msg.sender !== 'gestionnaire' }">
-                    <span *ngIf="msg.sender === 'gestionnaire'"  class="message-data-time">{{ msg.timestamp }}</span>
-                    <img *ngIf="msg.sender === 'gestionnaire'" src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar">
+               
+                  <div class="message-data" [ngClass]="{ 'text-right': msg.sender === '1', 'text-left': msg.sender !== '1' }">
+                    <span *ngIf="msg.sender == '1'"  class="message-data-time">{{ msg.timestamp }}</span>
+                    <img *ngIf="msg.sender == '1'" src="https://bootdey.com/img/Content/avatar/avatar7.png" alt="avatar">
                   </div>
-                  <div class="message" [ngClass]="{ 'other-message float-right': msg.sender === 'gestionnaire', 'my-message': msg.sender !== 'gestionnaire' }">
+                  <div class="message" [ngClass]="{ 'other-message float-right': msg.sender === '1', 'my-message': msg.sender !== '1' }">
                     {{ msg.content }}
                   </div>
                 </li>

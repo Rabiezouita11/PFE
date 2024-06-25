@@ -50,6 +50,6 @@ public class ChatController {
 
     @GetMapping("/gest/{userId}")
     public List<ChatMessage> getMessagesByUserIdgestionnaire(@PathVariable Long userId) {
-        return chatMessageService.findMessagesByUserIdGest(userId);
+        return chatMessageService.findMessagesByUserId(userId);
     }
 }

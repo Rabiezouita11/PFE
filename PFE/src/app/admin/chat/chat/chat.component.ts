@@ -32,7 +32,37 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.websocketChatService.connect();
     this.loadUsers();
   }
+  loadUsers(): void {
+    const authToken = this.tokenStorage.getToken();
+    if (!authToken) {
+      console.error('Authorization token not found');
+      Swal.fire('Error!', 'Authorization token not found', 'error');
+      return;
+    }
+    
+    this.userService.getAllUsers(authToken).subscribe(
+      (data: User[]) => {
+        console.log("Users Data:", data);
+        this.users = data;
 
+        // Loop through each user and call selectCollaborator
+        data.forEach(user => {
+          const userIdToSelect = user.id.toString();
+          this.selectCollaborator(userIdToSelect);
+        
+        
+        });
+  
+        // Filter users and update this.users if needed
+        this.users = data.filter(user => this.collaborateurIds.includes(user.id.toString()));
+    
+      },
+      error => {
+        console.log('Error fetching users:', error);
+      }
+    );
+  }
+  
   selectCollaborator(collaboratorId: string): void {
     console.log("collaboratorId",collaboratorId)
     this.selectedCollaborator = collaboratorId;
@@ -70,14 +100,11 @@ export class ChatComponent implements OnInit, OnDestroy {
   getCollaboratorName(collaboratorId: string): Observable<string> {
     if (this.websocketChatService.collaboratorNames[collaboratorId]) {
       // If the collaborator's name is already cached, return it as an observable
-      console.log(`Cached name found for collaborator ${collaboratorId}: ${this.websocketChatService.collaboratorNames[collaboratorId]}`);
       return of(this.websocketChatService.collaboratorNames[collaboratorId]);
     } else {
       // Otherwise, fetch the collaborator's name from the service
-      console.log(`Fetching name for collaborator ${collaboratorId} from service...`);
       return this.collaboratorService.getCollaboratorName(collaboratorId).pipe(
         switchMap(name => {
-          console.log(`Received name '${name}' for collaborator ${collaboratorId}. Caching and returning...`);
           this.websocketChatService.collaboratorNames[collaboratorId] = name; // Cache the collaborator's name
           return of(name); // Return the name wrapped in an observable
         }),
@@ -103,36 +130,34 @@ export class ChatComponent implements OnInit, OnDestroy {
       }
     });
   }
-
   getCollaboratorImage(collaboratorId: string): string {
-    return this.websocketChatService.collaboratorImages[collaboratorId] || 'assets/man-avatar-profile-picture-vector-600nw-229692004.webp';
-  }
-
-  loadUsers(): void {
-    const authToken = this.tokenStorage.getToken();
-    if (!authToken) {
-      console.error('Authorization token not found');
-      Swal.fire('Error!', 'Authorization token not found', 'error');
-      return;
-    }
+    // console.log("collaboratorId:",this.users.find(user => user.id.toString() === collaboratorId));
     
-    this.userService.getAllUsers(authToken).subscribe(
-      (data: User[]) => {
-        console.log("Users Data:", data);
+    // // Fetch user based on collaboratorId
+    // const user = this.users.find(user => user.id.toString() === collaboratorId);
+    // console.log("Found user:", user);
   
-        // Loop through each user and call selectCollaborator
-        data.forEach(user => {
-          const userIdToSelect = user.id.toString();
-          this.selectCollaborator(userIdToSelect);
-        });
+    // if (user && user.photos) {
+    //   console.log("User photos:", user.photos);
+    //   return this.getImageUrl(user.id.toString(), user.photos);
+    // } else {
+    //   console.log("No photos found for user");
+      return 'assets/man-avatar-profile-picture-vector-600nw-229692004.webp'; // Return default image if no image filename found
+    
+
+    
+  }
   
-        // Filter users and update this.users if needed
-        this.users = data.filter(user => this.collaborateurIds.includes(user.id.toString()));
-      },
-      error => {
-        console.log('Error fetching users:', error);
-      }
-    );
+  
+
+  // private fetchCollaboratorImage(collaboratorId: string, fileName: string | undefined): void {
+  //   const imageUrl = this.getImageUrl(parseInt(collaboratorId, 10), fileName);
+  //   console.log(imageUrl)
+  //   this.websocketChatService.collaboratorImages[collaboratorId] = imageUrl;
+  // }
+
+  private getImageUrl(userId: string, fileName: string | undefined): string {
+    return fileName ? `http://localhost:8080/api/auth/images/${userId}/${fileName}` : 'assets/man-avatar-profile-picture-vector-600nw-229692004.webp';
   }
   
   
