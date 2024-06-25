@@ -22,4 +22,8 @@ public class ChatMessageService {
     public List<ChatMessage> findMessagesByUserId(Long userId) {
         return chatMessageRepository.findBySenderOrRecipient(String.valueOf(userId), String.valueOf(userId));
     }
+    public List<ChatMessage> findMessagesByUserIdGest(Long userId) {
+        return chatMessageRepository.findByUserId(userId);
+    }
+
 }

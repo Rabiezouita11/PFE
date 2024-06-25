@@ -58,7 +58,7 @@
 
                 <li class="clearfix"
                   *ngFor="let msg of websocketChatService.publicMessages.concat(websocketChatService.privateMessages2) | sortByTimestamp">
-
+{{msg.sender}}
 
                   <div class="message-data"
                     [ngClass]="{ 'text-right': msg.sender != '1', 'text-left': msg.sender == '1' }">

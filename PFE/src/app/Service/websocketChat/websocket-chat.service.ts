@@ -161,5 +161,7 @@ export class WebsocketChatService {
       })))
     );
   }
-  
+  public getMessagesByUserId(userId: number): Observable<Message[]> {
+    return this.http.get<Message[]>(`http://localhost:8080/gest/${userId}`);
+  }
 }

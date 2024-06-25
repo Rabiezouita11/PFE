@@ -27,7 +27,7 @@ public class ChatController {
         chatMessageService.saveMessage(message);
 
         message.setRecipient(GESTIONNAIRE);
-
+        message.setUserId(Long.valueOf(message.getSender()));
         simpMessagingTemplate.convertAndSendToUser(GESTIONNAIRE, "/queue2/notification", message);
     }
 
@@ -46,5 +46,10 @@ public class ChatController {
     @GetMapping("/api/messages/{userId}")
     public List<ChatMessage> getMessagesByUserId(@PathVariable Long userId) {
         return chatMessageService.findMessagesByUserId(userId);
+    }
+
+    @GetMapping("/gest/{userId}")
+    public List<ChatMessage> getMessagesByUserIdgestionnaire(@PathVariable Long userId) {
+        return chatMessageService.findMessagesByUserIdGest(userId);
     }
 }

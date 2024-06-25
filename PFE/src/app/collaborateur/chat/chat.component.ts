@@ -7,6 +7,7 @@ export interface Message {
   content: string;
   timestamp: string;
   fileName?: string; // Include fileName property if you are storing image file names
+  user_id?: string; // Include fileName property if you are storing image file names
 }
 
 @Component({
@@ -51,7 +52,8 @@ export class ChatComponent implements OnInit, OnDestroy {
         sender: 'collaborator', // assuming 'collaborator' as the identifier for the user
         content: this.message,
         timestamp: new Date().toLocaleTimeString(),
-        fileName: this.fileName
+        fileName: this.fileName,
+        user_id : this.userId
       };
       console.log(newMessage);
       this.websocketChatService.publicMessages.push(newMessage);

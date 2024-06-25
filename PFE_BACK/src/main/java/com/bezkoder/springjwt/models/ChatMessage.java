@@ -19,6 +19,7 @@ public class ChatMessage {
     private String content;
     private LocalDateTime timestamp;
     private String fileName;
+    private Long userId; // Add userId field
 
     // Constructors, Getters, and Setters
     public ChatMessage() {
