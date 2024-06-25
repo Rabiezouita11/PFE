@@ -114,7 +114,7 @@ export class WebsocketChatService {
   public getImageUrl(userId: number, fileName: string | undefined): string {
     console.log("userId", userId);
     console.log("fileName", fileName);
-    return fileName ? `http://localhost:8080/api/auth/images/${userId}/${fileName}` : 'https://bootdey.com/img/Content/avatar/avatar2.png';
+    return fileName ? `http://localhost:8080/api/auth/images/${userId}/${fileName}` : 'assets/man-avatar-profile-picture-vector-600nw-229692004.webp';
   }
 
   public sendMessage(messageContent: string, fileName: string): void {

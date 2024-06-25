@@ -52,5 +52,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return user.getUsername();
     }
-
+    public Optional<User> getUserByUsername(String username) {
+        return repository.findByUsername(username);
+    }
 }

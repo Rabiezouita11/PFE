@@ -68,7 +68,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   getCollaboratorImage(collaboratorId: string): string {
-    return this.websocketChatService.collaboratorImages[collaboratorId] || 'https://bootdey.com/img/Content/avatar/avatar2.png';
+    return this.websocketChatService.collaboratorImages[collaboratorId] || 'assets/man-avatar-profile-picture-vector-600nw-229692004.webp';
   }
 
   loadUsers(): void {
