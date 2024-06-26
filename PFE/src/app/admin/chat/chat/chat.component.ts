@@ -88,10 +88,12 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   sendReply(): void {
     if (this.replyMessage.trim() && this.recipientId.trim()) {
+      const now = new Date();
+      const formattedTimestamp = now.toISOString().split('.')[0]; // '2024-06-26T09:57:25'
       const message: Message = {
         sender: '1',
         content: this.replyMessage,
-        timestamp: new Date().toLocaleTimeString()
+        timestamp:formattedTimestamp
       };
       if (!this.websocketChatService.privateMessages[this.recipientId]) {
         this.websocketChatService.privateMessages[this.recipientId] = [];

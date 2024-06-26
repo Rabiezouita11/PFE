@@ -138,6 +138,11 @@
         <span class="menu-title">demande attestations</span>
       </a>
     </li>
-    
+    <li class="nav-item" *ngIf="role && role.includes('ROLE_GESTIONNAIRE')" [ngClass]="{'active': isActive('/chat')}">
+      <a class="nav-link" routerLink="/chat">
+        <i class="fas fa-comments menu-icon"></i> <!-- Chat icon -->
+        <span class="menu-title">Chat</span>
+      </a>
+    </li>
   </ul>
 </nav>

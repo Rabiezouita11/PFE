@@ -42,25 +42,31 @@ export class ChatComponent implements OnInit, OnDestroy {
       console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaa",messages)
       this.websocketChatService.privateMessages2 = messages;
       this.combinedMessages = this.websocketChatService.publicMessages.concat(this.websocketChatService.privateMessages2);
+
+      
     });
   }
 
   sendMessage(): void {
-    console.log("thisuserIddd",this.userId)
     if (this.message.trim()) {
       this.websocketChatService.sendMessage(this.message, this.fileName);
+      const now = new Date();
+      now.setHours(now.getHours() + 1); // Add one hour to the current time
+  
+      const formattedTimestamp = now.toISOString().split('.')[0]; // '2024-06-26T09:57:25'
       const newMessage: Message = {
         sender: 'collaborator', // assuming 'collaborator' as the identifier for the user
         content: this.message,
-        timestamp: new Date().toLocaleTimeString(),
+        timestamp: formattedTimestamp,
         fileName: this.fileName,
-        userId : this.userId
+        userId: this.userId
       };
-      console.log(newMessage);
+  
       this.websocketChatService.publicMessages.push(newMessage);
       this.message = '';
     }
   }
+  
 
   ngOnDestroy(): void {
     this.websocketChatService.disconnect();

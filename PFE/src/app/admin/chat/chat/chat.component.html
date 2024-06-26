@@ -13,7 +13,7 @@
               <input type="text" class="form-control" placeholder="Search...">
             </div>
             <ul class="list-unstyled chat-list mt-2 mb-0">
-              <li class="clearfix" *ngFor="let collaboratorId of collaborateurIds" (click)="selectCollaborator(collaboratorId)">
+              <li class="clearfix" *ngFor="let collaboratorId of collaborateurIds" (click)="selectCollaborator(collaboratorId)" [ngClass]="{'selected': selectedCollaborator === collaboratorId}">
                 <img [src]="getCollaboratorImage(collaboratorId)" alt="Collaborator Image" width="50" height="50">
                 <div class="about">
                   <div class="name">{{ getCollaboratorName(collaboratorId) | async }}</div>

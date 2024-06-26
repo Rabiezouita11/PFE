@@ -59,7 +59,6 @@
                 <li class="clearfix"
                   *ngFor="let msg of websocketChatService.publicMessages.concat(websocketChatService.privateMessages2) | sortByTimestamp">
 
-
                   <div class="message-data"
                     [ngClass]="{ 'text-right': msg.sender != '1', 'text-left': msg.sender == '1' || msg.sender == 'Gestionnaire' }">
                     <span *ngIf="msg.sender != '1'" class="message-data-time">{{ msg.timestamp }}</span>

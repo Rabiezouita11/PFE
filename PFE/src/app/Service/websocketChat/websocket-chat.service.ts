@@ -6,7 +6,7 @@ import { CollaboratorService } from '../collaborator/collaborator.service';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { DateTimeService } from '../dateTime/date-time.service';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 
 export interface Message {
   sender: string;
@@ -63,6 +63,8 @@ export class WebsocketChatService {
 
   private subscribeToPrivateMessages(): void {
     if (this.stompClient && this.userId) {
+      const now = new Date();
+      const formattedTimestamp = now.toISOString().split('.')[0]; // '2024-06-26T09:57:25'
       this.stompClient.subscribe(`/user/${this.userId}/queue2/notification`, (message) => {
         const notification = JSON.parse(message.body);
         console.log('Private Message:', notification);
@@ -70,7 +72,7 @@ export class WebsocketChatService {
         const newMessage = {
           sender: '1',
           content: notification.content,
-          timestamp: new Date().toLocaleTimeString(),
+          timestamp: notification.timestamp,
           fileName: notification.fileName
         };
 
@@ -92,11 +94,12 @@ export class WebsocketChatService {
           this.fetchCollaboratorName(collaboratorId);
           this.fetchCollaboratorImage(collaboratorId, notification.fileName);
         }
-
+       const now = new Date();
+      const formattedTimestamp = now.toISOString().split('.')[0]; // '2024-06-26T09:57:25'
         this.privateMessages[collaboratorId].push({
           sender: notification.sender,
           content: notification.content,
-          timestamp: new Date().toLocaleTimeString(),
+          timestamp: formattedTimestamp,
           fileName: notification.fileName
         });
       });
@@ -158,12 +161,16 @@ export class WebsocketChatService {
   }
   public getPersistedMessages(userId: number): Observable<Message[]> {
     return this.http.get<any[]>(`http://localhost:8080/api/messages/${userId}`).pipe(
+      tap(messages => {
+        console.log('Received messages with original timestamps:', messages.map(msg => msg.timestamp));
+      }),
       map(messages => messages.map((message: any) => ({
         ...message,
-        timestamp: this.dateTimeService.convertToTimeString(message.timestamp)
+        timestamp: message.timestamp
       })))
     );
   }
+
   public getMessagesByUserId(userId: number): Observable<Message[]> {
     return this.http.get<Message[]>(`http://localhost:8080/gest/${userId}`);
   }
