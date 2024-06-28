@@ -19,6 +19,12 @@
                   <div class="name">{{ getCollaboratorName(collaboratorId) | async }}</div>
                   <div class="status">
                     <div class="status"><i class="fa fa-circle online"></i> online</div>
+                    <div *ngIf="hasMessages(collaboratorId)">
+
+                    <div class="last-message-label">Last Message:</div>
+
+                    <div class="last-message">{{ getLastMessage(collaboratorId)  | truncate }}</div>
+                  </div>
                    
                   </div>
                 </div>
@@ -57,6 +63,7 @@
                   <div class="message" [ngClass]="{ 'other-message float-right': msg.sender === '1', 'my-message': msg.sender !== '1' }">
                     {{ msg.content }}
                   </div>
+                  
                 </li>
               </ul>
             </div>

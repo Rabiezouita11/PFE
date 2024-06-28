@@ -23,6 +23,7 @@ import { CalenderComponent } from './calender/calender.component';
 import listPlugin from '@fullcalendar/list/main.js';
 import timeGridPlugin from '@fullcalendar/timegrid/main.js';
 import { SortByTimestampPipe } from './sort-by-timestamp.pipe';
+import { TruncatePipe } from './truncate.pipe';
 
 FullCalendarModule.registerPlugins([
   // register FullCalendar plugins

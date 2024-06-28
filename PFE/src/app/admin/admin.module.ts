@@ -19,15 +19,17 @@ import { SpinnerComponent } from './spinner/spinner.component';
 import { ChartsModule } from 'ng2-charts';
 import { NotificationComponent } from './notification/notification.component';
 import { ChatComponent } from './chat/chat/chat.component';
+import { TruncatePipe } from '../truncate.pipe';
 
 
 @NgModule({
-  declarations: [DashboardComponent, HeaderComponent, ComponentComponent, SidbarComponent, FooterComponent, BadgeComponent, AbsencesComponent, QuestionsRhComponent, AttestationsComponent, UsersComponent, NavComponent, DemandeAttestationsComponent, SpinnerComponent, NotificationComponent, ChatComponent],
+  declarations: [TruncatePipe, DashboardComponent, HeaderComponent, ComponentComponent, SidbarComponent, FooterComponent, BadgeComponent, AbsencesComponent, QuestionsRhComponent, AttestationsComponent, UsersComponent, NavComponent, DemandeAttestationsComponent, SpinnerComponent, NotificationComponent, ChatComponent],
   imports: [
     CommonModule,
     AdminRoutingModule,
     FormsModule,
-    ChartsModule
+    ChartsModule,
+
 
   ],
 

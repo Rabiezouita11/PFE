@@ -64,6 +64,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/gest/**").permitAll()
 
 				.antMatchers("/socket/**").permitAll()
+				.antMatchers("/count-unread/**").permitAll()
+				.antMatchers("/update-all-is-clicked-to-false/**").permitAll()
+
 
 		    .antMatchers("/api/badges/**").permitAll()
 				.antMatchers("/api/CongerMaladie/**").permitAll()

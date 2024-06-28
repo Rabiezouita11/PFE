@@ -139,10 +139,12 @@
       </a>
     </li>
     <li class="nav-item" *ngIf="role && role.includes('ROLE_GESTIONNAIRE')" [ngClass]="{'active': isActive('/chat')}">
-      <a class="nav-link" routerLink="/chat">
+      <a class="nav-link" routerLink="/chat" (click)="handleClickOnChatIcon()">
         <i class="fas fa-comments menu-icon"></i> <!-- Chat icon -->
         <span class="menu-title">Chat</span>
+        <span class="badge badge-pill badge-danger">{{ unreadMessageCount }}</span> <!-- Badge for unread count -->
       </a>
     </li>
+    
   </ul>
 </nav>

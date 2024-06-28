@@ -20,6 +20,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   public selectedCollaborator: string | null = null;
   public users!: User[];
   private messageSubscription!: Subscription;
+  public gestionnaireMessageCount: number = 0; // New property for message count
+  unreadMessageCount: number = 0;
 
   constructor(
     private collaboratorService: CollaboratorService,
@@ -31,6 +33,17 @@ export class ChatComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.websocketChatService.connect();
     this.loadUsers();
+
+  }
+  fetchUnreadMessageCount(): void {
+    this.websocketChatService.getCountOfUnreadMessages().subscribe(
+      count => {
+        this.unreadMessageCount = count;
+      },
+      error => {
+        console.error('Error fetching unread message count:', error);
+      }
+    );
   }
   loadUsers(): void {
     const authToken = this.tokenStorage.getToken();
@@ -43,8 +56,8 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.userService.getAllUsers(authToken).subscribe(
       (data: User[]) => {
         console.log("Users Data:", data);
-        this.users = data;
-  
+        this.users = data.filter(user => user.status === true);
+
         // Filter users and update this.users if needed
   
         // Loop through each user and call selectCollaborator
@@ -65,25 +78,48 @@ export class ChatComponent implements OnInit, OnDestroy {
     console.log("Selected collaboratorId:", collaboratorId);
     this.selectedCollaborator = collaboratorId;
     this.recipientId = collaboratorId;
-
+  
     // Load messages for the selected collaborator
     this.websocketChatService.getMessagesByUserId(parseInt(collaboratorId, 10)).subscribe(
       (messages: Message[]) => {
         this.websocketChatService.privateMessages[collaboratorId] = messages;
-
+  
         // Fetch collaborator's photo and update if necessary
         const user = this.users.find(user => user.id.toString() === collaboratorId);
-        console.log(user)
         if (user && user.photos) {
           const imageUrl = this.getImageUrl(user.id.toString(), user.photos);
           this.websocketChatService.collaboratorImages[collaboratorId] = imageUrl;
         }
+  
+        // Update last message for UI display
+        this.updateLastMessage(collaboratorId);
       },
       error => {
         console.error('Error fetching messages:', error);
       }
     );
   }
+  hasMessages(collaboratorId: string): boolean {
+    const messages = this.websocketChatService.privateMessages[collaboratorId] || [];
+    return messages.length > 0;
+  }
+  updateLastMessage(collaboratorId: string): void {
+    const messages = this.websocketChatService.privateMessages[collaboratorId];
+    if (messages && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      // Update your UI to show the last message (if needed)
+      console.log('Last message:', lastMessage);
+    }
+  }
+  getLastMessage(collaboratorId: string): string {
+    const messages = this.websocketChatService.privateMessages[collaboratorId];
+    if (messages && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      return lastMessage.content; // Assuming 'content' is where your message text is stored
+    }
+    return ''; // Return empty string if no messages or undefined collaboratorId
+  }
+  
 
 
   sendReply(): void {

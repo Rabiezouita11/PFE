@@ -3,7 +3,7 @@ import * as SockJS from 'sockjs-client';
 import * as Stomp from 'stompjs';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import { CollaboratorService } from '../collaborator/collaborator.service';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { DateTimeService } from '../dateTime/date-time.service';
 import { map, tap } from 'rxjs/operators';
@@ -37,7 +37,8 @@ export class WebsocketChatService {
   public collaboratorNames: { [collaboratorId: string]: string } = {};
   public collaboratorImages: { [collaboratorId: string]: string } = {}; // To store image URLs
   public privateMessages2: MessageGestionnaire[] = [];
-
+  private unreadMessageCountSubject: BehaviorSubject<number> = new BehaviorSubject<number>(0);
+  public unreadMessageCount$ = this.unreadMessageCountSubject.asObservable();
   constructor(
     private dateTimeService: DateTimeService ,
     private http: HttpClient,
@@ -56,10 +57,14 @@ export class WebsocketChatService {
       console.log('Connected to WebSocket');
       this.subscribeToUserNotifications();
       this.subscribeToPrivateMessages();
+      this.fetchUnreadMessageCount(); // Fetch initial unread message count on connect
+
     }, (error) => {
       console.error('WebSocket connection error:', error);
     });
   }
+
+
 
   private subscribeToPrivateMessages(): void {
     if (this.stompClient && this.userId) {
@@ -68,6 +73,7 @@ export class WebsocketChatService {
       this.stompClient.subscribe(`/user/${this.userId}/queue2/notification`, (message) => {
         const notification = JSON.parse(message.body);
         console.log('Private Message:', notification);
+        this.updateUnreadMessageCount(); // Increment unread message count
 
         const newMessage = {
           sender: '1',
@@ -79,6 +85,24 @@ export class WebsocketChatService {
         this.privateMessages2.push(newMessage);
       });
     }
+  }
+  private updateUnreadMessageCount(): void {
+    this.fetchUnreadMessageCount(); // Fetch updated unread message count from API
+  }
+  private fetchUnreadMessageCount(): void {
+    if (this.userId) {
+      this.http.get<number>('http://localhost:8080/count-unread').subscribe(
+        count => {
+          this.unreadMessageCountSubject.next(count); // Update unread message count
+        },
+        error => {
+          console.error('Error fetching unread message count:', error);
+        }
+      );
+    }
+  }
+    public resetUnreadMessageCount(): void {
+    this.unreadMessageCountSubject.next(0);
   }
 
   public subscribeToUserNotifications(): void {
@@ -173,5 +197,13 @@ export class WebsocketChatService {
 
   public getMessagesByUserId(userId: number): Observable<Message[]> {
     return this.http.get<Message[]>(`http://localhost:8080/gest/${userId}`);
+  }
+  public getCountOfUnreadMessages(): Observable<number> {
+    return this.http.get<number>('http://localhost:8080/count-unread');
+  }
+
+
+  public updateAllIsClickedToFalse(): Observable<string> {
+    return this.http.post<string>('http://localhost:8080/update-all-is-clicked-to-false', {});
   }
 }
