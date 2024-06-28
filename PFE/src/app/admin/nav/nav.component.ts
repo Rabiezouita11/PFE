@@ -176,4 +176,22 @@ updateTimeDifference(): void {
       Swal.fire('Deleted!', 'The notification has been deleted.', 'success');
     });
   }
+
+  handleNotificationClick(notification: { userId: number, fileName: string, message: string, username: string, id: number, timestamp: string }): void {
+    if (notification.message.includes('badge')) {
+      // Navigate to the specific route when the message contains "badge"
+      this.router.navigate(['/badge']); // Replace '/badge-route' with the actual route
+    }else if (notification.message.includes('attestation'))
+     {
+      this.router.navigate(['/demandeattestations']); // Replace '/badge-route' with the actual route
+
+     } else if(notification.message.includes('conger-payer'))
+      {
+        this.router.navigate(['/absences']); // Replace '/badge-route' with the actual route
+
+
+      }
+     
+    // Perform any other actions you need when a notification is clicked
+  }
 }

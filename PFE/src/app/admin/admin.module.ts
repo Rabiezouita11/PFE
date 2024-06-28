@@ -20,10 +20,11 @@ import { ChartsModule } from 'ng2-charts';
 import { NotificationComponent } from './notification/notification.component';
 import { ChatComponent } from './chat/chat/chat.component';
 import { TruncatePipe } from '../truncate.pipe';
-
+import { SortByTimes2Pipe } from '../sort-by-times2.pipe';
+import { ChatManagerComponent } from './chat-manager/chat-manager.component';
 
 @NgModule({
-  declarations: [TruncatePipe, DashboardComponent, HeaderComponent, ComponentComponent, SidbarComponent, FooterComponent, BadgeComponent, AbsencesComponent, QuestionsRhComponent, AttestationsComponent, UsersComponent, NavComponent, DemandeAttestationsComponent, SpinnerComponent, NotificationComponent, ChatComponent],
+  declarations: [SortByTimes2Pipe,TruncatePipe, DashboardComponent, HeaderComponent, ComponentComponent, SidbarComponent, FooterComponent, BadgeComponent, AbsencesComponent, QuestionsRhComponent, AttestationsComponent, UsersComponent, NavComponent, DemandeAttestationsComponent, SpinnerComponent, NotificationComponent, ChatComponent, ChatManagerComponent],
   imports: [
     CommonModule,
     AdminRoutingModule,

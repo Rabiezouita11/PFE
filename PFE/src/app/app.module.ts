@@ -24,6 +24,7 @@ import listPlugin from '@fullcalendar/list/main.js';
 import timeGridPlugin from '@fullcalendar/timegrid/main.js';
 import { SortByTimestampPipe } from './sort-by-timestamp.pipe';
 import { TruncatePipe } from './truncate.pipe';
+import { SortByTimes2Pipe } from './sort-by-times2.pipe';
 
 FullCalendarModule.registerPlugins([
   // register FullCalendar plugins
