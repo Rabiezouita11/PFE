@@ -46,7 +46,7 @@ export class BadgeComponent implements OnInit {
             this.fileName = this.tokenStorage.getUser().photos;
             this.username = this.tokenStorage.getUser().username;
             this.image = this.getImageUrl(); // Call getImageUrl() to construct the image URL
-            console.log("fileNamefileNamefileName"+this.fileName)
+            console.log("fileNamefileNamefileName" + this.fileName)
 
         }
         this.checkBadgeStatus();
@@ -79,7 +79,10 @@ export class BadgeComponent implements OnInit {
             return;
         }
 
-
+        if (!this.selectedFile) {
+            Swal.fire('Error!', 'Image is required', 'error');
+            return;
+          }
 
         this.badgeService.createBadgeForUser(this.userId, this.Newusername, this.Newmatricule, this.selectedFile, authToken).subscribe((data: Badge) => {
             console.log('Badge created successfully:', data);
@@ -102,25 +105,21 @@ export class BadgeComponent implements OnInit {
             console.error('Authorization token not found');
             return;
         }
-    
+
         // Make API request to check badge status
         this.badgeService.getBadgeStatus(this.userId, authToken).subscribe((response: any) => {
-            console.log(response);
-    
-            // Check if badge is deleted
-            if (!response.isDeleted && response.status === 'refuser') {
-                this.showBadgeForm = false;
-                return; // Exit early if badge is deleted
-            }
-    
+            console.log("response.isDeleted",response.isDeleted);
+            console.log("response.status",response.status);
+
+
             // Determine badge status and update UI accordingly
-            if (response.status === 'accepter' && response.isDeleted) {
+            if (response.status === 'accepter' && !response.isDeleted) {
                 this.showBadgeForm = true;
                 this.showBadgeRequestAccepter = true;
-            } else if (response.status === 'en cours') {
+            } else if (response.status === 'en cours' && !response.isDeleted) {
                 this.showBadgeForm = true;
                 this.showBadgeRequestPending = true;
-            } else if (response.status === 'refuser') {
+            } else if (response.status === 'refuser' && !response.isDeleted) {
                 this.showBadgeForm = true;
                 this.showBadgeRequestRefuse = true;
             } else {
@@ -131,7 +130,7 @@ export class BadgeComponent implements OnInit {
             // Handle error
         });
     }
-    
+
     getImageUrl(): string { // Assuming your backend endpoint for retrieving images is '/api/images/'
         return `http://localhost:8080/api/auth/images/${this.userId
             }/${this.fileName
@@ -194,11 +193,11 @@ export class BadgeComponent implements OnInit {
             Swal.fire('Error!', 'Authorization token not found', 'error');
             return;
         }
-    
+
         // Call the service method to delete the old badge request
         this.badgeService.deleteBadgeRequest(this.userId, authToken).subscribe(() => {
             // After successful deletion, set the flag to show the badge request form
-          this.showBadgeRequestRefuse = false; // Set showBadgeRequestRefuse to false
+            this.showBadgeRequestRefuse = false; // Set showBadgeRequestRefuse to false
 
             Swal.fire('Success!', 'Ancienne demande de badge supprimée. Veuillez refaire la demande.', 'success');
             this.ngOnInit();
@@ -207,36 +206,36 @@ export class BadgeComponent implements OnInit {
             Swal.fire('Error!', 'Error deleting old badge request', 'error');
         });
     }
-    
+
 
     loadScriptsAndStyles(): void {
         const SCRIPT_PATH_LIST = [
-          'https://code.jquery.com/jquery-3.6.0.min.js', // Load jQuery first
-          'assets/frontoffice/vendors/js/vendor.bundle.base.js',
-          'assets/frontoffice/vendors/chart.js/Chart.min.js',
-          'assets/frontoffice/js/off-canvas.js',
-          'assets/frontoffice/js/hoverable-collapse.js',
-          'assets/frontoffice/js/template.js',
-          'assets/frontoffice/js/settings.js',
-          'assets/frontoffice/js/todolist.js',
-          'assets/frontoffice/js/dashboard.js',
-          'assets/frontoffice/js/Chart.roundedBarCharts.js'
+            'https://code.jquery.com/jquery-3.6.0.min.js', // Load jQuery first
+            'assets/frontoffice/vendors/js/vendor.bundle.base.js',
+            'assets/frontoffice/vendors/chart.js/Chart.min.js',
+            'assets/frontoffice/js/off-canvas.js',
+            'assets/frontoffice/js/hoverable-collapse.js',
+            'assets/frontoffice/js/template.js',
+            'assets/frontoffice/js/settings.js',
+            'assets/frontoffice/js/todolist.js',
+            'assets/frontoffice/js/dashboard.js',
+            'assets/frontoffice/js/Chart.roundedBarCharts.js'
         ];
-      
+
         const STYLE_PATH_LIST = [
-          'assets/frontoffice/vendors/feather/feather.css',
-          'assets/frontoffice/vendors/ti-icons/css/themify-icons.css',
-          'assets/frontoffice/vendors/css/vendor.bundle.base.css',
-          'assets/frontoffice/vendors/datatables.net-bs4/dataTables.bootstrap4.css',
-          'assets/frontoffice/vendors/ti-icons/css/themify-icons.css',
-          'assets/frontoffice/js/select.dataTables.min.css',
-          'assets/frontoffice/css/vertical-layout-light/style.css',
-          'assets/frontoffice/images/favicon.png'
+            'assets/frontoffice/vendors/feather/feather.css',
+            'assets/frontoffice/vendors/ti-icons/css/themify-icons.css',
+            'assets/frontoffice/vendors/css/vendor.bundle.base.css',
+            'assets/frontoffice/vendors/datatables.net-bs4/dataTables.bootstrap4.css',
+            'assets/frontoffice/vendors/ti-icons/css/themify-icons.css',
+            'assets/frontoffice/js/select.dataTables.min.css',
+            'assets/frontoffice/css/vertical-layout-light/style.css',
+            'assets/frontoffice/images/favicon.png'
         ];
-      
+
         this.scriptStyleLoaderService.loadScripts(SCRIPT_PATH_LIST);
         this.scriptStyleLoaderService.loadStyles(STYLE_PATH_LIST);
-      }
+    }
     toggleDropdown(event: Event): void {
         event.stopPropagation(); // Prevent the click event from propagating to the document
 

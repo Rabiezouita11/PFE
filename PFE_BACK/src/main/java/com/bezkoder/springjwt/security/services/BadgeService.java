@@ -2,6 +2,7 @@ package com.bezkoder.springjwt.security.services;
 
 import com.bezkoder.springjwt.models.Badge;
 import com.bezkoder.springjwt.repository.BadgeRepository;
+import com.bezkoder.springjwt.util.BadgeNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +19,13 @@ public class BadgeService {
         Badge badge = badgeRepository.findByUserIdAndStatus(userId, "accepter");
         return badge != null;
     }
-    public String findBadgeStatusByUserId(Long userId) {
-        // Retrieve the badge status for the user
-        Badge badge = badgeRepository.findByUserId(userId);
-        return badge != null ? badge.getStatus() : null;
+    public String findBadgeStatusByUserId(Long userId) throws BadgeNotFoundException {
+        List<Badge> badges = badgeRepository.findFirstByUserIdOrderByCreatedAtDesc(userId);
+        if (badges.isEmpty()) {
+            throw new BadgeNotFoundException("Badge not found for userId: " + userId);
+        }
+        // Assuming you need the status of the first badge or you can add logic to find a specific status
+        return badges.get(0).getStatus();
     }
     public Badge acceptBadge(Long badgeId) {
         Badge badge = badgeRepository.findById(badgeId).orElseThrow(() -> new RuntimeException("Badge not found"));
@@ -53,15 +57,19 @@ public class BadgeService {
         });
     }
 
-    public boolean isBadgeDeleted(Long userId) {
-        List<Badge> badges = badgeRepository.findByUser_Id(userId);
-        for (Badge badge : badges) {
-            if (badge.isDeleted()) {
-                return true; // Found at least one deleted badge
-            }
+    public boolean isBadgeDeleted(Long userId) throws BadgeNotFoundException {
+        Badge badge = badgeRepository.findTopByUserIdOrderByCreatedAtDesc(userId);
+        if (badge == null) {
+            throw new BadgeNotFoundException("Badge not found for userId: " + userId);
         }
-        return false; // No deleted badges found
+        return badge.isDeleted();
     }
-
+    public Badge findLastBadgeRequestByUserId(Long userId) throws BadgeNotFoundException {
+        List<Badge> badges = badgeRepository.findFirstByUserIdOrderByCreatedAtDesc(userId);
+        if (badges.isEmpty()) {
+            throw new BadgeNotFoundException("No badge request found for userId: " + userId);
+        }
+        return badges.get(0);
+    }
 
 }

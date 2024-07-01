@@ -8,6 +8,7 @@ import com.bezkoder.springjwt.repository.UserRepository;
 import com.bezkoder.springjwt.security.services.BadgeService;
 import com.bezkoder.springjwt.security.services.NotificationService;
 import com.bezkoder.springjwt.security.services.UserService;
+import com.bezkoder.springjwt.util.BadgeNotFoundException;
 import com.bezkoder.springjwt.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -148,7 +149,7 @@ public class BadgeController {
     @GetMapping("/status/{userId}")
     public ResponseEntity<?> checkBadgeStatus(@PathVariable Long userId, @AuthenticationPrincipal UserDetails userDetails) {
         if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_COLLABORATEUR"))) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have the required role
         }
         try {
             // Check if the user has a badge with status "accepter"
@@ -163,7 +164,11 @@ public class BadgeController {
             response.put("isDeleted", isDeleted);
 
             return ResponseEntity.ok().body(response);
+        } catch (BadgeNotFoundException e) {
+           // logger.error("Badge not found for userId: {}", userId, e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Badge not found for userId: " + userId);
         } catch (Exception e) {
+           // logger.error("Error checking badge status for userId: {}", userId, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error checking badge status");
         }
     }
