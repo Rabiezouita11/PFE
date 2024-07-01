@@ -7,6 +7,7 @@ export interface Badge {
     matricule: string;
     status: string;
     photos :string
+    isDeleted :boolean
     // Add other fields as needed
     user: {
       email: string;

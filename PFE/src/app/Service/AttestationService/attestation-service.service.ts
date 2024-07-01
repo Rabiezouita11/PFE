@@ -73,4 +73,19 @@ deleteAttestation(attestationId: number, authToken: string): Observable<string> 
 
   return this.http.delete<string>(`${this.baseUrl}/attestations/${attestationId}`, { headers, responseType: 'text' as 'json' });
 }
+
+updateAttestation(file: File | null, name: string, id:string , isExist: boolean, authToken: string): Observable<string> {
+  const formData = new FormData();
+  if (file) {
+    formData.append('file', file);
+  }
+  formData.append('name', name);
+  formData.append('id', id);
+
+  formData.append('isExist', isExist ? 'true' : 'false');
+
+  const headers = new HttpHeaders({ 'Authorization': `Bearer ${authToken}` });
+
+  return this.http.post<string>(`${this.baseUrl}/UpdateAttestation`, formData, { headers: headers, responseType: 'text' as 'json' });
+}
 }

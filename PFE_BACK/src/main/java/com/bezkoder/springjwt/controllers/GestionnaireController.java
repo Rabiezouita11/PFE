@@ -516,5 +516,47 @@ public class GestionnaireController {
     public String getUserName(@PathVariable Long userId) {
         return userService.getUserNameById(userId);
     }
+    // Update existing attestation
+    @PostMapping("/UpdateAttestation")
+    public ResponseEntity<?> updateAttestation(
+            @RequestParam(value = "file", required = false) MultipartFile file,
+            @RequestParam("id") Long id,
+            @RequestParam("name") String name,
+            @RequestParam("isExist") boolean isExist) {
+        try {
+            Optional<Attestation> optionalAttestation = attestationService.findById(id);
+            if (optionalAttestation.isPresent()) {
+                Attestation attestation = optionalAttestation.get();
+
+                // Update name and existence status
+                attestation.setName(name);
+                attestation.setExist(isExist);
+
+                // Update PDF path if a new file is provided
+                if (file != null) {
+                    String fileName = StringUtils.cleanPath(FilenameUtils.getBaseName(file.getOriginalFilename()) + "_" + System.currentTimeMillis() + "." + FilenameUtils.getExtension(file.getOriginalFilename()));
+                    Path uploadDir = Paths.get(UPLOAD_DIR);
+                    if (!Files.exists(uploadDir)) {
+                        Files.createDirectories(uploadDir);
+                    }
+                    Files.copy(file.getInputStream(), uploadDir.resolve(fileName));
+
+                    String pdfPath = UPLOAD_DIR + "/" + fileName;
+                    attestation.setPdfPath(pdfPath);
+                }
+
+                // Save updated attestation in the database
+                attestationService.saveAttestation(attestation);
+
+                // Return success response with a custom message
+                return ResponseEntity.ok().body("Attestation updated successfully");
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            // If an exception occurs, return a server error response
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update attestation");
+        }
+    }
 
 }

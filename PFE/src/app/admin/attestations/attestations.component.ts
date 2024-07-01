@@ -11,19 +11,28 @@ declare var $: any;
 })
 export class AttestationsComponent implements OnInit {
   selectedFile: File | null = null;
+  selectedFileEdit: File | null = null;
+
   name: string = '';
   isExist: boolean = true;
   message: string = '';
   pdfPath: string = '';
+  pdfPathEdit: string = '';
+
   pdfContent: string = ''; // New property to store PDF content
   showUpload: boolean = false;
   showGeneratePdf: boolean = false;
   @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
+  @ViewChild('fileInputEdit') fileInputEditRef!: ElementRef<HTMLInputElement>;
+
   pdfName: any;
   attestations: any[] = [];
   pdfData: any;
   fileName: string = 'generated_pdf_1717595657203.pdf'; // Assuming this is the file name fetched from the backend
   @ViewChild('pdfModal') pdfModal: any; // Reference to the modal element
+    @ViewChild('editModal') editModal: any; // Reference to the edit modal element
+
+  editAttestation: any = {}; // Property to store the attestation being edited
 
   constructor(private attestationService: AttestationServiceService, private tokenStorage: TokenStorageService) { }
 
@@ -98,7 +107,27 @@ export class AttestationsComponent implements OnInit {
     this.pdfPath = file.name; // Optionally set pdfPath to display the file name
   }
 
+  onFileSelectedUpdate(event: any): void {
+    const file: File = event.target.files[0];
+    const allowedExtensions = ['pdf'];
 
+    if (!file) {
+      return; // Exit early if no file is selected
+    }
+
+    const extension = file.name.split('.').pop()?.toLowerCase(); // Add null check with optional chaining operator (?)
+
+    if (!extension || !allowedExtensions.includes(extension)) {
+      Swal.fire('Error!', 'Please select a PDF file.', 'error');
+      // Optionally clear the input field
+      if (this.fileInputEditRef) {
+        this.fileInputEditRef.nativeElement.value = '';
+      }
+      return;
+    }
+    this.selectedFileEdit = file;
+    this.pdfPathEdit = file.name; // Optionally set pdfPath to display the file name
+  }
   showUploadForm() {
     this.showUpload = true;
     this.showGeneratePdf = false;
@@ -213,5 +242,56 @@ export class AttestationsComponent implements OnInit {
       }
     });
   }
+  showEditModal(attestation: any): void {
+    this.editAttestation = { ...attestation }; // Clone the attestation data to avoid direct modification
+    $(this.editModal.nativeElement).modal('show');
+  }
 
+
+  onEditSubmita(): void {
+    console.log(this.editAttestation)
+   
+  }
+  onEditSubmit(): void {
+    const authToken = this.tokenStorage.getToken();
+
+    if (!authToken) {
+      console.error('Authorization token not found');
+      Swal.fire('Error!', 'Authorization token not found', 'error');
+      return;
+    }
+
+    // Perform client-side validation
+    if (!this.editAttestation.name.trim()) {
+      Swal.fire('Error!', 'Name is required', 'error');
+      return;
+    }
+    if (!this.selectedFileEdit) {
+      this.isExist = false;
+    } else {
+      this.isExist = true;
+    }
+    this.attestationService.updateAttestation(this.selectedFileEdit, this.editAttestation.name,this.editAttestation.id, this.isExist, authToken)
+      .subscribe(response => {
+        this.message = response;
+        Swal.fire('Success!', this.message, 'success');
+        // Reset input fields after successful submission
+        this.selectedFile = null;
+        this.name = '';
+        this.isExist = false;
+        this.pdfPath = ''; // Optionally reset pdfPath as well if needed
+        if (this.fileInputRef) {
+          this.fileInputRef.nativeElement.value = '';
+        }
+        this.loadAttestations();
+      }, error => {
+        if (error.error) {
+          this.message = error.error;
+        } else {
+          this.message = 'Failed to upload file.';
+        }
+        console.error('Error:', error);
+        Swal.fire('Error!', this.message, 'error');
+      });
+  }
 }

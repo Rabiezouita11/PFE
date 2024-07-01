@@ -19,6 +19,8 @@ public class Badge {
     private String matricule;
     private String status;
     private String photos;
+    private boolean isDeleted = false;
+
     public Badge() {
     }
 

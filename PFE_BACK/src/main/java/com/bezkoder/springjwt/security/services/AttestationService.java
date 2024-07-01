@@ -18,4 +18,7 @@ public class AttestationService {
     public Attestation saveAttestation(Attestation attestation) {
         return attestationRepository.save(attestation);
     }
+    public Optional<Attestation> findById(Long id) {
+        return attestationRepository.findById(id);
+    }
 }

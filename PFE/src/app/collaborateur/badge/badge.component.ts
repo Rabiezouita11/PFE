@@ -102,32 +102,36 @@ export class BadgeComponent implements OnInit {
             console.error('Authorization token not found');
             return;
         }
-
+    
         // Make API request to check badge status
         this.badgeService.getBadgeStatus(this.userId, authToken).subscribe((response: any) => {
             console.log(response);
-            if (response.status === 'accepter') { // User has a badge with status "accepter", display form and button to print
+    
+            // Check if badge is deleted
+            if (!response.isDeleted && response.status === 'refuser') {
+                this.showBadgeForm = false;
+                return; // Exit early if badge is deleted
+            }
+    
+            // Determine badge status and update UI accordingly
+            if (response.status === 'accepter' && response.isDeleted) {
                 this.showBadgeForm = true;
                 this.showBadgeRequestAccepter = true;
-
-            } else if (response.status === 'en cours') { // User does not have a badge with status "accepter", display message indicating request is pending
+            } else if (response.status === 'en cours') {
+                this.showBadgeForm = true;
                 this.showBadgeRequestPending = true;
-                this.showBadgeForm = true;
-
             } else if (response.status === 'refuser') {
-                this.showBadgeRequestRefuse = true;
                 this.showBadgeForm = true;
-
-
+                this.showBadgeRequestRefuse = true;
             } else {
                 this.showBadgeForm = false;
-
             }
         }, (error) => {
             console.error('Error checking badge status:', error);
             // Handle error
         });
     }
+    
     getImageUrl(): string { // Assuming your backend endpoint for retrieving images is '/api/images/'
         return `http://localhost:8080/api/auth/images/${this.userId
             }/${this.fileName

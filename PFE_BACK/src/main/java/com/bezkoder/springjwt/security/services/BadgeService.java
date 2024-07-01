@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class BadgeService {
     @Autowired
@@ -31,12 +33,35 @@ public class BadgeService {
     public Badge refuseBadge(Long badgeId) {
         Badge badge = badgeRepository.findById(badgeId).orElseThrow(() -> new RuntimeException("Badge not found"));
         badge.setStatus("refuser");
+
         badgeRepository.save(badge);
         return badge;
     }
 
     @Transactional
     public void deleteBadgeRequestByUserId(Long userId) {
+
         badgeRepository.deleteByUserId(userId);
     }
+    @Transactional
+    public void setBadgesAsDeletedByUserId(Long userId) {
+        List<Badge> badges = badgeRepository.findByUser_Id(userId);
+        badges.forEach(badge -> {
+            badge.setDeleted(true); // Set isDeleted to true
+            // Optionally, you can save the badge if necessary
+            badgeRepository.save(badge);
+        });
+    }
+
+    public boolean isBadgeDeleted(Long userId) {
+        List<Badge> badges = badgeRepository.findByUser_Id(userId);
+        for (Badge badge : badges) {
+            if (badge.isDeleted()) {
+                return true; // Found at least one deleted badge
+            }
+        }
+        return false; // No deleted badges found
+    }
+
+
 }

@@ -130,15 +130,20 @@ public class BadgeController {
         return new ResponseEntity<>(createdBadge, HttpStatus.CREATED);
     }
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteBadgeRequest(@PathVariable Long userId ,@AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> deleteBadgeRequest(@PathVariable Long userId, @AuthenticationPrincipal UserDetails userDetails) {
         if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_COLLABORATEUR"))) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
         }
 
-        // Call the service method to delete the badge request
-        badgeService.deleteBadgeRequestByUserId(userId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        try {
+            // Call the service method to update badges as deleted
+            badgeService.setBadgesAsDeletedByUserId(userId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); // Success response
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete badge requests: " + e.getMessage());
+        }
     }
+
 
     @GetMapping("/status/{userId}")
     public ResponseEntity<?> checkBadgeStatus(@PathVariable Long userId, @AuthenticationPrincipal UserDetails userDetails) {
@@ -148,11 +153,21 @@ public class BadgeController {
         try {
             // Check if the user has a badge with status "accepter"
             String status = badgeService.findBadgeStatusByUserId(userId);
-            return ResponseEntity.ok().body("{\"status\": \"" + status + "\"}");
+
+            // Get deleted status
+            boolean isDeleted = badgeService.isBadgeDeleted(userId);
+
+            // Prepare the response with status and isDeleted information
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", status);
+            response.put("isDeleted", isDeleted);
+
+            return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error checking badge status");
         }
     }
+
 
     @GetMapping("/")
     public ResponseEntity<?> getAllBadges(@AuthenticationPrincipal UserDetails userDetails) {
@@ -230,7 +245,7 @@ public class BadgeController {
             }
 
             // Retrieve badges by user
-            List<Badge> badges = badgeRepository.findByUser(user);
+            List<Badge> badges = badgeRepository.findByUserAndIsDeleted(user, false);
             return ResponseEntity.ok().body(badges);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving badges for user with ID: " + e);
