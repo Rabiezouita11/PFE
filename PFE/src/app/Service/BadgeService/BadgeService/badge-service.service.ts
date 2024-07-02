@@ -123,6 +123,21 @@ import {Badge} from 'src/app/Models/badge';
             this.baseUrl2
         }/user/${userId}`, requestOptions);
     }
+    getBadgesByUserIdTotale(userId : number, authToken : string): Observable < Badge[] > { // Construct headers with authorization token
+        const headers = new HttpHeaders(
+            {'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}`}
+        );
+
+        // Include headers in the request options
+        const requestOptions = {
+            headers: headers
+        };
+
+        // Make the HTTP GET request to fetch badges by user ID
+        return this.http.get<Badge[]>(`${
+            this.baseUrl2
+        }/TotaleBadge/${userId}`, requestOptions);
+    }
 
     deleteBadgeRequest(userId: number, authToken: string): Observable<any> {
         const headers = new HttpHeaders({

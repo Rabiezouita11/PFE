@@ -257,6 +257,26 @@ public class BadgeController {
         }
     }
 
+    @GetMapping("/TotaleBadge/{userId}")
+    public ResponseEntity<?> getBadgesByUserIdTotale(@PathVariable Long userId, @AuthenticationPrincipal UserDetails userDetails) {
+        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_COLLABORATEUR"))) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
+        }
+        try {
+            // Retrieve the user by ID
+            User user = userService.getUserById(userId);
+            if (user == null) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND); // User not found
+            }
+
+            // Retrieve badges by user
+            List<Badge> badges = badgeRepository.findByUser(user);
+            return ResponseEntity.ok().body(badges);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error retrieving badges for user with ID: " + e);
+        }
+    }
+
     @PutMapping("/{badgeId}")
     public ResponseEntity<Badge> updateBadge(@PathVariable Long badgeId, @RequestParam String username, @RequestParam String matricule,
                                              @RequestParam(value = "image", required = false) MultipartFile image,
