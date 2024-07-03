@@ -56,7 +56,7 @@ export class ChatManagerComponent implements OnInit {
   
       const formattedTimestamp = now.toISOString().split('.')[0]; // '2024-06-26T09:57:25'
       const newMessage: Message = {
-        sender: 'collaborator', // assuming 'collaborator' as the identifier for the user
+        sender: 'Manager', // assuming 'collaborator' as the identifier for the user
         content: this.message,
         timestamp: formattedTimestamp,
         fileName: this.fileName,
