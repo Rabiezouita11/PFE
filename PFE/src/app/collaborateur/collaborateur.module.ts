@@ -17,6 +17,7 @@ import { AbscencsComponent } from './abscencs/abscencs.component';
 import { ProfileComponent } from './profile/profile.component';
 import { ChatComponent } from './chat/chat.component';
 import { SortByTimestampPipe } from '../sort-by-timestamp.pipe';
+import { ChartsModule } from 'ng2-charts';
 
 @NgModule({
   declarations: [SortByTimestampPipe ,HomeComponent, BadgeComponent, MaladeComponent, AttestaionsComponent, QuestionsRhComponent, ComponentComponentCollaborateur, NavComponent, SidbarComponent, FooterComponent, AbscencsComponent, ProfileComponent, ChatComponent],
@@ -24,7 +25,8 @@ import { SortByTimestampPipe } from '../sort-by-timestamp.pipe';
     CommonModule,
     CollaborateurRoutingModule,
     FormsModule, // Add FormsModule here
-    
+    ChartsModule,
+
 
   ]
 })

@@ -1,14 +1,17 @@
 import {HttpClient} from '@angular/common/http';
 import {Component, HostListener, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
-import { DemandeAttestations } from 'src/app/Models/DemandeAttestations';
-import { Badge } from 'src/app/Models/badge';
-import { BadgeService } from 'src/app/Service/BadgeService/BadgeService/badge-service.service';
-import { DemandeAttestationsService } from 'src/app/Service/DemandeAttestations/demande-attestations.service';
+
+import {DemandeAttestations} from 'src/app/Models/DemandeAttestations';
+import {Badge} from 'src/app/Models/badge';
+import {BadgeService} from 'src/app/Service/BadgeService/BadgeService/badge-service.service';
+import {DemandeAttestationsService} from 'src/app/Service/DemandeAttestations/demande-attestations.service';
 import {ScriptStyleLoaderService} from 'src/app/Service/ScriptStyleLoaderService/script-style-loader-service.service';
-import { WebsocketChatService } from 'src/app/Service/websocketChat/websocket-chat.service';
+import {WebsocketChatService} from 'src/app/Service/websocketChat/websocket-chat.service';
 import {TokenStorageService} from 'src/app/_services/token-storage.service';
 import Swal from 'sweetalert2';
+import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
+import { Color, Label } from 'ng2-charts';
 
 @Component({selector: 'app-home', templateUrl: './home.component.html', styleUrls: ['./home.component.css']})
 export class HomeComponent implements OnInit {
@@ -22,18 +25,31 @@ export class HomeComponent implements OnInit {
     inProgressCount : number = 0;
     acceptedCount : number = 0;
     refusedCount : number = 0;
-    acceptedCountBadge: number = 0;
-    refusedCountBadge: number = 0;
-    inProgressCountBadge: number = 0;
-    demandesAttestations: DemandeAttestations[] = [];
-    enCoursCount: number = 0;
-    accepterCount: number = 0;
-    refuserCount: number = 0;
-    messageCount: number = 0;
-  totalMessages!: number;
+    acceptedCountBadge : number = 0;
+    refusedCountBadge : number = 0;
+    inProgressCountBadge : number = 0;
+    demandesAttestations : DemandeAttestations[] = [];
+    enCoursCount : number = 0;
+    accepterCount : number = 0;
+    refuserCount : number = 0;
+    messageCount : number = 0;
+    totalMessages !: number;
+    public badgeChartData : ChartDataSets[] = [];
+    public badgeChartLabels : Label[] = [];
+    public badgeChartOptions : ChartOptions = {
+        responsive: true
+    };
+    public badgeChartColors : Color[] = [{
+            backgroundColor: [
+                'rgba(0, 255, 0, 0.5)', 'rgba(255, 0, 0, 0.5)'
+            ], // Green for Accepted, Red for Refused
+        },];
 
-    constructor(  public websocketChatService: WebsocketChatService,  private demandeAttestationsService: DemandeAttestationsService 
-,    private badgeService: BadgeService,private http : HttpClient, private router : Router, private scriptStyleLoaderService : ScriptStyleLoaderService, private tokenStorage : TokenStorageService) {}
+    public badgeChartLegend = true;
+    public badgeChartType : ChartType = 'pie'; // Change the chart type to pie
+    public badgeChartPlugins = [];
+
+    constructor(public websocketChatService : WebsocketChatService, private demandeAttestationsService : DemandeAttestationsService, private badgeService : BadgeService, private http : HttpClient, private router : Router, private scriptStyleLoaderService : ScriptStyleLoaderService, private tokenStorage : TokenStorageService) {}
 
     ngOnInit(): void {
         this.loadScriptsAndStyles();
@@ -47,81 +63,96 @@ export class HomeComponent implements OnInit {
         }
 
         this.fetchRequestCounts();
-        this.fetchBadgesByUserId(this.userId); 
+        this.fetchBadgesByUserId(this.userId);
         this.loadDemandeAttestations();
         this.loadMessages();
 
     }
     loadMessages(): void {
-      const userId = this.tokenStorage.getUser().id;
-      this.websocketChatService.getPersistedMessages(userId).subscribe((messages) => {
-          console.log("Received messages:", messages);
-          this.messageCount = messages.length;  // Count the number of messages
-          this.totalMessages = 100;  // Set the total number of messages for the progress bar
-      });
-  }
-  calculateProgress(current: number, total: number): string {
-    return `${(current / total) * 100}%`;
-}
-    loadDemandeAttestations(): void {
-      const authToken = this.tokenStorage.getToken();
-    
-      if (!authToken) {
-        console.error('Authorization token not found');
-        Swal.fire('Error!', 'Authorization token not found', 'error');
-        return;
-      }
-    
-      this.demandeAttestationsService.getAllDemandeAttestations(authToken).subscribe(
-        data => {
-          // Filter the data by user_id
-       
-          this.demandesAttestations = data.filter(demande => demande.user_id == this.userId);
-    
-          // Compute counts for each status
-          this.enCoursCount = this.demandesAttestations.filter(demande => demande.isApproved === 'en cours').length;
-          this.accepterCount = this.demandesAttestations.filter(demande => demande.isApproved === 'accepted').length;
-          this.refuserCount = this.demandesAttestations.filter(demande => demande.isApproved === 'refused').length;
-    
-        
-         
-        },
-        error => {
-          console.error('Error fetching demande attestations:', error);
-          // Handle error
-        }
-      );
-    }
-    fetchBadgesByUserId(userId: number): void {
-      const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage
-      if (!authToken) {
-          console.error('Authorization token not found');
-          Swal.fire('Error!', 'Authorization token not found', 'error');
-
-          return;
-      }
-      this.badgeService.getBadgesByUserIdTotale(userId, authToken).subscribe((data: Badge[]) => {
-         // this.badges = data;
-          console.log(data)
-          let acceptedCountBadge = 0;
-          let refusedCountBadge = 0;
-          let inProgressCountBadge = 0;
-          data.forEach(badge => {
-            if (badge.status === 'accepter') {
-              acceptedCountBadge++;
-            } else if (badge.status === 'refuser') {
-              refusedCountBadge++;
-            } else if (badge.status === 'en cours') {
-              inProgressCountBadge++;
-            }
+        const userId = this.tokenStorage.getUser().id;
+        this.websocketChatService.getPersistedMessages(userId).subscribe((messages) => {
+            console.log("Received messages:", messages);
+            this.messageCount = messages.length; // Count the number of messages
+            this.totalMessages = 100; // Set the total number of messages for the progress bar
         });
-        this.acceptedCountBadge = acceptedCountBadge;
-        this.refusedCountBadge = refusedCountBadge;
-        this.inProgressCountBadge = inProgressCountBadge;
-      }, error => {
-          console.log(error); // Handle error
-      });
-  }
+    }
+    calculateProgress(current : number, total : number): string {
+        return `${
+            (current / total) * 100
+        }%`;
+    }
+    loadDemandeAttestations(): void {
+        const authToken = this.tokenStorage.getToken();
+
+        if (! authToken) {
+            console.error('Authorization token not found');
+            Swal.fire('Error!', 'Authorization token not found', 'error');
+            return;
+        }
+
+        this.demandeAttestationsService.getAllDemandeAttestations(authToken).subscribe(data => { // Filter the data by user_id
+
+            this.demandesAttestations = data.filter(demande => demande.user_id == this.userId);
+
+            // Compute counts for each status
+            this.enCoursCount = this.demandesAttestations.filter(demande => demande.isApproved === 'en cours').length;
+            this.accepterCount = this.demandesAttestations.filter(demande => demande.isApproved === 'accepted').length;
+            this.refuserCount = this.demandesAttestations.filter(demande => demande.isApproved === 'refused').length;
+
+
+        }, error => {
+            console.error('Error fetching demande attestations:', error);
+            // Handle error
+        });
+    }
+    fetchBadgesByUserId(userId : number): void {
+        const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage
+        if (! authToken) {
+            console.error('Authorization token not found');
+            Swal.fire('Error!', 'Authorization token not found', 'error');
+
+            return;
+        }
+        this.badgeService.getBadgesByUserIdTotale(userId, authToken).subscribe((data : Badge[]) => { // this.badges = data;
+            console.log(data)
+            this.prepareBadgeChartData(data);
+
+            let acceptedCountBadge = 0;
+            let refusedCountBadge = 0;
+            let inProgressCountBadge = 0;
+            data.forEach(badge => {
+                if (badge.status === 'accepter') {
+                    acceptedCountBadge++;
+                } else if (badge.status === 'refuser') {
+                    refusedCountBadge++;
+                } else if (badge.status === 'en cours') {
+                    inProgressCountBadge++;
+                }
+            });
+            this.acceptedCountBadge = acceptedCountBadge;
+            this.refusedCountBadge = refusedCountBadge;
+            this.inProgressCountBadge = inProgressCountBadge;
+        }, error => {
+            console.log(error); // Handle error
+        });
+    }
+    prepareBadgeChartData(data : Badge[]): void {
+        const acceptedBadges = data.filter(badge => badge.status === 'accepter');
+        const refusedBadges = data.filter(badge => badge.status === 'refuser');
+        const InprogressBadges = data.filter(badge => badge.status === 'en cours');
+
+        const acceptedCount = acceptedBadges.length;
+        const InprogressCount = InprogressBadges.length;
+
+        const refusedCount = refusedBadges.length;
+        this.badgeChartLabels = ['Accepted', 'Refused'  , 'In Progress'];
+        this.badgeChartData = [{
+                data: [
+                    acceptedCount, refusedCount , InprogressCount
+                ],
+                label: 'Badges'
+            }];
+    }
     fetchRequestCounts(): void {
         if (!this.userId) {
             console.error('User ID not found.');

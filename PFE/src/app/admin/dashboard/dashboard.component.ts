@@ -116,10 +116,6 @@ public attestationDemandChartPlugins = [];
     this.fetchBadges();
     this.loadDemandeAttestations();
     this.loadCongerMaladieList();
-
-  
-
-
   }
   loadUsers() {
     // Set the auth token before fetching users
