@@ -1,55 +1,145 @@
-import {HttpClient} from '@angular/common/http';
-import {Component, HostListener, OnInit} from '@angular/core';
-import {Router} from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
-import {DemandeAttestations} from 'src/app/Models/DemandeAttestations';
-import {Badge} from 'src/app/Models/badge';
-import {BadgeService} from 'src/app/Service/BadgeService/BadgeService/badge-service.service';
-import {DemandeAttestationsService} from 'src/app/Service/DemandeAttestations/demande-attestations.service';
-import {ScriptStyleLoaderService} from 'src/app/Service/ScriptStyleLoaderService/script-style-loader-service.service';
-import {WebsocketChatService} from 'src/app/Service/websocketChat/websocket-chat.service';
-import {TokenStorageService} from 'src/app/_services/token-storage.service';
+import { DemandeAttestations } from 'src/app/Models/DemandeAttestations';
+import { Badge } from 'src/app/Models/badge';
+import { BadgeService } from 'src/app/Service/BadgeService/BadgeService/badge-service.service';
+import { DemandeAttestationsService } from 'src/app/Service/DemandeAttestations/demande-attestations.service';
+import { ScriptStyleLoaderService } from 'src/app/Service/ScriptStyleLoaderService/script-style-loader-service.service';
+import { WebsocketChatService } from 'src/app/Service/websocketChat/websocket-chat.service';
+import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import Swal from 'sweetalert2';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
 
-@Component({selector: 'app-home', templateUrl: './home.component.html', styleUrls: ['./home.component.css']})
+@Component({ selector: 'app-home', templateUrl: './home.component.html', styleUrls: ['./home.component.css'] })
 export class HomeComponent implements OnInit {
-    roles : string[] = [];
+    roles: string[] = [];
     fileName !: string; // Add fileName property to store the image file name
     userId !: number; // Add userId property to store the user's ID
     image !: string; // Add image property to store the image URL
-    username : any;
-    elementRef : any;
-    isUICollapsed : boolean = false;
-    inProgressCount : number = 0;
-    acceptedCount : number = 0;
-    refusedCount : number = 0;
-    acceptedCountBadge : number = 0;
-    refusedCountBadge : number = 0;
-    inProgressCountBadge : number = 0;
-    demandesAttestations : DemandeAttestations[] = [];
-    enCoursCount : number = 0;
-    accepterCount : number = 0;
-    refuserCount : number = 0;
-    messageCount : number = 0;
+    username: any;
+    elementRef: any;
+    isUICollapsed: boolean = false;
+    inProgressCount: number = 0;
+    acceptedCount: number = 0;
+    refusedCount: number = 0;
+    acceptedCountBadge: number = 0;
+    refusedCountBadge: number = 0;
+    inProgressCountBadge: number = 0;
+    demandesAttestations: DemandeAttestations[] = [];
+    enCoursCount: number = 0;
+    accepterCount: number = 0;
+    refuserCount: number = 0;
+    messageCount: number = 0;
     totalMessages !: number;
-    public badgeChartData : ChartDataSets[] = [];
-    public badgeChartLabels : Label[] = [];
-    public badgeChartOptions : ChartOptions = {
+    public badgeChartData: ChartDataSets[] = [];
+    public badgeChartLabels: Label[] = [];
+    public badgeChartOptions: ChartOptions = {
         responsive: true
     };
-    public badgeChartColors : Color[] = [{
-            backgroundColor: [
-                'rgba(0, 255, 0, 0.5)', 'rgba(255, 0, 0, 0.5)'
-            ], // Green for Accepted, Red for Refused
-        },];
+    public badgeChartColors: Color[] = [{
+        backgroundColor: [
+            'rgba(0, 255, 0, 0.5)', 'rgba(255, 0, 0, 0.5)'
+        ], // Green for Accepted, Red for Refused
+    },];
 
     public badgeChartLegend = true;
-    public badgeChartType : ChartType = 'pie'; // Change the chart type to pie
+    public badgeChartType: ChartType = 'pie'; // Change the chart type to pie
     public badgeChartPlugins = [];
 
-    constructor(public websocketChatService : WebsocketChatService, private demandeAttestationsService : DemandeAttestationsService, private badgeService : BadgeService, private http : HttpClient, private router : Router, private scriptStyleLoaderService : ScriptStyleLoaderService, private tokenStorage : TokenStorageService) {}
+
+
+    public requestChartData: ChartDataSets[] = [];
+    public requestChartLabels: Label[] = [];
+    public requestChartOptions: ChartOptions = {
+        responsive: true
+    };
+    public requestChartColors: Color[] = [{
+        backgroundColor: [
+            'rgba(0, 123, 255, 0.5)', // Blue for In Progress
+            'rgba(40, 167, 69, 0.5)', // Green for Accepted
+            'rgba(220, 53, 69, 0.5)'  // Red for Refused
+        ],
+    }];
+    public requestChartLegend = true;
+    public requestChartType: ChartType = 'doughnut';
+    public requestChartPlugins = [];
+
+
+    public demandeChartData: ChartDataSets[] = [];
+    public demandeChartLabels: Label[] = [];
+    public demandeChartOptions: ChartOptions = {
+        responsive: true,
+        scales: { xAxes: [{}], yAxes: [{}] },
+        plugins: {
+            datalabels: {
+                anchor: 'end',
+                align: 'end',
+            }
+        }
+    };
+    public demandeChartColors: Color[] = [{
+        backgroundColor: [
+            this.generateRandomColor(),
+            this.generateRandomColor(),
+            this.generateRandomColor()
+        ],
+        borderColor: [
+            this.generateRandomColor(),
+            this.generateRandomColor(),
+            this.generateRandomColor()
+        ]
+    }];
+    public demandeChartLegend = true;
+    public demandeChartType: ChartType = 'bar';
+    public demandeChartPlugins = [];
+
+
+    public dailyMessageCounts: number[] = [];
+    public messageDates: Label[] = [];
+    public lineChartData: ChartDataSets[] = []; // Chart data
+    public lineChartLabels: Label[] = []; // Chart labels
+  
+    public lineChartOptions: ChartOptions = {
+      responsive: true,
+      scales: {
+        xAxes: [{
+          type: 'time',
+          time: {
+            unit: 'day' // Display data by day
+          },
+          scaleLabel: {
+            display: true,
+            labelString: 'Date'
+          }
+        }],
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          },
+          scaleLabel: {
+            display: true,
+            labelString: 'Message Count'
+          }
+        }]
+      },
+      plugins: {
+        datalabels: {
+          display: false
+        }
+      }
+    };
+    public lineChartColors = [{
+      borderColor: 'rgba(77, 166, 255, 1)',
+      backgroundColor: 'rgba(77, 166, 255, 0.2)',
+    }];
+    public lineChartLegend = true;
+    public lineChartType: ChartType = 'line';
+    public lineChartPlugins = [];
+
+    constructor(public websocketChatService: WebsocketChatService, private demandeAttestationsService: DemandeAttestationsService, private badgeService: BadgeService, private http: HttpClient, private router: Router, private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
     ngOnInit(): void {
         this.loadScriptsAndStyles();
@@ -61,7 +151,6 @@ export class HomeComponent implements OnInit {
             this.image = this.getImageUrl(); // Call getImageUrl() to construct the image URL
 
         }
-
         this.fetchRequestCounts();
         this.fetchBadgesByUserId(this.userId);
         this.loadDemandeAttestations();
@@ -72,19 +161,22 @@ export class HomeComponent implements OnInit {
         const userId = this.tokenStorage.getUser().id;
         this.websocketChatService.getPersistedMessages(userId).subscribe((messages) => {
             console.log("Received messages:", messages);
+            // Calculate daily message counts
             this.messageCount = messages.length; // Count the number of messages
             this.totalMessages = 100; // Set the total number of messages for the progress bar
         });
     }
-    calculateProgress(current : number, total : number): string {
-        return `${
-            (current / total) * 100
-        }%`;
+
+
+
+    calculateProgress(current: number, total: number): string {
+        return `${(current / total) * 100
+            }%`;
     }
     loadDemandeAttestations(): void {
         const authToken = this.tokenStorage.getToken();
 
-        if (! authToken) {
+        if (!authToken) {
             console.error('Authorization token not found');
             Swal.fire('Error!', 'Authorization token not found', 'error');
             return;
@@ -99,21 +191,48 @@ export class HomeComponent implements OnInit {
             this.accepterCount = this.demandesAttestations.filter(demande => demande.isApproved === 'accepted').length;
             this.refuserCount = this.demandesAttestations.filter(demande => demande.isApproved === 'refused').length;
 
+            this.prepareDemandeChartData();
 
         }, error => {
             console.error('Error fetching demande attestations:', error);
             // Handle error
         });
     }
-    fetchBadgesByUserId(userId : number): void {
+    prepareDemandeChartData(): void {
+        this.demandeChartLabels = ['En Cours', 'Accepted', 'Refused'];
+        this.demandeChartData = [{
+            data: [this.enCoursCount, this.accepterCount, this.refuserCount],
+            label: 'Demandes',
+            backgroundColor: [
+                this.generateRandomColor(),
+                this.generateRandomColor(),
+                this.generateRandomColor()
+            ],
+            borderColor: [
+                this.generateRandomColor(),
+                this.generateRandomColor(),
+                this.generateRandomColor()
+            ],
+            borderWidth: 1
+        }];
+    }
+    generateRandomColor(): string {
+        const letters = '0123456789ABCDEF';
+        let color = '#';
+        for (let i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
+    fetchBadgesByUserId(userId: number): void {
         const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage
-        if (! authToken) {
+        if (!authToken) {
             console.error('Authorization token not found');
             Swal.fire('Error!', 'Authorization token not found', 'error');
 
             return;
         }
-        this.badgeService.getBadgesByUserIdTotale(userId, authToken).subscribe((data : Badge[]) => { // this.badges = data;
+        this.badgeService.getBadgesByUserIdTotale(userId, authToken).subscribe((data: Badge[]) => { // this.badges = data;
             console.log(data)
             this.prepareBadgeChartData(data);
 
@@ -136,7 +255,7 @@ export class HomeComponent implements OnInit {
             console.log(error); // Handle error
         });
     }
-    prepareBadgeChartData(data : Badge[]): void {
+    prepareBadgeChartData(data: Badge[]): void {
         const acceptedBadges = data.filter(badge => badge.status === 'accepter');
         const refusedBadges = data.filter(badge => badge.status === 'refuser');
         const InprogressBadges = data.filter(badge => badge.status === 'en cours');
@@ -145,13 +264,13 @@ export class HomeComponent implements OnInit {
         const InprogressCount = InprogressBadges.length;
 
         const refusedCount = refusedBadges.length;
-        this.badgeChartLabels = ['Accepted', 'Refused'  , 'In Progress'];
+        this.badgeChartLabels = ['Accepted', 'Refused', 'In Progress'];
         this.badgeChartData = [{
-                data: [
-                    acceptedCount, refusedCount , InprogressCount
-                ],
-                label: 'Badges'
-            }];
+            data: [
+                acceptedCount, refusedCount, InprogressCount
+            ],
+            label: 'Badges'
+        }];
     }
     fetchRequestCounts(): void {
         if (!this.userId) {
@@ -159,22 +278,28 @@ export class HomeComponent implements OnInit {
             return;
         }
 
-        this.http.get<any>(`/api/CongerMaladie/count/${
-            this.userId
-        }`).subscribe(response => {
-            this.inProgressCount = response.inProgress;
-            this.acceptedCount = response.accepted;
-            this.refusedCount = response.refused;
-        }, error => {
-            console.error('Error fetching request counts:', error);
-        });
+        this.http.get<any>(`/api/CongerMaladie/count/${this.userId
+            }`).subscribe(response => {
+                this.inProgressCount = response.inProgress;
+                this.acceptedCount = response.accepted;
+                this.refusedCount = response.refused;
+                this.prepareRequestChartData();
+
+            }, error => {
+                console.error('Error fetching request counts:', error);
+            });
+    }
+    prepareRequestChartData(): void {
+        this.requestChartLabels = ['In Progress', 'Accepted', 'Refused'];
+        this.requestChartData = [{
+            data: [this.inProgressCount, this.acceptedCount, this.refusedCount],
+            label: 'Requests'
+        }];
     }
     getImageUrl(): string { // Assuming your backend endpoint for retrieving images is '/api/images/'
-        return `http://localhost:8080/api/auth/images/${
-            this.userId
-        }/${
-            this.fileName
-        }`;
+        return `http://localhost:8080/api/auth/images/${this.userId
+            }/${this.fileName
+            }`;
     }
     loadScriptsAndStyles(): void {
         const SCRIPT_PATH_LIST = [
@@ -203,7 +328,7 @@ export class HomeComponent implements OnInit {
             'assets/frontoffice/images/favicon.png'
         ];
         this.scriptStyleLoaderService.loadScripts(SCRIPT_PATH_LIST),
-        this.scriptStyleLoaderService.loadStyles(STYLE_PATH_LIST)
+            this.scriptStyleLoaderService.loadStyles(STYLE_PATH_LIST)
         // Show the loader
 
     }
