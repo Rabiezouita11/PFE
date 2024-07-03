@@ -12,11 +12,12 @@
   }
   
   .message {
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
+    white-space: pre-wrap; /* Preserve white space and line breaks */
+    word-wrap: break-word; /* Break long words */
+    overflow-wrap: break-word; /* Break long words in modern browsers */
+    padding: 10px;
     border-radius: 5px;
-    padding: 8px;
-    margin-bottom: 5px;
+    max-width: 80%; /* Adjust this value as needed */
   }
   
   .input-container {
