@@ -3,7 +3,7 @@
     <form (ngSubmit)="submitForm()" [formGroup]="questionsForm">
   
       <!-- Categories -->
-      <select id="categories" class="form-control" formControlName="categories" (change)="onCategoryChange($event.target?.value)">
+      <select id="categories" class="form-control" formControlName="categories" (change)="onCategoryChange($event)">
         <option value="">Select Category</option>
         <option *ngFor="let category of categoriesList" [value]="category">{{ category }}</option>
       </select>
@@ -33,9 +33,9 @@
       <!-- Pieces Joint -->
       <div class="form-group">
         <label for="piecesJoint">Pieces Joint</label>
-        <input type="file" id="piecesJoint" class="form-control-file" formControlName="piecesJoint">
+        <input type="file" id="piecesJoint" class="form-control-file"   (change)="onFileSelected($event)"  formControlName="piecesJoint" required>
       </div>
-  
+     
       <!-- Submit Button -->
       <button type="submit" class="btn btn-primary" [disabled]="questionsForm.invalid">Submit</button>
     </form>

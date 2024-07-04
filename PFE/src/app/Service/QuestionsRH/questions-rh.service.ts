@@ -30,14 +30,21 @@ export class QuestionsRHService {
     return this.http.get<QuestionsRH>(`${this.apiUrl}/QuestionsRH/${id}`, { headers: this.getHeaders() });
   }
 
-  createQuestionsRH(questionsRH: QuestionsRH | FormData): Observable<QuestionsRH> {
-    if (questionsRH instanceof FormData) {
-      // Handle FormData for file uploads
-      return this.http.post<QuestionsRH>(`${this.apiUrl}/QuestionsRH/`, questionsRH, { headers: this.getHeaders() });
-    } else {
-      // Handle regular JSON object
-      return this.http.post<QuestionsRH>(`${this.apiUrl}/QuestionsRH/`, questionsRH, { headers: this.getHeaders() });
+  createQuestionsRH(categories: string, sousCategories: string, titre: string, descriptions: string, piecesJoint: File | null, userId: string): Observable<QuestionsRH> {
+
+    const formData: FormData = new FormData();
+    formData.append('categories', categories);
+    formData.append('sousCategories', sousCategories);
+    formData.append('titre', titre);
+    formData.append('descriptions', descriptions);
+    if (piecesJoint) {
+      formData.append('piecesJoint', piecesJoint);
     }
+    formData.append('userId', userId);
+
+    return this.http.post<QuestionsRH>(`${this.apiUrl}/QuestionsRH/add`, formData, { headers: this.getHeaders() });
+
+ 
   }
 
 

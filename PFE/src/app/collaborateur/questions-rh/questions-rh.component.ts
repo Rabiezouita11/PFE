@@ -25,6 +25,7 @@ export class QuestionsRhComponent implements OnInit {
     'Maladie': ['Arrêt de travail', 'Autre']
   };
   sousCategoriesList: string[] = [];
+  selectedFile: File | null = null;
 
   userId: number = 0; // Initialize userId, will be updated from token
 
@@ -64,8 +65,9 @@ export class QuestionsRhComponent implements OnInit {
       this.loadSubcategories(category);
     });
   }
-  onCategoryChange(category: string): void {
-    this.loadSubcategories(category);
+  onCategoryChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    this.loadSubcategories(target.value);
   }
   
   loadSubcategories(category: string): void {
@@ -83,15 +85,24 @@ export class QuestionsRhComponent implements OnInit {
 
   }
   }
-
+  onFileSelected(event: any) {
+    this.selectedFile = event.target.files[0];
+}
 
 
   submitForm(): void {
     if (this.questionsForm.valid) {
-      const formData = this.questionsForm.value;
+      console.log('selectedFile:', this.selectedFile);
 
+      const formData = this.questionsForm.value;
+      console.log('Categories:', formData.categories);
+      console.log('Sous Categories:', formData.sousCategories);
+      console.log('Titre:', formData.titre);
+      console.log('Descriptions:', formData.descriptions);
+      console.log('Pieces Joint:', formData.piecesJoint);
+      console.log('User ID:', formData.userId);
       // Call createQuestionsRH method from service
-      this.questionsRHService.createQuestionsRH(formData).subscribe(
+      this.questionsRHService.createQuestionsRH(formData.categories,formData.sousCategories ,formData.titre , formData.descriptions, this.selectedFile ,formData.userId).subscribe(
         (createdQuestion) => {
           // Handle success response
           console.log('Question created:', createdQuestion);
