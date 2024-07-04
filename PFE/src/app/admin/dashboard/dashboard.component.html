@@ -73,6 +73,8 @@
       </div>
     </div>
   </div>
+  <div class="row mt-4" *ngIf="role =='ROLE_MANAGER' ">
+
   <div class="col-md-6"  *ngIf="role == 'ROLE_MANAGER'">
     
     <div class="card">
@@ -90,7 +92,26 @@
       </div>
     </div>
   </div>
-
+</div>
+  <div class="row mt-4" *ngIf="role =='ROLE_MANAGER' ">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">QuestionsRH Chart</h5>
+          <canvas baseChart
+                  [datasets]="questionsChartData"
+                  [labels]="questionsChartLabels"
+                  [options]="questionsChartOptions"
+                  [colors]="questionsChartColors"
+                  [legend]="questionsChartLegend"
+                  [chartType]="questionsChartType"
+                  [plugins]="questionsChartPlugins">
+          </canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  
 
 
 </div>

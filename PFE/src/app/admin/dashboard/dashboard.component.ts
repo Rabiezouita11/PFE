@@ -12,6 +12,8 @@ import { DemandeAttestationsService } from 'src/app/Service/DemandeAttestations/
 import { User } from 'src/app/Models/User';
 import { UsersService } from 'src/app/Service/users/users.service';
 import { CongerMaladieService } from 'src/app/Service/CongerMaladie/conger-maladie.service';
+import { QuestionsRHService } from 'src/app/Service/QuestionsRH/questions-rh.service';
+import { QuestionsRH } from 'src/app/Models/QuestionsRH';
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -101,7 +103,33 @@ public attestationDemandChartPlugins = [];
  public leaveTypesChartLegend = true;
  public leaveTypesChartType: ChartType = 'pie';
  public leaveTypesChartPlugins = [];
-  constructor(private congerMaladieService : CongerMaladieService, private userService: UsersService,private demandeAttestationsService: DemandeAttestationsService,private badgeService: BadgeService,private attestationService: AttestationServiceService ,private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
+
+
+
+
+
+
+
+
+
+
+
+ public questionsChartData: ChartDataSets[] = [];
+ public questionsChartLabels: Label[] = [];
+ public questionsChartOptions: ChartOptions = {
+   responsive: true,
+ };
+ public questionsChartColors: Color[] = [{
+   backgroundColor: []
+ }];
+ public questionsChartLegend = true;
+ public questionsChartType: ChartType = 'bar';
+ public questionsChartPlugins = [];
+
+
+
+ 
+  constructor(private questionsRHService: QuestionsRHService ,private congerMaladieService : CongerMaladieService, private userService: UsersService,private demandeAttestationsService: DemandeAttestationsService,private badgeService: BadgeService,private attestationService: AttestationServiceService ,private router:Router,private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
   ngOnInit(): void {
     if (this.tokenStorage.getToken()) {
@@ -116,7 +144,42 @@ public attestationDemandChartPlugins = [];
     this.fetchBadges();
     this.loadDemandeAttestations();
     this.loadCongerMaladieList();
+    this.loadQuestionsRH();
+
   }
+  loadQuestionsRH(): void {
+    // Assuming QuestionsRHService.getAllQuestionsRH() returns Observable<QuestionsRH[]>
+    this.questionsRHService.getAllQuestionsRH().subscribe(
+      (data: QuestionsRH[]) => {
+        // Extract data for chart
+        const questionCounts = this.prepareQuestionsChartData(data);
+        // Set chart data
+        this.questionsChartLabels = Object.keys(questionCounts);
+        this.questionsChartData = [{
+          data: Object.values(questionCounts),
+          label: 'QuestionsRH'
+        }];
+        // Set chart colors (generate random colors)
+        this.questionsChartColors[0].backgroundColor = this.generateRandomColors(Object.keys(questionCounts).length);
+      },
+      error => {
+        console.error('Error fetching QuestionsRH:', error);
+        // Handle error, e.g., show error message
+      }
+    );
+  }
+  prepareQuestionsChartData(data: QuestionsRH[]): { [key: string]: number } {
+    // Prepare chart data (count by categories, or other relevant data)
+    const questionCounts: { [key: string]: number } = {};
+    data.forEach(question => {
+      // Aggregate counts based on categories or other attributes
+      // Example: Count questions by category
+      const category = question.categories; // Adjust as per your QuestionsRH model
+      questionCounts[category] = (questionCounts[category] || 0) + 1;
+    });
+    return questionCounts;
+  }
+  
   loadUsers() {
     // Set the auth token before fetching users
     const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage
