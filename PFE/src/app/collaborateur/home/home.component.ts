@@ -12,6 +12,8 @@ import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import Swal from 'sweetalert2';
 import { ChartDataSets, ChartOptions, ChartType } from 'chart.js';
 import { Color, Label } from 'ng2-charts';
+import { QuestionsRH } from 'src/app/Models/QuestionsRH';
+import { QuestionsRHService } from 'src/app/Service/QuestionsRH/questions-rh.service';
 
 @Component({ selector: 'app-home', templateUrl: './home.component.html', styleUrls: ['./home.component.css'] })
 export class HomeComponent implements OnInit {
@@ -139,7 +141,37 @@ export class HomeComponent implements OnInit {
     public lineChartType: ChartType = 'line';
     public lineChartPlugins = [];
 
-    constructor(public websocketChatService: WebsocketChatService, private demandeAttestationsService: DemandeAttestationsService, private badgeService: BadgeService, private http: HttpClient, private router: Router, private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
+
+
+
+    userQuestions: QuestionsRH[] = [];
+  
+    // Chart properties
+    questionCountData: ChartDataSets[] = [{ data: [], label: 'Questions Received' }];
+    questionCountLabels: Label[] = [];
+    chartOptions: ChartOptions = {
+      responsive: true,
+      scales: { 
+        xAxes: [{ 
+          ticks: { 
+            autoSkip: true, 
+            maxTicksLimit: 10 
+          } 
+        }],
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      }
+    };
+    chartType: ChartType = 'bar';
+    chartLegend = true;
+    chartPlugins = [];
+
+
+    constructor(     private questionsRHService: QuestionsRHService,
+        public websocketChatService: WebsocketChatService, private demandeAttestationsService: DemandeAttestationsService, private badgeService: BadgeService, private http: HttpClient, private router: Router, private scriptStyleLoaderService: ScriptStyleLoaderService, private tokenStorage: TokenStorageService) { }
 
     ngOnInit(): void {
         this.loadScriptsAndStyles();
@@ -155,8 +187,50 @@ export class HomeComponent implements OnInit {
         this.fetchBadgesByUserId(this.userId);
         this.loadDemandeAttestations();
         this.loadMessages();
+        this.fetchQuestionsRH();
 
     }
+
+    fetchQuestionsRH(): void {
+        const authToken = this.tokenStorage.getToken();
+    
+        if (!authToken) {
+          console.error('Authorization token not found');
+          Swal.fire('Error!', 'Authorization token not found', 'error');
+          return;
+        }
+    
+        this.questionsRHService.getQuestionsRHById(this.userId).subscribe(
+          (data: QuestionsRH[]) => {
+            this.userQuestions = data;
+            this.updateChartData();
+          },
+          (error) => {
+            console.error('Error fetching user questions:', error);
+          }
+        );
+      }
+      updateChartData(): void {
+        // Reset data arrays
+        this.questionCountLabels = [];
+        const questionCounts: number[] = [];
+    
+        // Calculate counts for each category
+        this.userQuestions.forEach(question => {
+          const category = question.categories; // Assuming 'categories' is the field for category
+          if (!this.questionCountLabels.includes(category)) {
+            this.questionCountLabels.push(category);
+            questionCounts.push(1);
+          } else {
+            const index = this.questionCountLabels.indexOf(category);
+            questionCounts[index]++;
+          }
+        });
+    
+        // Update chart data
+        this.questionCountData = [{ data: questionCounts, label: 'Questions Received' }];
+      }
+    
     loadMessages(): void {
         const userId = this.tokenStorage.getUser().id;
         this.websocketChatService.getPersistedMessages(userId).subscribe((messages) => {

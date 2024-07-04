@@ -26,10 +26,13 @@ export class QuestionsRHService {
     return this.http.get<QuestionsRH[]>(`${this.apiUrl}/QuestionsRH/`, { headers: this.getHeaders() });
   }
 
-  getQuestionsRHById(id: number): Observable<QuestionsRH> {
-    return this.http.get<QuestionsRH>(`${this.apiUrl}/QuestionsRH/${id}`, { headers: this.getHeaders() });
+  getQuestionsRHById(userId: number): Observable<QuestionsRH[]> {
+    return this.http.get<QuestionsRH[]>(`${this.apiUrl}/QuestionsRH/${userId}`, { headers: this.getHeaders() });
   }
-
+  getQuestionsRHByUserId(userId: number): Observable<QuestionsRH[]> {
+    return this.http.get<QuestionsRH[]>(`${this.apiUrl}/QuestionsRH/user/${userId}`, { headers: this.getHeaders() });
+  }
+  
   createQuestionsRH(categories: string, sousCategories: string, titre: string, descriptions: string, piecesJoint: File | null, userId: string): Observable<QuestionsRH> {
 
     const formData: FormData = new FormData();

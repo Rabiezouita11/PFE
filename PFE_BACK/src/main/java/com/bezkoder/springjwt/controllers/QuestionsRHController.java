@@ -40,8 +40,8 @@ public class QuestionsRHController {
 
     // Get a single QuestionsRH by ID
     @GetMapping("/{id}")
-    public Optional<QuestionsRH> getQuestionsRHById(@PathVariable Long id) {
-        return questionsRHRepository.findById(id);
+    public List<QuestionsRH> getQuestionsByUserId(@PathVariable Long id) {
+        return questionsRHRepository.findByUserId(id);
     }
     @GetMapping("/pdfs/{fileName:.+}")
     @ResponseBody
