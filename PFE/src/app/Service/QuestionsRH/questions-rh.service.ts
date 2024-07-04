@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment'; // Assuming you have environment configurations
 import { QuestionsRH } from 'src/app/Models/QuestionsRH';
@@ -55,4 +55,16 @@ export class QuestionsRHService {
   deleteQuestionsRH(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/QuestionsRH/${id}`, { headers: this.getHeaders() });
   }
+
+  getPdf(fileName: string, authToken: string): Observable<HttpResponse<Blob>> {
+    const headers = new HttpHeaders({ 
+        'Content-Type': 'application/pdf',
+        'Authorization': `Bearer ${authToken}` 
+    });
+    return this.http.get(`${this.apiUrl}/QuestionsRH/pdfs/${fileName}`, {
+        responseType: 'blob',
+        observe: 'response',
+        headers: headers
+    });
+}
 }

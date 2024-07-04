@@ -491,6 +491,9 @@ public class GestionnaireController {
 
         return new ResponseEntity<>(resource, headers, HttpStatus.OK);
     }
+
+
+
     @DeleteMapping("/attestations/{attestationId}")
     public ResponseEntity<?> deleteAttestation(@PathVariable Long attestationId) throws IOException {
         Optional<Attestation> attestationOptional = attestationRepository.findById(attestationId);
