@@ -204,27 +204,35 @@
       </div>
 
     </div>
-  </div>
     <div class="col-md-6 grid-margin stretch-card">
       <div class="card">
-          <div class="card-body">
-              <p class="card-title">Demande Attestations Statistics</p>
-              <div style="display: block;">
-                  <canvas baseChart
-                          [datasets]="demandeChartData"
-                          [labels]="demandeChartLabels"
-                          [options]="demandeChartOptions"
-                          [colors]="demandeChartColors"
-                          [legend]="demandeChartLegend"
-                          [chartType]="demandeChartType"
-                          [plugins]="demandeChartPlugins">
-                  </canvas>
-              </div>
+        <div class="card-body">
+          <p class="card-title">Question Rh</p>
+          <div style="display: block;">
+            <canvas baseChart [datasets]="questionCountData" [labels]="questionCountLabels" [options]="chartOptions"
+              [legend]="chartLegend" [chartType]="chartType" [plugins]="chartPlugins">
+            </canvas>
           </div>
+        </div>
       </div>
+    </div>
+    <div class="col-md-6 grid-margin stretch-card">
+      <div class="card">
+        <div class="card-body">
+          <p class="card-title">Demande Attestations Statistics</p>
+          <div style="display: block;">
+            <canvas baseChart [datasets]="demandeChartData" [labels]="demandeChartLabels" [options]="demandeChartOptions"
+              [colors]="demandeChartColors" [legend]="demandeChartLegend" [chartType]="demandeChartType"
+              [plugins]="demandeChartPlugins">
+            </canvas>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
 
-  
-  
-  </div>
+
+
+
+</div>

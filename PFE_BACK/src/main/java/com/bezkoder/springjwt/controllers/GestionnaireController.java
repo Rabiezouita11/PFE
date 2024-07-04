@@ -80,7 +80,8 @@ public class GestionnaireController {
     private SimpMessagingTemplate messagingTemplate;
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers(@AuthenticationPrincipal UserDetails userDetails) {
-        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTIONNAIRE"))) {
+        if (!userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_GESTIONNAIRE")  ||
+                a.getAuthority().equals("ROLE_MANAGER"))) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN); // User doesn't have required role
         }
 
@@ -491,6 +492,9 @@ public class GestionnaireController {
 
         return new ResponseEntity<>(resource, headers, HttpStatus.OK);
     }
+
+
+
     @DeleteMapping("/attestations/{attestationId}")
     public ResponseEntity<?> deleteAttestation(@PathVariable Long attestationId) throws IOException {
         Optional<Attestation> attestationOptional = attestationRepository.findById(attestationId);

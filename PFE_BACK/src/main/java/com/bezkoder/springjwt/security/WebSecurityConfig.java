@@ -62,6 +62,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 				.antMatchers("/notify").permitAll()
 				.antMatchers("/api/messages/**").permitAll()
 				.antMatchers("/gest/**").permitAll()
+				.antMatchers("/api/QuestionsRH/**").permitAll()
 
 				.antMatchers("/socket/**").permitAll()
 				.antMatchers("/count-unread/**").permitAll()
