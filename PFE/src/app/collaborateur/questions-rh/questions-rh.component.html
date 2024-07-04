@@ -1,1 +1,43 @@
-<p>questions-rh works!</p>
+<div class="container">
+    <h2>Add Question</h2>
+    <form (ngSubmit)="submitForm()" [formGroup]="questionsForm">
+  
+      <!-- Categories -->
+      <select id="categories" class="form-control" formControlName="categories" (change)="onCategoryChange($event.target?.value)">
+        <option value="">Select Category</option>
+        <option *ngFor="let category of categoriesList" [value]="category">{{ category }}</option>
+      </select>
+      
+  
+      <!-- Subcategories -->
+      <div class="form-group">
+        <label for="sousCategories">Subcategories</label>
+        <select id="sousCategories" class="form-control" formControlName="sousCategories">
+          <option value="">Select Subcategory</option>
+          <option *ngFor="let subcategory of sousCategoriesList" [value]="subcategory">{{ subcategory }}</option>
+        </select>
+      </div>
+  
+      <!-- Titre -->
+      <div class="form-group">
+        <label for="titre">Titre</label>
+        <input type="text" id="titre" class="form-control" formControlName="titre" placeholder="Enter Title">
+      </div>
+  
+      <!-- Descriptions -->
+      <div class="form-group">
+        <label for="descriptions">Descriptions</label>
+        <textarea id="descriptions" class="form-control" formControlName="descriptions" rows="4" placeholder="Enter Description"></textarea>
+      </div>
+  
+      <!-- Pieces Joint -->
+      <div class="form-group">
+        <label for="piecesJoint">Pieces Joint</label>
+        <input type="file" id="piecesJoint" class="form-control-file" formControlName="piecesJoint">
+      </div>
+  
+      <!-- Submit Button -->
+      <button type="submit" class="btn btn-primary" [disabled]="questionsForm.invalid">Submit</button>
+    </form>
+  </div>
+  
