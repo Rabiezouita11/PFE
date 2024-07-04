@@ -10,6 +10,7 @@ import { DemandeAttestationsComponent } from './demande-attestations/demande-att
 import { NotificationComponent } from './notification/notification.component';
 import { ChatComponent } from './chat/chat/chat.component';
 import { ChatManagerComponent } from './chat-manager/chat-manager.component';
+import { ProfileComponent } from './profile/profile.component';
 
 const routes: Routes = [
 
@@ -25,6 +26,8 @@ const routes: Routes = [
   { path: 'ChatManager', component: ChatManagerComponent , data: {title: 'Administrateur'}},
 
   { path: 'users', component: UsersComponent , data: {title: 'Administrateur'}},
+  { path: 'profile', component: ProfileComponent , data: {title: 'Administrateur'}},
+
   { path: 'Notification', component: NotificationComponent , data: {title: 'Administrateur'}},
 ];
 

@@ -76,10 +76,11 @@
           </a>
           <div class="dropdown-menu dropdown-menu-right navbar-dropdown" [ngClass]="{ 'show': dropdownOpen }"
             aria-labelledby="profileDropdown">
-            <!-- <a class="dropdown-item" routerLink="Profile">
-                  <i class="ti-settings text-primary" ></i>
-                  Settings
-                </a> -->
+      
+            <a class="dropdown-item" routerLink="profile">
+              <i class="ti-settings text-primary" ></i>
+              Settings
+            </a>
             <a (click)="logout()" class="dropdown-item">
               <i class="ti-power-off text-primary"></i>
               Logout

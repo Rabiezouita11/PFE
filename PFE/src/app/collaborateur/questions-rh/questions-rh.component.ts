@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { QuestionsRH } from 'src/app/Models/QuestionsRH';
+import { fileSizeValidator } from 'src/app/Models/file-size.validator';
 import { QuestionsRHService } from 'src/app/Service/QuestionsRH/questions-rh.service';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import Swal from 'sweetalert2';
@@ -51,7 +52,7 @@ export class QuestionsRhComponent implements OnInit {
       sousCategories: ['', Validators.required],
       titre: ['', Validators.required],
       descriptions: ['', Validators.required],
-      piecesJoint: [null],
+      piecesJoint: [null, [fileSizeValidator(1048576)]], // 1 MB in bytes
       userId: [this.userId]
     });
 
@@ -72,10 +73,23 @@ export class QuestionsRhComponent implements OnInit {
       this.userId = this.tokenStorage.getUser().id;
     }
   }
-
   onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0];
+    const file: File = event.target.files[0];
+    const maxSize = 1048576; // 1 MB in bytes
+  
+    if (file.size > maxSize) {
+      Swal.fire({
+        icon: 'error',
+        title: 'File too large',
+        text: `The selected file exceeds the maximum size of 1 MB. Please choose a smaller file.`,
+      });
+      this.selectedFile = null;
+      (this.questionsForm.get('piecesJoint') as FormControl).setValue(null); // Clear the form control
+    } else {
+      this.selectedFile = file;
+    }
   }
+  
 
   submitForm(): void {
     if (this.questionsForm.valid) {

@@ -125,9 +125,18 @@ export class AbscencsComponent implements OnInit {
             });
 
             function isStepValid(this: any, step: JQuery<HTMLElement>): boolean { // Check if the step is valid (e.g., message is entered)
-
                 let isValid: boolean = true;
-
+                if (step.attr('id') === 'leave-type-fieldset' && !$('#congerType').val()) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Oops...',
+                        text: 'Please select the type of leave!',
+                        confirmButtonText: 'OK'
+                    });
+                    isValid = false;
+                }
+        
+                
                 if (step.find('textarea[name="message"]').length > 0 && (step.find('textarea[name="message"]').val()as string).trim() === '') { // Show SweetAlert confirmation dialog
                     Swal.fire({icon: 'warning', title: 'Oops...', text: 'Please write your message!', confirmButtonText: 'OK'});
                     isValid = false;
@@ -142,10 +151,8 @@ export class AbscencsComponent implements OnInit {
                     Swal.fire({icon: 'warning', title: 'Oops...', text: 'Please select an end date!', confirmButtonText: 'OK'});
                     isValid = false;
                 }
-                if (step.attr('id') === 'conger-type' && this.congerType === '') {
-                    Swal.fire({icon: 'warning', title: 'Oops...', text: 'Please select the type of leave!', confirmButtonText: 'OK'});
-                    isValid = false;
-                }
+               
+                
                 // Check if start date is less than end date
                 const startDateValue = new Date(step.find('input[name="start_date"]').val()as string);
                 const endDateValue = new Date(step.find('input[name="end_date"]').val()as string);

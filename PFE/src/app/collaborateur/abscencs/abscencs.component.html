@@ -77,16 +77,18 @@
                             </ul>
                             <!-- fieldsets -->
                            
-                            <fieldset >
+                            <fieldset id="leave-type-fieldset">
                                 <div class="form-card">
-                                    <label for="congerType">Type de congé :</label>
-                                    <select class="form-control"name="congerType" id="congerType" [(ngModel)]="typeConger">
-                                        <option value="conger-maladie">Congé maladie</option>
-                                        <option value="conger-payer">Congé payé</option>
-                                    </select>
+                                  <label for="congerType">Type de congé :</label>
+                                  <select class="form-control" name="congerType" id="congerType" [(ngModel)]="typeConger" required>
+                                    <option value="" disabled selected>Select a type</option>
+                                    <option value="conger-maladie">Congé maladie</option>
+                                    <option value="conger-payer">Congé payé</option>
+                                  </select>
                                 </div>
                                 <input type="button" name="next" class="next action-button" value="Next Step" />
-                            </fieldset>
+                              </fieldset>
+                              
                             
                             <fieldset>
                                 <div class="form-card">
