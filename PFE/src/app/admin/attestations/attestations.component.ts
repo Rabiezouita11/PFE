@@ -23,6 +23,9 @@ export class AttestationsComponent implements OnInit {
   showUpload: boolean = false;
   showGeneratePdf: boolean = false;
   @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
+  @ViewChild('fileInput2') fileInputReff!: ElementRef<HTMLInputElement>;
+  @ViewChild('editModal', { static: false }) editModalRef!: ElementRef;
+
   @ViewChild('fileInputEdit') fileInputEditRef!: ElementRef<HTMLInputElement>;
 
   pdfName: any;
@@ -87,12 +90,24 @@ export class AttestationsComponent implements OnInit {
   }
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
+    const maxSize = 1048576; // 1 MB in bytes
+
     const allowedExtensions = ['pdf'];
 
     if (!file) {
       return; // Exit early if no file is selected
     }
-
+    if (file.size > maxSize) {
+      Swal.fire({
+        icon: 'error',
+        title: 'File too large',
+        text: `The selected file exceeds the maximum size of 1 MB. Please choose a smaller file.`,
+      });
+      this.selectedFile = null;
+      this.fileInputReff.nativeElement.value = ''; // Clear the input field
+      return;
+    }
+    
     const extension = file.name.split('.').pop()?.toLowerCase(); // Add null check with optional chaining operator (?)
 
     if (!extension || !allowedExtensions.includes(extension)) {
@@ -166,8 +181,8 @@ export class AttestationsComponent implements OnInit {
         this.name = '';
         this.isExist = false;
         this.pdfPath = ''; // Optionally reset pdfPath as well if needed
-        if (this.fileInputRef) {
-          this.fileInputRef.nativeElement.value = '';
+        if (this.fileInputReff) {
+          this.fileInputReff.nativeElement.value = '';
         }
         this.loadAttestations();
       }, error => {
@@ -266,11 +281,9 @@ export class AttestationsComponent implements OnInit {
       Swal.fire('Error!', 'Name is required', 'error');
       return;
     }
-    if (!this.selectedFileEdit) {
-      this.isExist = false;
-    } else {
+ 
       this.isExist = true;
-    }
+   
     this.attestationService.updateAttestation(this.selectedFileEdit, this.editAttestation.name,this.editAttestation.id, this.isExist, authToken)
       .subscribe(response => {
         this.message = response;
@@ -284,6 +297,9 @@ export class AttestationsComponent implements OnInit {
           this.fileInputRef.nativeElement.value = '';
         }
         this.loadAttestations();
+        this.hideEditModal();
+
+
       }, error => {
         if (error.error) {
           this.message = error.error;
@@ -294,4 +310,9 @@ export class AttestationsComponent implements OnInit {
         Swal.fire('Error!', this.message, 'error');
       });
   }
+  hideEditModal(): void {
+    const modalElement = this.editModalRef.nativeElement as HTMLElement;
+    $(modalElement).modal('hide');
+  }
+
 }

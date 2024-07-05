@@ -5,6 +5,7 @@ import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import Swal from 'sweetalert2';
 import { DemandeAttestations } from 'src/app/Models/DemandeAttestations';
 import { DemandeAttestationsService } from 'src/app/Service/DemandeAttestations/demande-attestations.service';
+import { ScriptStyleLoaderService } from 'src/app/Service/ScriptStyleLoaderService/script-style-loader-service.service';
 
 declare var $: any;
 
@@ -37,11 +38,14 @@ export class AttestaionsComponent implements OnInit {
     private http: HttpClient,
     private tokenStorage: TokenStorageService,
     private attestationService: AttestationServiceService,
+    private scriptStyleLoaderService: ScriptStyleLoaderService,
+
     private demandeAttestationsService: DemandeAttestationsService // Inject the DemandeAttestationsService
   ) { }
 
   ngOnInit(): void {
-  
+    this.loadScriptsAndStyles();
+
     if (this.tokenStorage.getToken()) {
       this.userId = this.tokenStorage.getUser().id;
       this.user.username = this.tokenStorage.getUser().username;
@@ -52,6 +56,34 @@ export class AttestaionsComponent implements OnInit {
 
   }
   
+  loadScriptsAndStyles(): void {
+    const SCRIPT_PATH_LIST = [
+      'https://code.jquery.com/jquery-3.6.0.min.js', // Load jQuery first
+      'assets/frontoffice/vendors/js/vendor.bundle.base.js',
+      'assets/frontoffice/vendors/chart.js/Chart.min.js',
+      'assets/frontoffice/js/off-canvas.js',
+      'assets/frontoffice/js/hoverable-collapse.js',
+      'assets/frontoffice/js/template.js',
+      'assets/frontoffice/js/settings.js',
+      'assets/frontoffice/js/todolist.js',
+      'assets/frontoffice/js/dashboard.js',
+      'assets/frontoffice/js/Chart.roundedBarCharts.js'
+    ];
+  
+    const STYLE_PATH_LIST = [
+      'assets/frontoffice/vendors/feather/feather.css',
+      'assets/frontoffice/vendors/ti-icons/css/themify-icons.css',
+      'assets/frontoffice/vendors/css/vendor.bundle.base.css',
+      'assets/frontoffice/vendors/datatables.net-bs4/dataTables.bootstrap4.css',
+      'assets/frontoffice/vendors/ti-icons/css/themify-icons.css',
+      'assets/frontoffice/js/select.dataTables.min.css',
+      'assets/frontoffice/css/vertical-layout-light/style.css',
+      'assets/frontoffice/images/favicon.png'
+    ];
+  
+    this.scriptStyleLoaderService.loadScripts(SCRIPT_PATH_LIST);
+    this.scriptStyleLoaderService.loadStyles(STYLE_PATH_LIST);
+  }
   openStatusModal(status: string): void {
     // Filter demandeAttestations based on the status
     const filteredDemandes = this.demandesAttestations.filter(demande => demande.isApproved === status);

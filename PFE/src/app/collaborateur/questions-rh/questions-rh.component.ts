@@ -3,6 +3,7 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { QuestionsRH } from 'src/app/Models/QuestionsRH';
 import { fileSizeValidator } from 'src/app/Models/file-size.validator';
 import { QuestionsRHService } from 'src/app/Service/QuestionsRH/questions-rh.service';
+import { ScriptStyleLoaderService } from 'src/app/Service/ScriptStyleLoaderService/script-style-loader-service.service';
 import { TokenStorageService } from 'src/app/_services/token-storage.service';
 import Swal from 'sweetalert2';
 declare var $: any;
@@ -38,14 +39,44 @@ export class QuestionsRhComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private questionsRHService: QuestionsRHService,
-    private tokenStorage: TokenStorageService
+    private tokenStorage: TokenStorageService ,
+    private scriptStyleLoaderService: ScriptStyleLoaderService,
   ) { }
 
   ngOnInit(): void {
     this.loadUserId();
     this.initForm();
-  }
+    this.loadScriptsAndStyles();
 
+  }
+  loadScriptsAndStyles(): void {
+    const SCRIPT_PATH_LIST = [
+      'https://code.jquery.com/jquery-3.6.0.min.js', // Load jQuery first
+      'assets/frontoffice/vendors/js/vendor.bundle.base.js',
+      'assets/frontoffice/vendors/chart.js/Chart.min.js',
+      'assets/frontoffice/js/off-canvas.js',
+      'assets/frontoffice/js/hoverable-collapse.js',
+      'assets/frontoffice/js/template.js',
+      'assets/frontoffice/js/settings.js',
+      'assets/frontoffice/js/todolist.js',
+      'assets/frontoffice/js/dashboard.js',
+      'assets/frontoffice/js/Chart.roundedBarCharts.js'
+    ];
+  
+    const STYLE_PATH_LIST = [
+      'assets/frontoffice/vendors/feather/feather.css',
+      'assets/frontoffice/vendors/ti-icons/css/themify-icons.css',
+      'assets/frontoffice/vendors/css/vendor.bundle.base.css',
+      'assets/frontoffice/vendors/datatables.net-bs4/dataTables.bootstrap4.css',
+      'assets/frontoffice/vendors/ti-icons/css/themify-icons.css',
+      'assets/frontoffice/js/select.dataTables.min.css',
+      'assets/frontoffice/css/vertical-layout-light/style.css',
+      'assets/frontoffice/images/favicon.png'
+    ];
+  
+    this.scriptStyleLoaderService.loadScripts(SCRIPT_PATH_LIST);
+    this.scriptStyleLoaderService.loadStyles(STYLE_PATH_LIST);
+  }
   initForm(): void {
     this.questionsForm = this.fb.group({
       categories: ['', Validators.required],

@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Badge } from 'src/app/Models/badge';
 import { BadgeService } from 'src/app/Service/BadgeService/BadgeService/badge-service.service';
@@ -15,6 +15,8 @@ export class BadgeComponent implements OnInit {
     image !: string; // Add image property to store the image URL
     imageBadge !: string; // Add image property to store the image URL
     isPrinting: boolean = false;
+    @ViewChild('fileInput2') fileInputReff!: ElementRef<HTMLInputElement>;
+    @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
 
     username: any;
     dropdownOpen: boolean = false;
@@ -96,9 +98,7 @@ export class BadgeComponent implements OnInit {
             Swal.fire('Error!', 'Error creating badge', 'error');
         });
     }
-    onFileSelected(event: any) {
-        this.selectedFile = event.target.files[0];
-    }
+  
     checkBadgeStatus() {
         const authToken = this.tokenStorage.getToken();
         if (!authToken) {
@@ -252,8 +252,68 @@ export class BadgeComponent implements OnInit {
     toggleUICollapse() {
         this.isUICollapsed = !this.isUICollapsed;
     }
+    onFileSelected(event: any) {
+        const file: File = event.target.files[0];
+        const maxSize = 1048576; // 1 MB in bytes
+        const allowedExtensions = ['png','jpg','jpeg'];
+
+        if (!file) {
+            return; // Exit early if no file is selected
+          }
+        
+          const extension = file.name.split('.').pop()?.toLowerCase(); // Add null check with optional chaining operator (?)
+          if (!extension || !allowedExtensions.includes(extension)) {
+            Swal.fire('Error!', 'Please select a png , jpeg , jpg  file.', 'error');
+            // Optionally clear the input field
+            if (this.fileInputReff) {
+              this.fileInputReff.nativeElement.value = '';
+            }
+            return;
+          }
+          if (file.size > maxSize) {
+            Swal.fire({
+              icon: 'error',
+              title: 'File too large',
+              text: `The selected file exceeds the maximum size of 1 MB. Please choose a smaller file.`,
+            });
+            this.selectedFile = null;
+            this.fileInputReff.nativeElement.value = ''; // Clear the input field
+            return;
+          }
+          this.selectedFile = file;
+
+    }
     onFileChange(event: any) {
-        this.imageFile = event.target.files[0];
+        const file: File = event.target.files[0];
+        const maxSize = 1048576; // 1 MB in bytes
+        const allowedExtensions = ['png','jpg','jpeg'];
+
+        if (!file) {
+            return; // Exit early if no file is selected
+          }
+        
+          const extension = file.name.split('.').pop()?.toLowerCase(); // Add null check with optional chaining operator (?)
+          if (!extension || !allowedExtensions.includes(extension)) {
+            Swal.fire('Error!', 'Please select a png , jpeg , jpg  file.', 'error');
+            // Optionally clear the input field
+            if (this.fileInputRef) {
+              this.fileInputRef.nativeElement.value = '';
+            }
+            return;
+          }
+          if (file.size > maxSize) {
+            Swal.fire({
+              icon: 'error',
+              title: 'File too large',
+              text: `The selected file exceeds the maximum size of 1 MB. Please choose a smaller file.`,
+            });
+            this.selectedFile = null;
+            this.fileInputRef.nativeElement.value = ''; // Clear the input field
+            return;
+          }
+          this.imageFile = file;
+
+
     }
     updateBadge() {
         const authToken = this.tokenStorage.getToken(); // Retrieve the authorization token from local storage

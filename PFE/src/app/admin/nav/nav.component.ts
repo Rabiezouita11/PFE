@@ -191,6 +191,13 @@ updateTimeDifference(): void {
 
 
       }
+      else if(notification.message.includes('Questions Rh'))
+        {
+          this.router.navigate(['/QuestionsRh']); // Replace '/badge-route' with the actual route
+  
+  
+        }
+       
      
     // Perform any other actions you need when a notification is clicked
   }

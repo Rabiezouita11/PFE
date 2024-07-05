@@ -33,6 +33,7 @@
                 type="file" 
                 id="image" 
                 class="form-control-file" 
+                #fileInput2
                 (change)="onFileSelected($event)" 
                 required>
               <div *ngIf="!selectedFile && (badgeForm.submitted || badgeForm.dirty)" class="alert alert-danger">
@@ -137,11 +138,11 @@
         </div>
         <div class="mb-3">
           <label for="matriculeInput" class="form-label">Matricule</label>
-          <input type="text" class="form-control" id="matriculeInput" [(ngModel)]="badges[0].matricule">
+          <input type="text" class="form-control" id="matriculeInput"  [(ngModel)]="badges[0].matricule">
         </div>
         <div class="mb-3">
           <label for="imageInput" class="form-label">Image</label>
-          <input type="file" class="form-control" id="imageInput" (change)="onFileChange($event)">
+          <input type="file" class="form-control" id="imageInput"  #fileInput (change)="onFileChange($event)">
         </div>
       </div>
       <div class="modal-footer">
