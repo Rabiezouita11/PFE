@@ -4,10 +4,12 @@
     <div class="form-group">
       <label for="attestationSelect">Select Attestation:</label>
       <select id="attestationSelect" class="form-control" [(ngModel)]="selectedAttestation" name="attestation">
+        <option [ngValue]="null"  selected>Select Attestation</option>
         <option *ngFor="let attestation of attestations" [ngValue]="attestation">
           {{ attestation.name }} - {{ attestation.exist ? 'crée le ' + attestation.creationDate : 'Inexiste' }}
         </option>
       </select>
+      
     </div>
 
     <h3 style="text-align: center;" *ngIf="attestations && attestations.length == 0;">No attestations available</h3>

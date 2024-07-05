@@ -24,3 +24,8 @@
     border-radius: 50%; /* Circular shape */
   }
   
+  
+  .notification-dropdown {
+    max-height: 300px; /* Adjust the max-height as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+}

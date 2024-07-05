@@ -24,7 +24,7 @@
           <a class="nav-link count-indicator dropdown-toggle" (click)="updateTimeDifference()" id="notificationDropdown" href="#" data-toggle="dropdown">
             <i class="icon-bell mx-0">{{ userNotifications.length }}</i>
           </a>
-          <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list" aria-labelledby="notificationDropdown">
+          <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list notification-dropdown" aria-labelledby="notificationDropdown">
             <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
             <ng-container *ngFor="let notification of userNotifications">
               <a class="dropdown-item preview-item">
@@ -76,11 +76,7 @@
               </div>
             </div>
         </li>
-        <li class="nav-item nav-settings d-none d-lg-flex">
-          <a class="nav-link" href="#">
-            <i class="icon-ellipsis"></i>
-          </a>
-        </li>
+       
       </ul>
       <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
         <span class="icon-menu"></span>
