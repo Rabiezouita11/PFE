@@ -17,6 +17,8 @@ export class ProfileComponent implements OnInit {
   currentPassword: string = '';
   newPassword: string = '';
   username: any;
+  fileName!: string; // Add fileName property to store the image file name
+
   constructor(
     private UsersService: UsersService,
     private http: HttpClient,
@@ -29,6 +31,8 @@ export class ProfileComponent implements OnInit {
       this.userId = this.tokenStorage.getUser().id;
       this.user.username = this.tokenStorage.getUser().username;
       this.user.email = this.tokenStorage.getUser().email;
+      this.fileName = this.tokenStorage.getUser().photos;
+      this.username = this.tokenStorage.getUser().username;
 
     }
   }
@@ -99,5 +103,8 @@ export class ProfileComponent implements OnInit {
       }
     );
   }
-
+  getImageUrl(): string {
+    // Assuming your backend endpoint for retrieving images is '/api/images/'
+    return `http://localhost:8080/api/auth/images/${this.userId}/${this.fileName}`;
+  }
 }
